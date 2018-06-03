@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Inverse Distance Weighting Test</title>
+    <meta name="description" content="Inverse Distance Weighting Test">
+    <meta name="author" content="Önder ALTINTAŞ">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <img src="http://vignette4.wikia.nocookie.net/uncyclopedia/images/f/f5/Ryu-cvs-hadoken-a.gif/revision/latest?cb=20091026065536" />
+    <div>
+      Resim genişliği(pixel):
+      <input id="WidthPx" type="number" min="1" max="5000" value=500>
+      </input>
+    </div>
+    <div>
+      Resim yüksekliği(pixel):
+      <input id="HeightPx" type="number" min="1" max="5000" value=500>
+      </input>
+    </div>
+    <div>
+      Rastgele oluşturulacak kontrol noktası sayısı:
+      <input id="ControlPoints" type="number" min="1" max="5000" value=100>
+      </input>
+    </div>
+    <div>
+      IDW power:
+      <input id="Power" type="number" min="1" max="30" value=3>
+      </input>
+    </div>
+    <div>
+      Kontrol noktası arama mesafesi:
+      <input id="SearchRadius" type="number" min="1" value=5000>
+      </input>
+    </div>
+    <button id="runAnalysis">Çalıştır</button>
+    </br>
+    <div id="startTimeDiv"></div>
+    <div id="endTimeDiv"></div>
+    <div id="differenceTimeDiv"></div>
+    <div id="canvasDiv"></div>
+    <script src="colorwithvalue.js"></script>
+    <script src="colormanager.js"></script>
+    <script src="idwmanager.js"></script>
+    <script src="test.js"></script>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+.notifier
+{
+  position:fixed;
+  z-index:9999;
+  background-color:rgba(0,0,0,0);
+  right:2%;
+  top:2%;
+}
+
+.notification
+{
+  width: 0px;
+  height: 0px;
+  background-color: rgba(0,0,0,0);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  float:left;
+  margin-right:5px;
+  margin-left: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  opacity:0;
+  -webkit-transition: all 0.5s ease-in;
+  -moz-transition: all 0.5s ease-in;
+  -ms-transition: all 0.5s ease-in;
+  -o-transition: all 0.5s ease-in;
+  transition: all 0.5s ease-in;
+
+}
+
+.connectionError
+{
+  background-image: url(../media/noconnection.png); 
+}
+
+.noInternet
+{
+  background-image: url(../media/noconnection.png); 
+}
+
+.download
+{
+  background-image: url(../media/download.png); 
+}
+
+.downloadError
+{
+  background-image: url(../media/downloaderror.png); 
+}
+
+.loading
+{
+  background-image: url(../media/loading.gif); 
+}
+
+.notificationVisible
+{
+  opacity:1;
+  width:64px;
+  height:64px;
+}

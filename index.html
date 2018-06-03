@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Small Apps</title>
+  <meta name="description" content="Small Apps">
+  <meta name="author" content="Önder ALTINTAŞ">
+  <style>
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body{
+  font-family:'Open Sans', sans-serif;
+  background:#151837;
+  width:90%;
+  margin:0 auto;
+  padding:2em 0 6em;
+}
+h1:before{
+  content: "// ";
+}
+h1{
+  font-size:3em;
+  color:#fefefe;
+  text-transform:lowercase;
+}
+.wrapper{
+  margin:3em 0;
+}
+a,a:visited,a:hover,a:active{
+  -webkit-backface-visibility:hidden;
+          backface-visibility:hidden;
+	position:relative;
+  transition:0.5s color ease;
+	text-decoration:none;
+	color:#81b3d2;
+	font-size:2.5em;
+}
+a:hover{
+	color:#d73444;
+}
+a.before:before,a.after:after{
+  content: "";
+  transition:0.5s all ease;
+  -webkit-backface-visibility:hidden;
+          backface-visibility:hidden;
+  position:absolute;
+}
+a.before:before{
+  top:-0.25em;
+}
+a.after:after{
+  bottom:-0.25em;
+}
+a.before:before,a.after:after{
+  height:5px;
+  height:0.35rem;
+  width:0;
+  background:#d73444;
+}
+a.first:after{
+  left:0;
+}
+a.second:after{
+  right:0;
+}
+a.third:after,a.sixth:before,a.sixth:after{
+  left:50%;
+  -webkit-transform:translateX(-50%);
+          transform:translateX(-50%);
+}
+a.fourth:before,a.fourth:after{
+  left:0;
+}
+a.fifth:before,a.fifth:after{
+  right:0;
+}
+a.seventh:before{
+  right:0;
+}
+a.seventh:after{
+  left:0;
+}
+a.eigth:before{
+  left:0;
+}
+a.eigth:after{
+  right:0;
+}
+a.before:hover:before,a.after:hover:after{
+  width:100%;
+}
+.square{
+  box-sizing:border-box;
+  margin-left:-0.4em;
+  position:relative;
+  font-size:2.5em;
+  overflow:hidden;
+}
+.square a{
+  position:static;
+  font-size:100%;
+  padding:0.2em 0.4em;
+}
+.square:before,.square:after{
+  content: "";
+  box-sizing:border-box;
+  transition:0.25s all ease;
+  -webkit-backface-visibility:hidden;
+          backface-visibility:hidden;
+  position:absolute;
+  width:5px;
+  width:0.35rem;
+  height:0;
+  background:#d73444;
+}
+.square:before{
+  left:0;
+  bottom:-0.2em;
+}
+.square.individual:before{
+  transition-delay:0.6s;
+}
+.square:after{
+  right:0;
+  top:-0.2em;
+}
+.square.individual:after{
+  transition-delay:0.2s;
+}
+.square a:before{
+  left:0;
+  transition:0.25s all ease;
+}
+.square a:after{
+  right:0;
+  transition:0.25s all ease;
+}
+.square.individual a:after{
+  transition:0.25s all ease 0.4s;
+}
+.square:hover:before,.square:hover:after{
+  height:calc(100% + 0.4em);
+}
+.square:hover a:before,.square:hover a:after{
+  width:100%;
+}
+  </style>
+</head>
+<body>
+<h1>Small Apps</h1> <a href="http://github.com/onderaltintas/"><h3 style="font-size:20px;">by Önder ALTINTAŞ<h3></a>
+<div class="wrapper">
+  <a class="first after" href="./parallax-game/">Parallax Game(css-coordinates)</a>
+</div>
+<div class="wrapper">
+  <a class="second after" href="./chibi-rpg/">Chibi RPG(Canvas-Early)</a>
+</div>
+<div class="wrapper">
+  <a class="third after" href="./wood-chuck-conversation/">Wood Chuck Conversation(speech synth)</a>
+</div>
+<div class="wrapper">
+  <a class="fourth before after" href="./favicon-changer/">Favicon Changer</a>
+</div>
+<div class="wrapper">
+  <a class="fifth before after" href="./visual-notifier/">Visual Notifier</a>
+</div>
+<div class="wrapper">
+  <a class="sixth before after" href="./colorization/">Colorization (with inverse distance weighting)</a>
+</div>
+<h3 style="color:white;">This page's css's were obtained from codepen: <a href="https://codepen.io/brenden/pen/RNZXqx"><h3 style="font-size:20px;">by Brenden Palmer<h3></a></h3>
+</body>
+</html>

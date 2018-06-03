@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <script src="favicon_changer.js"></script>
+  <script>
+  var favIconChanger = new FavIconChanger();
+  var i = 0;
+  var imageSrc = "favicon.png";
+  var changeIconInterval = function(){
+    i++;
+    favIconChanger.changeFavicon(i,imageSrc);
+    setTimeout(function(){
+      changeIconInterval();
+    }, 1000);
+  };
+  
+  changeIconInterval();
+  </script>
+</body>
+</html>
