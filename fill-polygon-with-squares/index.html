@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Fill with squares</title>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <div id="topBar" class="card">
+      <div class="marginSome" style="width:calc(100% - 30px);">
+            <span class="grid card"></span>
+            <span class="leftFloat">&nbsp;:&nbsp;</span>
+            <input id="oneSquare" class="borderless leftFloat card" style="width:100px;text-align:right;" type="number" value="1"></input>
+            <span class="leftFloat">m²</span>
+            <span class="grid card rightFloat"></span>
+            <span id="result" class="rightFloat">&nbsp;</span>
+            <span class="rightFloat">&nbsp;=>&nbsp;</span>
+            <span class="grid card rightFloat"></span>
+            <span id="multiplier" class="rightFloat">&nbsp;</span>
+            <span class="rightFloat">&nbsp;:&nbsp;</span>
+            <span class="grids card rightFloat"></span>
+      </div>
+    </div>
+    <script src="fill-polygon-with-squares.js"></script>
+  </body>
+</html>

@@ -1,0 +1,55 @@
+    html, body, #map{
+     font-family: 'Roboto', sans-serif;
+     width: 100%;
+     height: 100%;
+     margin: 0px;
+     padding: 0px;
+    }
+    
+    #topBar{
+      position:fixed;
+      left:20px;
+      top:20px;
+      width:600px;
+      height:40px;
+      background-color: rgba(255,255,255,0.7);
+      border-radius: 5px;
+    }
+    
+    .card{
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    }
+    
+    .grid{
+       border-color: white;
+       background-color: rgba(175,0,0,0.5);
+       width:20px;
+       height:20px;
+       float:left;
+    }
+    
+    .grids{
+       border-color: white;
+       background-color: rgba(0,175,0,0.5);
+       width:20px;
+       height:20px;
+       float:left;
+    }
+    
+    .marginSome{
+      margin:10px;
+      float: left;
+    };
+    
+    .leftFloat{
+      float: left;
+    }
+    
+    .borderless{
+      border: none;
+      border-color: transparent;
+    }
+    
+    .rightFloat{
+      float: right;
+    }
