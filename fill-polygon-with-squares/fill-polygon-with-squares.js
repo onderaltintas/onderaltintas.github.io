@@ -1,4 +1,4 @@
-  var raster = new ol.layer.Tile({
+var raster = new ol.layer.Tile({
     source: new ol.source.OSM()
   });
 
@@ -93,7 +93,7 @@
       }
     }
     
-    document.getElementById("multiplier").innerHTML = stepMultiplier + " x &nbsp;";
+    document.getElementById("multiplier").innerHTML = (stepMultiplier*stepMultiplier) + " x &nbsp;";
     document.getElementById("result").innerHTML = "&nbsp;" + (count * stepMultiplier) + " x &nbsp;";
     console.log(count);
   });
