@@ -94,7 +94,7 @@ var raster = new ol.layer.Tile({
     }
     
     document.getElementById("multiplier").innerHTML = (stepMultiplier*stepMultiplier) + " x &nbsp;";
-    document.getElementById("result").innerHTML = "&nbsp;" + (count * stepMultiplier) + " x &nbsp;";
+    document.getElementById("result").innerHTML = "&nbsp;" + (count * stepMultiplier * stepMultiplier) + " x &nbsp;";
     console.log(count);
   });
      
