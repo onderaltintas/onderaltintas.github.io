@@ -1,6 +1,12 @@
-var raster = new ol.layer.Tile({
+  var raster = new ol.layer.Tile({
     source: new ol.source.OSM()
   });
+  
+  var mapBoxTile = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+      url: 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZWxlY3Ryb25pY3BhbmRhIiwiYSI6ImNpcGdzZTJucDAwMTl2bW50OWZhcWdzZ2MifQ.NoouUSbSRMmpOboh2oRtFA'
+    })
+  })
 
   var drawingSource = new ol.source.Vector({wrapX: false});
 
@@ -30,7 +36,7 @@ var raster = new ol.layer.Tile({
   })
 
   var map = new ol.Map({
-    layers: [raster, gridVector, drawingVector],
+    layers: [mapBoxTile, gridVector, drawingVector],
     target: 'map',
     view: new ol.View({
       center: [-11000000, 4600000],
@@ -66,7 +72,7 @@ var raster = new ol.layer.Tile({
     var extent = drawnGeometry.getExtent();
     var ring = [];
     var count = 0;
-    var minStep = document.getElementById("oneSquare").value;
+    var minStep = Math.sqrt(document.getElementById("onePerson").value);
     var extentArea = (extent[2] - extent[0]) * (extent[3] - extent[1]);
     var maximumNumberOfSquares = 1000;
     var stepMultiplier = 1;
@@ -93,9 +99,8 @@ var raster = new ol.layer.Tile({
       }
     }
     
-    document.getElementById("multiplier").innerHTML = (stepMultiplier*stepMultiplier) + " x &nbsp;";
+    document.getElementById("multiplier").innerHTML = (stepMultiplier * stepMultiplier) + " x &nbsp;";
     document.getElementById("result").innerHTML = "&nbsp;" + (count * stepMultiplier * stepMultiplier) + " x &nbsp;";
-    console.log(count);
   });
      
   map.addInteraction(draw);
