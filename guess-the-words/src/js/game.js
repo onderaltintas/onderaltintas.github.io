@@ -257,7 +257,7 @@ function toasty(){
 }
 
 function playToasty(){
-  var audio = new Audio('../sound/toasty.ogg');
+  var audio = new Audio('src/sound/toasty.ogg');
   audio.play();
 }
 
