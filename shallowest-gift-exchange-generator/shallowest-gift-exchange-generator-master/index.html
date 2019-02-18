@@ -1,0 +1,105 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Christmas Gift Exchange</title>
+  <meta name="description" content="Sweepstake Randomizer">
+  <meta name="author" content="Önder">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
+ <div class="container">
+ <br>
+ <div>
+ <button id="sweepstakeButton" type="button" class="btn btn-primary" aria-label="Right Align" disabled><i class="glyphicon glyphicon-gift"></i>&nbsp; Sweepstake!</button>  
+ </div>
+  <h3>People</h3>
+<ul id="peopleList" class="list-group">
+</ul>
+  <h3>Results</h3>
+<ul id="resultList" class="list-group">
+</ul>
+<form class="form-inline">
+<input type="text" id="nameInput" placeholder="Name">
+<input type="text" id="emailInput" placeholder="E-Mail address">
+<button id="addButton" type="button" class="btn btn-primary btn-xs" aria-label="Left Align"><i class="glyphicon glyphicon-plus"></i><i class="glyphicon glyphicon-user"></i></button>  
+</form>
+</div>
+<body>
+  <script>
+	var peopleArray = new Array();
+	var sweepStakeArray = new Array();
+	var addPerson = function() 
+	{
+		var name = document.getElementById("nameInput").value; //.value gets input values
+		var email = document.getElementById("emailInput").value;
+		if(name == "" || email == "")
+		{
+			return false;
+		}
+		
+		var text ="Name: "+name+", E-mail:"+email;
+		text += "<button id='removePersonButton"+name+"' class='btn btn-danger pull-right btn-xs RbtnMargin' type='button' onClick='removePerson(this)'><i class='glyphicon glyphicon-minus'></i><i class='glyphicon glyphicon-user'></i></button>";
+		var li = "<li id='personListItem"+name+"' class='list-group-item'>" + text + "</li>";
+		document.getElementById("peopleList").innerHTML += li;
+		peopleArray.push({name: name, email: email});
+		if(peopleArray.length %2 == 0)
+		{
+			document.getElementById('sweepstakeButton').disabled = false;
+			return true;
+		}
+		
+		document.getElementById('sweepstakeButton').disabled = true;
+	}
+	
+	var removePerson = function(buttonElement)
+	{
+		var name = buttonElement.id.replace("removePersonButton","");
+		var selectedElementId = "personListItem"+name;
+		var selectedElement = document.getElementById(selectedElementId);
+		selectedElement.parentNode.removeChild(selectedElement);
+		var personFromArray = peopleArray.find(function (person) {
+															return person.name === name;
+														});
+		peopleArray = peopleArray.filter(function(returnableObjects){
+															   return returnableObjects !== personFromArray;
+														});
+		if(peopleArray.length %2 == 0)
+		{
+			document.getElementById('sweepstakeButton').disabled = false;
+			return true;
+		}
+		
+		document.getElementById('sweepstakeButton').disabled = true;
+	}
+	
+	var doSweepStake = function()
+	{
+		if(peopleArray.length == 0) 
+		{
+			return false;
+		}
+		
+		var peopleArray1 = peopleArray.slice(), // copy array
+			peopleArray2 = peopleArray.slice();
+			resultListContent = "";
+	    sweepStakeArray = new Array();
+		peopleArray1.sort(function() { return 0.5 - Math.random();}); 
+		peopleArray2.sort(function() { return 0.5 - Math.random();});
+		while (peopleArray1.length) {
+			var person1 = peopleArray1.pop(),
+				person2 = peopleArray2[0].name + peopleArray2[0].email == person1.name + person1.email ? peopleArray2.pop() : peopleArray2.shift();
+		    sweepStakeArray.push({ person1: person1, person2: person2 });
+			resultListContent += "<li class='list-group-item'>" + person1.name +" => "+ person2.name + "</li>"
+		}
+		
+		document.getElementById("resultList").innerHTML = resultListContent;
+	}
+	
+	document.getElementById("addButton").onclick = addPerson;
+	document.getElementById("sweepstakeButton").onclick = doSweepStake;
+  </script>
+</body>
+</html>
