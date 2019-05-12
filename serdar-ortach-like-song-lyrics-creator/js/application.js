@@ -16,7 +16,16 @@ function SongCreator() {
   ];
   
   this.kareokeSong = document.createElement('audio');
-  this.kareokeSong.setAttribute('src', 'assets/referenceMusicKareoke.mp3');
+  this.kareokeSong.preload = "auto";
+  if(browserCanPlay('audio/mpeg')){
+      this.kareokeSong.setAttribute('src', 'assets/referenceMusicKareoke.mp3');
+  } else if (browserCanPlay('audio/webm')){
+      this.kareokeSong.setAttribute('src', 'assets/referenceMusicKareoke.webm');
+  } else if (browserCanPlay('audio/ogg')){
+      this.kareokeSong.setAttribute('src', 'assets/referenceMusicKareoke.ogg');
+  } else {
+      document.getElementById("placeForLyrics").innerHTML = "no audio support!!! Probly internet explorer :(";
+  }
 }
 
 /*Creating lyrics style is up to coder. This part is subject to change. It is not 4,4,2*/
@@ -108,7 +117,7 @@ function createWordDom(word, domId) {
 }
 
 SongCreator.prototype.kareoke = function(lyricsArray) {
-  var kareokeStartTime = 10000;
+  var kareokeStartTime = 7000;
   var self = this;
   setTimeout(function() {
      self.startKareoke(lyricsArray);
@@ -129,6 +138,9 @@ SongCreator.prototype.startKareoke = function(lyricsArray) {
   var currentWord = 0;
   function enlightWord(wordNo) {
     var previousWordNo = wordNo - 1 < 0 ? wordCount - 1 : wordNo - 1;
+    if(!document.getElementById("word" + previousWordNo)){
+      return;
+    }
     document.getElementById("word" + previousWordNo).classList.remove("kareokeWordEnlight");;
     document.getElementById("word" + wordNo).classList.add("kareokeWordEnlight");
     currentWord = (currentWord + 1) % wordCount;
@@ -139,6 +151,11 @@ SongCreator.prototype.startKareoke = function(lyricsArray) {
 
 function getRandom(maxNumber) {
   return Math.round(Math.random() * (maxNumber - 1))
+}
+
+function browserCanPlay(format){
+  var a = document.createElement('audio');
+  return !!(a.canPlayType && a.canPlayType(format + ';').replace(/no/, ''));
 }
 
 var sc = new SongCreator();
