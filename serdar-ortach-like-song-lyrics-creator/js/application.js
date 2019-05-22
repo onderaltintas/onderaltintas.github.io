@@ -33,17 +33,21 @@ SongCreator.prototype.createLyrics = function() {
   var firstPart = [];
   var secondPart = [];
   var chorus = [];
-
+  
+  var firstPartWordsClone = this.firstPartWords.slice(0);
+  var secondPartWordsClone = this.secondPartWords.slice(0);
+  var chorusWordsClone = this.chorusWords.slice(0);
+  
   for (var i = 0; i < 4; i++) {
-    firstPart.push(createSentence(this.firstPartWords));
+    firstPart.push(createSentence(firstPartWordsClone));
   }
 
   for (var i = 0; i < 4; i++) {
-    secondPart.push(createSentence(this.secondPartWords));
+    secondPart.push(createSentence(secondPartWordsClone));
   }
 
   for (var i = 0; i < 2; i++) {
-    chorus.push(createSentence(this.chorusWords));
+    chorus.push(createSentence(chorusWordsClone));
   }
 
   return [firstPart, secondPart, chorus];
@@ -81,7 +85,9 @@ function createSentence(sentenceParts) {
   var sentence = [];
   for (var i = 0; i < sentenceParts.length; i++) {
     var words = sentenceParts[i];
-    var chosenWord = words[getRandom(words.length)];
+    var wordNo = getRandom(words.length);
+    var chosenWord = words[wordNo];
+    words.splice(wordNo, 1);
     sentence.push(chosenWord);
   }
 
