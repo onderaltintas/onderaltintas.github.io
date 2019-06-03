@@ -153,13 +153,14 @@ a.before:hover:before,a.after:hover:after{
 	  }
   </style>
 	<script>
+		var advertisementPlayer;
 	function browserCanPlay(format){
 	    var a = document.createElement('audio');
 	    return !!(a.canPlayType && a.canPlayType(format + ';').replace(/no/, ''));
 	}
 		
-	function playAdvertisement(){
-		var advertisementPlayer = document.createElement('audio');
+	function loadAdvertisement(){
+		advertisementPlayer = document.createElement('audio');
 		advertisementPlayer.preload = "auto";
 		if(browserCanPlay('audio/mpeg')){
 			advertisementPlayer.setAttribute('src', './superOnder.mp3');
@@ -169,9 +170,15 @@ a.before:hover:before,a.after:hover:after{
 			advertisementPlayer.setAttribute('src', './superOnder.ogg');
 		}
 	}
+		
+		function playAdvertisement(){
+			if(advertisementPlayer){
+				advertisementPlayer.play();
+			}
+		}		
 	</script>
 </head>
-<body onload="playAdvertisement()">
+<body onload="loadAdvertisement()">
 	
 <h1>Small Apps</h1> <a href="http://github.com/onderaltintas/"><h3 style="font-size:20px;">by Önder ALTINTAŞ</h3></a>
 	<h3 style="font-size:20px;color:rgb(235,235,235);">onderaltintas@gmail.com</h3>
@@ -180,6 +187,7 @@ a.before:hover:before,a.after:hover:after{
 	<p class="safeColor">Ye can access the source codes <a style="font-size:20px;" href="https://github.com/onderaltintas">here</a></p>
 	<p class="safeColor">Ye can also reach me by using <a href="https://twitter.com/intent/tweet?screen_name=_onderaltintas_&ref_src=twsrc%5Etfw" class="twitter-mention-button" data-show-count="false">Tweet to @_onderaltintas_</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> or
 	follow me @twitter with using <a href="https://twitter.com/_onderaltintas_?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @_onderaltintas_</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+	<p class="safeColor">Notice2: You can also listen my own advertisement by clicking <button onclick="playAdvertisement()">Play advertisement</button> button which is dubbed by proffesional voice actor Ertuğrul Ulutaş. I am so happy that he did not reject my request. It is in turkish language.</p>
 <div class="wrapper">
   <a class="sixth before after" href="./arz/">Arz (Earth - Gaia) (New! 22.05.2019)</a>
 </div>	
