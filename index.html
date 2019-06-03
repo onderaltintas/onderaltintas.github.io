@@ -153,6 +153,11 @@ a.before:hover:before,a.after:hover:after{
 	  }
   </style>
 	<script>
+	function browserCanPlay(format){
+	    var a = document.createElement('audio');
+	    return !!(a.canPlayType && a.canPlayType(format + ';').replace(/no/, ''));
+	}
+		
 	function playAdvertisement(){
 		var advertisementPlayer = document.createElement('audio');
 		advertisementPlayer.preload = "auto";
