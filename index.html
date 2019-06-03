@@ -201,7 +201,7 @@
         .btn {
             box-sizing: border-box;
             appearance: none;
-            background-color: transparent;
+            background-color: blue;
             border: 2px solid red;
             border-radius: 0.6em;
             color: red;
@@ -258,10 +258,6 @@
                 advertisementPlayer.setAttribute('src', './superOnder.webm');
             } else if (browserCanPlay('audio/ogg')) {
                 advertisementPlayer.setAttribute('src', './superOnder.ogg');
-            }
-
-            document.onclick = function() {
-                playAdvertisement();
             }
         }
 
