@@ -158,9 +158,9 @@ a.before:hover:before,a.after:hover:after{
   box-sizing: border-box;
   appearance: none;
   background-color: transparent;
-  border: 2px solid $red;
+  border: 2px solid #red;
   border-radius: 0.6em;
-  color: $red;
+  color: #red;
   cursor: pointer;
   display: flex;
   align-self: center;
@@ -183,13 +183,13 @@ a.before:hover:before,a.after:hover:after{
 }
 
 	  .third {
-  border-color: $blue;
+  border-color: #blue;
   color: #fff;
-  box-shadow: 0 0 40px 40px $blue inset, 0 0 0 0 $blue;
+  box-shadow: 0 0 40px 40px $blue inset, 0 0 0 0 #blue;
   transition: all 150ms ease-in-out;
   
   &:hover {
-    box-shadow: 0 0 10px 0 $blue inset, 0 0 10px 4px $blue;
+    box-shadow: 0 0 10px 0 #blue inset, 0 0 10px 4px #blue;
   }
 }
 	  
@@ -212,7 +212,9 @@ a.before:hover:before,a.after:hover:after{
 			advertisementPlayer.setAttribute('src', './superOnder.ogg');
 		}
 		
-		playAdvertisement();
+		setTimeout(function(){
+			playAdvertisement();
+		}, 3000);
 	}
 		
 		function playAdvertisement(){
