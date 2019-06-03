@@ -1,281 +1,334 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <title>Small Apps</title>
-  <meta name="description" content="Small Applications">
-  <meta name="keywords" content="HTML,CSS,JavaScript,Canvas,HTML5,Monkey Island,Parallax,IDW,Inverse Distance">
-  <meta name="author" content="Önder ALTINTAŞ">  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <style>
-@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+    <meta charset="utf-8">
+    <title>Small Apps</title>
+    <meta name="description" content="Small Applications">
+    <meta name="keywords" content="HTML,CSS,JavaScript,Canvas,HTML5,Monkey Island,Parallax,IDW,Inverse Distance">
+    <meta name="author" content="Önder ALTINTAŞ">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Open+Sans);
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: #151837;
+            width: 90%;
+            margin: 0 auto;
+            padding: 2em 0 6em;
+        }
+        
+        h1:before {
+            content: "// ";
+        }
+        
+        h1 {
+            font-size: 3em;
+            color: #fefefe;
+            text-transform: lowercase;
+        }
+        
+        .wrapper {
+            margin: 3em 0;
+        }
+        
+        a,
+        a:visited,
+        a:hover,
+        a:active {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            position: relative;
+            transition: 0.5s color ease;
+            text-decoration: none;
+            color: #81b3d2;
+            font-size: 2.5em;
+        }
+        
+        a:hover {
+            color: #d73444;
+        }
+        
+        a.before:before,
+        a.after:after {
+            content: "";
+            transition: 0.5s all ease;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            position: absolute;
+        }
+        
+        a.before:before {
+            top: -0.25em;
+        }
+        
+        a.after:after {
+            bottom: -0.25em;
+        }
+        
+        a.before:before,
+        a.after:after {
+            height: 5px;
+            height: 0.35rem;
+            width: 0;
+            background: #d73444;
+        }
+        
+        a.first:after {
+            left: 0;
+        }
+        
+        a.second:after {
+            right: 0;
+        }
+        
+        a.third:after,
+        a.sixth:before,
+        a.sixth:after {
+            left: 50%;
+            -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+        }
+        
+        a.fourth:before,
+        a.fourth:after {
+            left: 0;
+        }
+        
+        a.fifth:before,
+        a.fifth:after {
+            right: 0;
+        }
+        
+        a.seventh:before {
+            right: 0;
+        }
+        
+        a.seventh:after {
+            left: 0;
+        }
+        
+        a.eigth:before {
+            left: 0;
+        }
+        
+        a.eigth:after {
+            right: 0;
+        }
+        
+        a.before:hover:before,
+        a.after:hover:after {
+            width: 100%;
+        }
+        
+        .square {
+            box-sizing: border-box;
+            margin-left: -0.4em;
+            position: relative;
+            font-size: 2.5em;
+            overflow: hidden;
+        }
+        
+        .square a {
+            position: static;
+            font-size: 100%;
+            padding: 0.2em 0.4em;
+        }
+        
+        .square:before,
+        .square:after {
+            content: "";
+            box-sizing: border-box;
+            transition: 0.25s all ease;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            position: absolute;
+            width: 5px;
+            width: 0.35rem;
+            height: 0;
+            background: #d73444;
+        }
+        
+        .square:before {
+            left: 0;
+            bottom: -0.2em;
+        }
+        
+        .square.individual:before {
+            transition-delay: 0.6s;
+        }
+        
+        .square:after {
+            right: 0;
+            top: -0.2em;
+        }
+        
+        .square.individual:after {
+            transition-delay: 0.2s;
+        }
+        
+        .square a:before {
+            left: 0;
+            transition: 0.25s all ease;
+        }
+        
+        .square a:after {
+            right: 0;
+            transition: 0.25s all ease;
+        }
+        
+        .square.individual a:after {
+            transition: 0.25s all ease 0.4s;
+        }
+        
+        .square:hover:before,
+        .square:hover:after {
+            height: calc(100% + 0.4em);
+        }
+        
+        .square:hover a:before,
+        .square:hover a:after {
+            width: 100%;
+        }
+        
+        .safeColor {
+            color: #E7903C;
+        }
+        /*play advertisement button style*/
+        
+        // Basic Button Style
+        .btn {
+            box-sizing: border-box;
+            appearance: none;
+            background-color: transparent;
+            border: 2px solid red;
+            border-radius: 0.6em;
+            color: red;
+            cursor: pointer;
+            display: flex;
+            align-self: center;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1;
+            margin: 20px;
+            padding: 1.2em 2.8em;
+            text-decoration: none;
+            text-align: center;
+            text-transform: uppercase;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+        
+        .btn:hover {
+            color: #fff;
+            outline: 0;
+        }
+        
+        .btn:focus {
+            color: #fff;
+            outline: 0;
+        }
+        
+        .third {
+            border-color: blue;
+            color: #fff;
+            box-shadow: 0 0 40px 40px blue inset, 0 0 0 0 blue;
+            transition: all 150ms ease-in-out;
+        }
+        
+        .third:hover {
+            box-shadow: 0 0 10px 0 blue inset, 0 0 10px 4px blue;
+        }
+    </style>
+    <script>
+        var advertisementPlayer;
 
-body{
-  font-family:'Open Sans', sans-serif;
-  background:#151837;
-  width:90%;
-  margin:0 auto;
-  padding:2em 0 6em;
-}
-h1:before{
-  content: "// ";
-}
-h1{
-  font-size:3em;
-  color:#fefefe;
-  text-transform:lowercase;
-}
-.wrapper{
-  margin:3em 0;
-}
-a,a:visited,a:hover,a:active{
-  -webkit-backface-visibility:hidden;
-          backface-visibility:hidden;
-	position:relative;
-  transition:0.5s color ease;
-	text-decoration:none;
-	color:#81b3d2;
-	font-size:2.5em;
-}
-a:hover{
-	color:#d73444;
-}
-a.before:before,a.after:after{
-  content: "";
-  transition:0.5s all ease;
-  -webkit-backface-visibility:hidden;
-          backface-visibility:hidden;
-  position:absolute;
-}
-a.before:before{
-  top:-0.25em;
-}
-a.after:after{
-  bottom:-0.25em;
-}
-a.before:before,a.after:after{
-  height:5px;
-  height:0.35rem;
-  width:0;
-  background:#d73444;
-}
-a.first:after{
-  left:0;
-}
-a.second:after{
-  right:0;
-}
-a.third:after,a.sixth:before,a.sixth:after{
-  left:50%;
-  -webkit-transform:translateX(-50%);
-          transform:translateX(-50%);
-}
-a.fourth:before,a.fourth:after{
-  left:0;
-}
-a.fifth:before,a.fifth:after{
-  right:0;
-}
-a.seventh:before{
-  right:0;
-}
-a.seventh:after{
-  left:0;
-}
-a.eigth:before{
-  left:0;
-}
-a.eigth:after{
-  right:0;
-}
-a.before:hover:before,a.after:hover:after{
-  width:100%;
-}
-.square{
-  box-sizing:border-box;
-  margin-left:-0.4em;
-  position:relative;
-  font-size:2.5em;
-  overflow:hidden;
-}
-.square a{
-  position:static;
-  font-size:100%;
-  padding:0.2em 0.4em;
-}
-.square:before,.square:after{
-  content: "";
-  box-sizing:border-box;
-  transition:0.25s all ease;
-  -webkit-backface-visibility:hidden;
-          backface-visibility:hidden;
-  position:absolute;
-  width:5px;
-  width:0.35rem;
-  height:0;
-  background:#d73444;
-}
-.square:before{
-  left:0;
-  bottom:-0.2em;
-}
-.square.individual:before{
-  transition-delay:0.6s;
-}
-.square:after{
-  right:0;
-  top:-0.2em;
-}
-.square.individual:after{
-  transition-delay:0.2s;
-}
-.square a:before{
-  left:0;
-  transition:0.25s all ease;
-}
-.square a:after{
-  right:0;
-  transition:0.25s all ease;
-}
-.square.individual a:after{
-  transition:0.25s all ease 0.4s;
-}
-.square:hover:before,.square:hover:after{
-  height:calc(100% + 0.4em);
-}
-.square:hover a:before,.square:hover a:after{
-  width:100%;
-}
-	  
-	  .safeColor{
-	  	color: #E7903C;
-	  }
-	  
-	  /*play advertisement button style*/
-	  // Basic Button Style
-.btn {
-  box-sizing: border-box;
-  appearance: none;
-  background-color: transparent;
-  border: 2px solid #red;
-  border-radius: 0.6em;
-  color: #red;
-  cursor: pointer;
-  display: flex;
-  align-self: center;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1;
-  margin: 20px;
-  padding: 1.2em 2.8em;
-  text-decoration: none;
-  text-align: center;
-  text-transform: uppercase;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 700;
+        function browserCanPlay(format) {
+            var a = document.createElement('audio');
+            return !!(a.canPlayType && a.canPlayType(format + ';').replace(/no/, ''));
+        }
 
-  &:hover,
-  &:focus {
-    color: #fff;
-    outline: 0;
-  }
-}
+        function loadAdvertisement() {
+            advertisementPlayer = document.createElement('audio');
+            advertisementPlayer.preload = "auto";
+            if (browserCanPlay('audio/mpeg')) {
+                advertisementPlayer.setAttribute('src', './superOnder.mp3');
+            } else if (browserCanPlay('audio/webm')) {
+                advertisementPlayer.setAttribute('src', './superOnder.webm');
+            } else if (browserCanPlay('audio/ogg')) {
+                advertisementPlayer.setAttribute('src', './superOnder.ogg');
+            }
 
-	  .third {
-  border-color: #blue;
-  color: #fff;
-  box-shadow: 0 0 40px 40px $blue inset, 0 0 0 0 #blue;
-  transition: all 150ms ease-in-out;
-  
-  &:hover {
-    box-shadow: 0 0 10px 0 #blue inset, 0 0 10px 4px #blue;
-  }
-}
-	  
-  </style>
-	<script>
-		var advertisementPlayer;
-	function browserCanPlay(format){
-	    var a = document.createElement('audio');
-	    return !!(a.canPlayType && a.canPlayType(format + ';').replace(/no/, ''));
-	}
-		
-	function loadAdvertisement(){
-		advertisementPlayer = document.createElement('audio');
-		advertisementPlayer.preload = "auto";
-		if(browserCanPlay('audio/mpeg')){
-			advertisementPlayer.setAttribute('src', './superOnder.mp3');
-		} else if (browserCanPlay('audio/webm')){
-			advertisementPlayer.setAttribute('src', './superOnder.webm');
-		} else if (browserCanPlay('audio/ogg')){
-			advertisementPlayer.setAttribute('src', './superOnder.ogg');
-		}
-		
-		setTimeout(function(){
-			playAdvertisement();
-		}, 3000);
-	}
-		
-		function playAdvertisement(){
-			if(advertisementPlayer){
-				advertisementPlayer.play();
-			}
-		}		
-	</script>
+            document.onclick = function() {
+                playAdvertisement();
+            }
+        }
+
+        function playAdvertisement() {
+            if (advertisementPlayer) {
+                advertisementPlayer.play();
+            }
+        }
+    </script>
 </head>
-<body onload="loadAdvertisement()">
-	
-<h1>Small Apps</h1> <a href="http://github.com/onderaltintas/"><h3 style="font-size:20px;">by Önder ALTINTAŞ</h3></a>
-	<h3 style="font-size:20px;color:rgb(235,235,235);">onderaltintas@gmail.com</h3>
-	<p class="safeColor">Notice: I am a Software Engineer. All projects here are non mobile friendly, 
-		non cross browser compatible, made@night and half arsed implementations. Don't judge me with them</p>
-	<p class="safeColor">Ye can access the source codes <a style="font-size:20px;" href="https://github.com/onderaltintas">here</a></p>
-	<p class="safeColor">Ye can also reach me by using <a href="https://twitter.com/intent/tweet?screen_name=_onderaltintas_&ref_src=twsrc%5Etfw" class="twitter-mention-button" data-show-count="false">Tweet to @_onderaltintas_</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> or
-	follow me @twitter with using <a href="https://twitter.com/_onderaltintas_?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @_onderaltintas_</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-	<p class="safeColor">Notice2: You can listen my own advertisement again by clicking <button class='btn third' onclick="playAdvertisement()">Play advertisement</button> button which is dubbed by proffesional voice actor <a style="font-size:20px;" href="https://www.youtube.com/channel/UCFpBwEn13s0QSVdmlSuOVIQ">Ertuğrul Ulutaş</a>. I am so happy that he did not reject my request. It is in turkish language.</p>
-<div class="wrapper">
-  <a class="sixth before after" href="./arz/">Arz (Earth - Gaia) (New! 22.05.2019)</a>
-</div>	
-<div class="wrapper">
-  <a class="sixth before after" href="./serdar-ortach-like-song-lyrics-creator/">Song lyrics creator with Kareoke features(Serdar Ortach styla)(New! 13.05.2019)</a>
-</div>	
-<div class="wrapper">
-  <a class="sixth before after" href="./shallowest-gift-exchange-generator/">Shallowest Gift Exchange Generator(18.02.2019)</a>
-</div>
-<div class="wrapper">
-  <a class="sixth before after" href="./guess-the-words/">Guess the words game (11.02.2019)</a>
-</div>
-<div class="wrapper">
-  <a class="first after" href="./parallax-game/">Parallax Game(css-coordinates)</a>
-</div>
-<div class="wrapper">
-  <a class="second after" href="./chibi-rpg/">Chibi RPG(Canvas-Early)</a>
-</div>
-<div class="wrapper">
-  <a class="third after" href="./wood-chuck-conversation/">Wood Chuck Conversation(speech synth)</a>
-</div>
-<div class="wrapper">
-  <a class="fourth before after" href="./favicon-changer/">Favicon Changer</a>
-</div>
-<div class="wrapper">
-  <a class="fifth before after" href="./visual-notifier/">Visual Notifier</a>
-</div>
-<div class="wrapper">
-  <a class="sixth before after" href="./colorization/">Colorization (with inverse distance weighting)</a>
-</div>
-<div class="wrapper">
-  <a class="sixth before after" href="./fill-polygon-with-squares/">OpenLayers Example (3+)</a>
-</div>
-<h3 style="color:white;">This page's css's were obtained from codepen: <a href="https://codepen.io/brenden/pen/RNZXqx"><h3 style="font-size:20px;">by Brenden Palmer<h3></a></h3>
-<h3 style="color:white;">Text color @notice place was obtained with finding safe color fitting for background with using <a href="http://colorsafe.co/"><h3 style="font-size:20px;">http://colorsafe.co/</h3></a> 
-	. Copy to clipboard functionality doesn't work by the way.</h3>
-	
-	
-	<center>
-		<h3 style="color:white;">#of ppl visited this s</h3><br/><script type="text/javascript" src="//widget.supercounters.com/ssl/hit.js"></script><script type="text/javascript">sc_hit(1542942,0,9);</script>
-	</center>
-	
 
+<body onload="loadAdvertisement()">
+
+    <h1>Small Apps</h1> <a href="http://github.com/onderaltintas/"><h3 style="font-size:20px;">by Önder ALTINTAŞ</h3></a>
+    <h3 style="font-size:20px;color:rgb(235,235,235);">onderaltintas@gmail.com</h3>
+    <p class="safeColor">Notice: I am a Software Engineer. All projects here are non mobile friendly, non cross browser compatible, made@night and half arsed implementations. Don't judge me with them</p>
+    <p class="safeColor">Ye can access the source codes <a style="font-size:20px;" href="https://github.com/onderaltintas">here</a></p>
+    <p class="safeColor">Ye can also reach me by using <a href="https://twitter.com/intent/tweet?screen_name=_onderaltintas_&ref_src=twsrc%5Etfw" class="twitter-mention-button" data-show-count="false">Tweet to @_onderaltintas_</a>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> or follow me @twitter with using <a href="https://twitter.com/_onderaltintas_?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @_onderaltintas_</a>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </p>
+    <p class="safeColor">Notice2: You can listen my own advertisement again by clicking
+        <button class='btn third' onclick="playAdvertisement()">Play advertisement</button> button which is dubbed by proffesional voice actor <a style="font-size:20px;" href="https://www.youtube.com/channel/UCFpBwEn13s0QSVdmlSuOVIQ">Ertuğrul Ulutaş</a>. I am so happy that he did not reject my request. It is in turkish language.</p>
+    <div class="wrapper">
+        <a class="sixth before after" href="./arz/">Arz (Earth - Gaia) (New! 22.05.2019)</a>
+    </div>
+    <div class="wrapper">
+        <a class="sixth before after" href="./serdar-ortach-like-song-lyrics-creator/">Song lyrics creator with Kareoke features(Serdar Ortach styla)(New! 13.05.2019)</a>
+    </div>
+    <div class="wrapper">
+        <a class="sixth before after" href="./shallowest-gift-exchange-generator/">Shallowest Gift Exchange Generator(18.02.2019)</a>
+    </div>
+    <div class="wrapper">
+        <a class="sixth before after" href="./guess-the-words/">Guess the words game (11.02.2019)</a>
+    </div>
+    <div class="wrapper">
+        <a class="first after" href="./parallax-game/">Parallax Game(css-coordinates)</a>
+    </div>
+    <div class="wrapper">
+        <a class="second after" href="./chibi-rpg/">Chibi RPG(Canvas-Early)</a>
+    </div>
+    <div class="wrapper">
+        <a class="third after" href="./wood-chuck-conversation/">Wood Chuck Conversation(speech synth)</a>
+    </div>
+    <div class="wrapper">
+        <a class="fourth before after" href="./favicon-changer/">Favicon Changer</a>
+    </div>
+    <div class="wrapper">
+        <a class="fifth before after" href="./visual-notifier/">Visual Notifier</a>
+    </div>
+    <div class="wrapper">
+        <a class="sixth before after" href="./colorization/">Colorization (with inverse distance weighting)</a>
+    </div>
+    <div class="wrapper">
+        <a class="sixth before after" href="./fill-polygon-with-squares/">OpenLayers Example (3+)</a>
+    </div>
+    <h3 style="color:white;">This page's css's were obtained from codepen: <a href="https://codepen.io/brenden/pen/RNZXqx"><h3 style="font-size:20px;">by Brenden Palmer<h3></a></h3>
+    <h3 style="color:white;">Text color @notice place was obtained with finding safe color fitting for background with using <a href="http://colorsafe.co/"><h3 style="font-size:20px;">http://colorsafe.co/</h3></a>
+    . Copy to clipboard functionality doesn't work by the way.</h3>
+
+    <center>
+        <h3 style="color:white;">#of ppl visited this s</h3>
+        <br/>
+        <script type="text/javascript" src="//widget.supercounters.com/ssl/hit.js"></script>
+        <script type="text/javascript">
+            sc_hit(1542942, 0, 9);
+        </script>
+    </center>
 </body>
 </html>
