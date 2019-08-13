@@ -96,3 +96,7 @@ html,body,#map{
 .snap{
   background-image: url("../assets/snap.png");
 }
+
+.nonRelative{
+  margin-left: 15px;
+}
