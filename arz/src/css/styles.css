@@ -92,3 +92,7 @@ html,body,#map{
 .modify{
   background-image: url("../assets/modify.png");
 }
+
+.snap{
+  background-image: url("../assets/snap.png");
+}
