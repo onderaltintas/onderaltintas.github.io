@@ -2,7 +2,7 @@
  * Creates an instance of ColorWithValue.
  * @class
  * @classdesc For colorization, to create object which has red, green, blue codes and value.
- * Önder ALTINTAÞ 03.08.2016
+ * Ã–nder ALTINTAÅž 03.08.2016
  */
 var ColorWithValue = function(r,g,b,a,value)
 {
