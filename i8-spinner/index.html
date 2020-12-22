@@ -1,0 +1,41 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>The HTML5 Herald</title>
+  <meta name="description" content="bmw spinner test">
+  <meta name="author" content="Önder">
+
+  <!--<link rel="stylesheet" href="css/styles.css?v=1.0">-->
+
+</head>
+
+<body>
+  <img id="spinner" src = ""/>
+  <script>
+	var fps = 30;
+	var imgIndex = 1;
+	var imgFile = "01.webp";
+	var spinner = document.getElementById("spinner");
+	var now = performance.now();
+	function spin(){
+		if(performance.now() - now < 1000 / fps){
+			requestAnimationFrame(spin);
+			return;
+		}
+		
+		now = performance.now();
+		imgIndex = ((imgIndex + 1) %36) +1;
+		imgFile = imgIndex+".webP";
+		imgFile = imgFile.length < 7 ? "0" + imgFile : imgFile;
+		spinner.src = "./img/"+imgFile;
+		requestAnimationFrame(spin);
+	}
+	
+	spin();
+  </script>
+  <!--<script src="js/scripts.js"></script>-->
+</body>
+</html>
