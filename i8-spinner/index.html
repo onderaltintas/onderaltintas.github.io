@@ -23,8 +23,8 @@
 	
 	function getNextFrameFile(){
 		imgIndex = ((imgIndex + 1) %36) +1;
-		imgFile = imgIndex+".webP";
-		imgFile = imgFile.length < 7 ? "0" + imgFile : imgFile;
+		imgFile = imgIndex+".png";
+		imgFile = imgFile.length <6 ? "0" + imgFile : imgFile;
 		return "./img/"+imgFile;
 	}
 
