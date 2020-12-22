@@ -20,6 +20,14 @@
 	var imgFile = "01.webp";
 	var spinner = document.getElementById("spinner");
 	var now = performance.now();
+	
+	function getNextFrameFile(){
+		imgIndex = ((imgIndex + 1) %36) +1;
+		imgFile = imgIndex+".webP";
+		imgFile = imgFile.length < 7 ? "0" + imgFile : imgFile;
+		return "./img/"+imgFile;
+	}
+
 	function spin(){
 		if(performance.now() - now < 1000 / fps){
 			requestAnimationFrame(spin);
@@ -27,14 +35,31 @@
 		}
 		
 		now = performance.now();
-		imgIndex = ((imgIndex + 1) %36) +1;
-		imgFile = imgIndex+".webP";
-		imgFile = imgFile.length < 7 ? "0" + imgFile : imgFile;
-		spinner.src = "./img/"+imgFile;
+		spinner.src = getNextFrameFile();
 		requestAnimationFrame(spin);
 	}
+
+	function preloadImage(imgFile, callback){
+		var img=new Image();
+		img.src=imgFile;
+		img.onload = callback;
+	}
 	
-	spin();
+	function preloadImages(callback){
+		var totalNumImages = 36;
+		var completedImages = 0;
+		for(var i = 0; i < totalNumImages; i++){
+			preloadImage(getNextFrameFile(),function(){
+				completedImages++;
+				if(totalNumImages === completedImages){
+					callback();
+				}
+			})
+		}
+	}
+	
+	preloadImages(spin);
+	
   </script>
   <!--<script src="js/scripts.js"></script>-->
 </body>
