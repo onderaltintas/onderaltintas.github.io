@@ -44,10 +44,10 @@ function xYılSonraBestekiParaminHali(yil, aylikKatkiPayi, yillikKatkiPayiArtisi
    birikenPara = birikenPara * (1 + devletKatkiPayi);
    var enflasyonEtkisiIleBuGunkuAlimGucu = birikenPara * (Math.pow((1 - sonOnYillikOrtalamaEnflasyon), yil));
    var sonuc = {
-	   toplamOdenenKatkiPayi: toplamOdenenKatkiPayi,
-	   sonKatkiPayi: sonKatkiPayi,
-	   birikenPara: birikenPara,
-	   enflasyonEtkisiIleBuGunkuAlimGucu: enflasyonEtkisiIleBuGunkuAlimGucu
+	   toplamOdenenKatkiPayi: Math.round(toplamOdenenKatkiPayi).toLocaleString(),
+	   sonKatkiPayi: Math.round(sonKatkiPayi).toLocaleString(),
+	   birikenPara: Math.round(birikenPara).toLocaleString(),
+	   enflasyonEtkisiIleBuGunkuAlimGucu: Math.round(enflasyonEtkisiIleBuGunkuAlimGucu).toLocaleString()
    }
    console.log(" Toplam odenen katki payi:"+ toplamOdenenKatkiPayi + " Son katkı payı:" + sonKatkiPayi);
    console.log(yil + " yıl sonra BES biriken para: " + birikenPara);
