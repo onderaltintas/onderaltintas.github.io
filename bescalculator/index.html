@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="index.css">
+<script src="bescalc.js"></script>
+</head>
+<body>
+<div class="container">
+	<h1>Bireysel Emeklilik Sistemi Gelir Hesaplama Aracı</h1>
+	<p class="text-danger">Burada yapılan hesaplamalar tahmini enflasyon ve fon artışları kullanılarak yapılmaktadır. Hata olabilir. Herhangi bir garanti/söz verilmemektedir. Kaynak kod açık ve değiştirilebilir.</p>
+	
+	<h2>Girmeniz Gerekenler</h2>
+	<div class="mb-3">
+		<label for="aylikKatkiPayi">Aylık katkı payı(TL):</label>
+		<input type="number" id="aylikKatkiPayi" name="aylikKatkiPayi" class="form-control" min="1" value="3000">
+		<div class="form-text">TL cinsinden ilk ödemeye başlayacağınız katkı payı</div>
+	</div>
+	<div class="mb-3">
+		<label for="yillikKatkiPayiArtisi" class="form-label">Yıllık katkı payı artışı(%):</label>
+		<input type="number" id="yillikKatkiPayiArtisi" name="yillikKatkiPayiArtisi" class="form-control" min="0" step=".01" value="14.66">
+		<div class="form-text">Yıllık yüzde(%) kaç artırmayı düşünüyorsunuz</div>
+	</div>
+	<div class="mb-3">
+		<label for="fonGetirisi" class="form-label">Tahmini yıllık ortalama fon getirisi(%):</label>
+		<input type="number" id="fonGetirisi" name="fonGetirisi" class="form-control" min="0" step=".01" value="30">
+		<div class="form-text">BES birikiminizle alacağınız fonların yıllık ortalama yüzde(%) kar durumu</div>
+	</div>
+	<div class="mb-3">
+		<label for="devletKatkiPayi" class="form-label">Devletin ödediği katkı(%):</label>
+		<input type="number" id="devletKatkiPayi" name="devletKatkiPayi" class="form-control" min="0" step=".01" value="30">
+		<div class="form-text">Devletin BES birikiminize yüzde(%) katkısı (tahmini %30)</div>
+	</div>
+	<div class="mb-3">
+		<label for="yillikOrtalamaEnflasyon" class="form-label">Yıllık tahmini ortalama enflasyon(%):</label>
+		<input type="number" id="yillikOrtalamaEnflasyon" name="yillikOrtalamaEnflasyon" class="form-control" min="0" step=".01" value="14.66">
+		<div class="form-text">Ortalama yıllık enflasyon tahmininiz (Son 10 yıl ortalama 14.66%)</div>
+	</div>
+	<div class="mb-3">
+		<label for="besteBulunulacakYilSayisi" class="form-label">BES'de kalınacak yıl sayısı(yıl):</label>
+		<input type="number" id="besteBulunulacakYilSayisi" name="besteBulunulacakYilSayisi" class="form-control" min="0" value="15" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+		<div class="form-text">Kaç yıl boyunca BES'de kalacağınız</div>
+	</div>
+	<button type="submit" class="btn btn-primary" onclick="besHesapla();">Hesapla</button>
+	<h2>Sonuçlar</h2>
+	<div class="mb-3">
+		<label for="sonuc" class="form-label">Sonuçlar:</label>
+		<textarea id="sonuc" name="result" class="form-control" rows="4" cols="50">
+	</textarea>
+	</div>
+		<label for="hata" class="form-label">Hatalar:</label>
+		<textarea id="hata" name="error" class="form-control" rows="4" cols="50">
+	</textarea>
+
+</div>
+</body>
+</html>
