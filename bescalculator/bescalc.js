@@ -19,8 +19,9 @@ function besHesapla(){
 		besteBulunulacakYilSayisi = document.getElementById("besteBulunulacakYilSayisi").value;
 		var sonuc = xYılSonraBestekiParaminHali(besteBulunulacakYilSayisi, aylikKatkiPayi, yillikKatkiPayiArtisi, fonGetirisi, devletKatkiPayi, yillikOrtalamaEnflasyon);
 		document.getElementById("sonuc").value = "Toplam ödenen katkı payı: " + sonuc.toplamOdenenKatkiPayi + " TL." 
-		+ "\n En son ödenen katkı payı: " + sonuc.sonKatkiPayi + " TL." +"\n BES içinde biriken toplam para: " + sonuc.birikenPara + " TL."
+		+ "\n En son ödenen katkı payı: " + sonuc.sonKatkiPayi + " TL." 
 		+ "\n En son ödenen katkı payının günümüzdeki alım gücü: " + sonuc.enSonOdenenKatkiPayininBuGunkuAlimGucu + " TL."
+		+ "\n BES içinde biriken toplam para: " + sonuc.birikenPara + " TL."
 		+ "\n Ortalama tahmini enflasyon etkisi ile biriken paranın günümüzdeki alım gücü: " + sonuc.enflasyonEtkisiIleBuGunkuAlimGucu + " TL."
 		
 	}catch(e){
