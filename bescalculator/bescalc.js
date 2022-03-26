@@ -20,6 +20,7 @@ function besHesapla(){
 		var sonuc = xYılSonraBestekiParaminHali(besteBulunulacakYilSayisi, aylikKatkiPayi, yillikKatkiPayiArtisi, fonGetirisi, devletKatkiPayi, yillikOrtalamaEnflasyon);
 		document.getElementById("sonuc").value = "Toplam ödenen katkı payı: " + sonuc.toplamOdenenKatkiPayi + " TL." 
 		+ "\n En son ödenen katkı payı: " + sonuc.sonKatkiPayi + " TL." +"\n BES içinde biriken toplam para: " + sonuc.birikenPara + " TL."
+		+ "\n En son ödenen katkı payının günümüzdeki alım gücü: " + sonuc.enSonOdenenKatkiPayininBuGunkuAlimGucu + " TL."
 		+ "\n Ortalama tahmini enflasyon etkisi ile biriken paranın günümüzdeki alım gücü: " + sonuc.enflasyonEtkisiIleBuGunkuAlimGucu + " TL."
 		
 	}catch(e){
@@ -43,11 +44,13 @@ function xYılSonraBestekiParaminHali(yil, aylikKatkiPayi, yillikKatkiPayiArtisi
    }
    birikenPara = birikenPara * (1 + devletKatkiPayi);
    var enflasyonEtkisiIleBuGunkuAlimGucu = birikenPara * (Math.pow((1 - sonOnYillikOrtalamaEnflasyon), yil));
+   var enSonOdenenKatkiPayininBuGunkuAlimGucu = sonKatkiPayi * (Math.pow((1 - sonOnYillikOrtalamaEnflasyon), yil));
    var sonuc = {
 	   toplamOdenenKatkiPayi: Math.round(toplamOdenenKatkiPayi).toLocaleString(),
 	   sonKatkiPayi: Math.round(sonKatkiPayi).toLocaleString(),
 	   birikenPara: Math.round(birikenPara).toLocaleString(),
-	   enflasyonEtkisiIleBuGunkuAlimGucu: Math.round(enflasyonEtkisiIleBuGunkuAlimGucu).toLocaleString()
+	   enflasyonEtkisiIleBuGunkuAlimGucu: Math.round(enflasyonEtkisiIleBuGunkuAlimGucu).toLocaleString(),
+	   enSonOdenenKatkiPayininBuGunkuAlimGucu: enSonOdenenKatkiPayininBuGunkuAlimGucu
    }
    console.log(" Toplam odenen katki payi:"+ toplamOdenenKatkiPayi + " Son katkı payı:" + sonKatkiPayi);
    console.log(yil + " yıl sonra BES biriken para: " + birikenPara);
