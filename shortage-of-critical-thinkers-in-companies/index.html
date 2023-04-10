@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shortage of Critical Thinkers in Companies - GIS - Precision</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div class="nav-wrapper teal">
+      <a href="#" class="brand-logo center">Shortage of Critical Thinkers in Companies - GIS - Precision</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <p>I trust my knowledge in software and GIS fields.</p><p>
+Our topic is the difficulties in defining requirements and determining their fulfillment. We have a good example of this.</p><p>
+https://www.movable-type.co.uk/scripts/latlong-utm-mgrs.html</p><p>
+In the code you can see on the above website, there is a field like this:</p><p>
+
+const lat = Number(φ.toDegrees().toFixed(14)); // nm precision (1nm = 10^-14°)</p><p>
+
+What does this mean? When converting values entered as latitude or longitude, take the decimal point up to 14 digits in nanometer precision. In other words, take into account one ten-thousandth of a millimeter in calculations.</p><p>
+By its nature, we will not need nanometer precision in GIS applications for the next 1500 years, because even the highest resolution maps we have today have a precision of centimeters at best.</p><p>
+Of course, when you try to maintain this level of precision, you also have to consider accommodating 14 digits in your user interface. Therefore, your user experience is negatively affected.</p><p>
+Given this information, do we really need to make calculations with nanometer precision? I don't think so. So what does NATO say about this:</p><p>
+https://en.wikipedia.org/wiki/Military_Grid_Reference_System#:~:text=10%20meter%20resolution%20(4%20%2B%204,NATO%20standard%20for%20specifying%20coordinates.</p><p>
+What is the UTM precision?</p><p>
+https://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system</p><p>
+They are accurate to around a millimeter within 3000 km of the central meridian.</p><p>
+I believe that there is a lack of people who can say "it's not necessary" in companies in general, except for the places I have worked at. What is 14 digits after the decimal point anyway? Do we need to look at it under a microscope?</p><p>
+The first part of the title was quoted from a Turkish forum called "Ekşi Sözlük". Since the language used there is vulgar, some changes were made to the wording to make it more appropriate. If you need a translation of that part, please let me know.</p>
+  </div>
+  <nav>
+    <div class="nav-wrapper teal">
+      <a href="#" class="brand-logo center">Şirketlerde Olmamış Diyecek Adam Eksikliği - GIS - Precision</a>
+    </div>
+  </nav>
+  <div class="container">
+<p>Şimdi ön bilgi olarak -elime yapıştığı üzere- devamlı GIS yazılım projelerinde çalıştığımı söylemem lazım. Oysa ki ben herhangi bir yazılım alanında da başarılı olduğumu düşünüyorum.</p><p>
+Yazılım ve GIS alanındaki bilgime güveniyorum. </p><p>
+
+Konumuz gereksinimlerin tanımlanmasında ve gereksinim karşılama tayininin yapılmasında yaşanan zorluklar. Buna güzel bir örneğimiz var.</p><p>
+
+https://www.movable-type.co.uk/scripts/latlong-utm-mgrs.html</p><p>
+Yukarıdaki web sitesinde görebileceğiniz kodlarda şöyle bir alan mevcut:</p><p>
+const lat = Number(φ.toDegrees().toFixed(14)); // nm precision (1nm = 10^-14°)</p><p>
+
+Bu ne demek? Enlem ya da boylam olarak girilen değerlerin nanometre seviyesinde çevrimini yaparken ondalık basamağı 14 haneye kadar al. Yani milimetrenin 100 binde bir değerini hesaba kat.</p><p>
+Doğası gereği GIS uygulamalarında şu ana kadar ve gelecek 1500 yıl boyunca nanometre hassasiyetine ihtiyacımız olmayacak. Çünkü elimizdeki en yüksek çözünürlüklü haritalar taş çatlasa santimetre hassasiyetinde.</p><p>
+Tabii siz bu hassasiyet değerini korumaya çalıştığınızda kullanıcı arayüzlerinizde de 18 hane barındırma durumunu göz önüne alıyorsunuz. Bu sebeple kullanıcı deneyiminiz de kötü yönde etkileniyor.</p><p>
+
+Elimizdeki bu bilgiler varken nanometre hassasiyetinde hesaplamalar yapmamıza gerek var mı? Bence yok. Peki NATO bu işe ne diyor:</p><p>
+https://en.wikipedia.org/wiki/Military_Grid_Reference_System#:~:text=10%20meter%20resolution%20(4%20%2B%204,NATO%20standard%20for%20specifying%20coordinates.</p><p>
+
+UTM precision'u ne kadar?</p><p>
+https://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system</p><p>
+They are accurate to around a millimeter within 3000 km of the central meridian.</p><p>
+
+Bu yüzden çalıştığım yerler hariç olmak üzere genel olarak şirketlerde olmamış diyecek adam eksikliği olduğunu düşünüyorum. Virgülden sonra 14 hane nedir yani? Mikroskopla mı bakacağız buna?</p><p>
+
+chatGPT token sınırı olduğundan ve ingilizce çevrimi ona yaptıracağımdan yazıyı kısa kesiyorum. </p><p>
+
+Başlığın ilk kısmını ekşi sözlükten alıntıladım, argo olduğu için biraz değiştirmem gerekti. </p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>
