@@ -29,7 +29,7 @@
     target: 'olContainer',
     view: view
   });
-  var istExtent = new ol.extent.boundingExtent([[45,42],[26,36]]);  
+  var istExtent = new ol.extent.boundingExtent([[26,36],[45,42]]);  
   istExtent = ol.proj.transformExtent(istExtent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
   view.fit(istExtent, map.getSize()); 
   </script>
