@@ -19,10 +19,9 @@ body { margin: 0; padding: 0; }
 	// https://account.mapbox.com
 	mapboxgl.accessToken = 'pk.eyJ1IjoiZWxlY3Ryb25pY3BhbmRhIiwiYSI6ImNpcGdzZTJucDAwMTl2bW50OWZhcWdzZ2MifQ.NoouUSbSRMmpOboh2oRtFA';
     const map = new mapboxgl.Map({
-        container: 'map', // container ID
-        center: [-74.5, 40], // starting position [lng, lat]
-        zoom: 9 // starting zoom
+        container: 'map', 
     });
+map.fitBounds([[28.646238242798773,40.931140446086175],[29.538132517282705,41.273739333978995]]);
 </script>
 
 </body>
