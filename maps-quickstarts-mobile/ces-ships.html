@@ -22,6 +22,7 @@
     // Your access token can be found at: https://ion.cesium.com/tokens.
     // Replace `your_access_token` with your Cesium ion access token.
     var DEGREE_IN_RADIAN = 0.034906585;
+    var movementDiff = 0.005;
     var numPoints = 5000;
     var images = ["blue","red","green"];
     const west = 28.646238242798773;
@@ -59,10 +60,18 @@
   var scene = viewer.cesiumWidget._scene;
   var billboards = scene.primitives.add(new Cesium.BillboardCollection());
   addBillboardsWithRotations(numPoints, west, south, east, north, billboards);
+  var bb = billboards._billboards;
   animate();
 
   function animate(){
-
+    bb.forEach(function(b){
+      var carto = Cesium.Ellipsoid.WGS84.cartesianToCartographic(pos);
+      var lon = Cesium.Math.toDegrees(carto.longitude);
+      var lat = Cesium.Math.toDegrees(carto.latitude);
+      b.rotation = b.rotation + 2 * DEGREE_IN_RADIAN;
+      b.position = [lon + dif*Math.sin(b.rotation),lat + dif*Math.cos(b.rotation)]
+    });
+    
     requestAnimationFrame(animate);
   }
 
