@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Cesium FullScreen Quick Start</title>
+  <!-- Include the CesiumJS JavaScript and CSS files -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <style>
+  html, body, #cesiumContainer{
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+  }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    // Your access token can be found at: https://ion.cesium.com/tokens.
+    // Replace `your_access_token` with your Cesium ion access token.
+    var DEGREE_IN_RADIAN = 0.0174532925;
+    var movementDiff = 0.005;
+    var numPoints = 5000;
+    var images = ["blue","red","green"];
+    const west = 28.646238242798773;
+    const south = 40.931140446086175;
+    const east = 29.538132517282705;
+    const north = 41.273739333978995;
+    let Ist = Cesium.Rectangle.fromDegrees(west,south,east,north);
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNmQ3ZWM1ZS00YTRmLTRkYjktYWQxNi0zZWNiZTllODgzZTkiLCJpZCI6MTU4MjUsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1Njg4ODg1OTJ9.LFvQbACK9dUUMLRurJQ10kyT5Zc-IChMLKNnJqDj8iw';
+    Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Ist;
+    // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      animation:false,
+      geocoder:false,
+      fullscreenButton: false,
+      baseLayerPicker: false,
+      homeButton: false,
+      infoBox: false,
+      sceneModePicker: false,
+      selectionIndicator: false,
+      timeline: false,
+      navigationInstructionsInitiallyVisible: false,
+      navigationHelpButton: false,
+      showRenderLoopErrors: false,
+      shadows: true,
+      baseLayer: new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+        url : 'https://a.tile.openstreetmap.org/'
+      })),
+      sceneMode: Cesium.SceneMode.SCENE2D,
+      mapProjection: new Cesium.WebMercatorProjection()
+    });
+
+  viewer.camera.setView({
+    destination: Ist,
+  });  
+  var scene = viewer.cesiumWidget._scene;
+  var billboards = scene.primitives.add(new Cesium.BillboardCollection());
+  addBillboardsWithRotations(numPoints, west, south, east, north, billboards);
+  var bb = billboards._billboards;
+  animate();
+
+  function animate(){
+    bb.forEach(function(b){
+      var carto = Cesium.Ellipsoid.WGS84.cartesianToCartographic(b.position);
+      var lon = Cesium.Math.toDegrees(carto.longitude);
+      var lat = Cesium.Math.toDegrees(carto.latitude);
+      var prevRotation = b.rotation
+      b.rotation =  b.rotation + 2 * DEGREE_IN_RADIAN;
+      b.position = Cesium.Cartesian3.fromDegrees(lon + movementDiff*Math.cos(b.rotation), lat + movementDiff*Math.sin(b.rotation));
+    });
+    
+    requestAnimationFrame(animate);
+  }
+
+  function addBillboardsWithRotations(numPoints, west, south, east, north, billboards) {
+    var points = [];
+    var coord, rotation, image;
+    for(var i = 0; i < numPoints; i++){
+      coord = [getRandom(west,east),getRandom(south,north)];
+      rotation = getRandom(0,360) * DEGREE_IN_RADIAN;
+      img = "./"+images[Math.floor(getRandom(0,3))] + "ship.png";
+      billboards.add({
+  			position : Cesium.Cartesian3.fromDegrees(coord[0], coord[1]),
+        rotation : rotation,
+ 				image : img
+      });
+    }
+  }
+
+  function getRandom(min, max){
+    return Math.random() * (max - min) + min;
+  }
+   
+  </script>
+ </div>
+ <button style="position: absolute; right: 5px; top: 5px; z-index:313131" onclick="addInstance">Add new cesium instance</button>
+</body>
+</html>
