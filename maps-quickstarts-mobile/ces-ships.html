@@ -68,7 +68,7 @@
       var carto = Cesium.Ellipsoid.WGS84.cartesianToCartographic(b.position);
       var lon = Cesium.Math.toDegrees(carto.longitude);
       var lat = Cesium.Math.toDegrees(carto.latitude);
-      b.rotation = Math.PI*2 - (b.rotation + 2 * DEGREE_IN_RADIAN);
+      b.rotation = b.rotation - 2 * DEGREE_IN_RADIAN;
       b.position = Cesium.Cartesian3.fromDegrees(lon + movementDiff*Math.sin(b.rotation),lat + movementDiff*Math.cos(b.rotation));
     });
     
