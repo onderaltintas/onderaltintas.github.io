@@ -95,8 +95,8 @@
     return Math.random() * (max - min) + min;
   }
 
-  var left = 0;
-  var top = 0;
+  var l = 0;
+  var t = 0;
   function addInstance(){
     var w = window.innerWidth;
     var h = window.innerHeight;
@@ -106,11 +106,11 @@
     d.style.width = instanceWidth;
     d.style.height = instanceHeight;
     d.style.position = "absolute";
-    d.style.left = left + "px";
-    d.style.top = top + "px";
+    d.style.left = l + "px";
+    d.style.top = t + "px";
     d.id = "cesiumContainer" + left + top;
-    left = top + instanceHeight >= h ? left + instanceWidth : left;
-    top = top + instanceHeight >= h ? 0 : top + instanceHeight;
+    l = t + instanceHeight >= h ? l + instanceWidth : l;
+    t = t + instanceHeight >= h ? 0 : t + instanceHeight;
     document.body.appendChild(d);
     var v = new Cesium.Viewer(d.id, {
       animation:false,
