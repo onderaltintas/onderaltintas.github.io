@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Cesium FullScreen Quick Start</title>
+  <!-- Include the CesiumJS JavaScript and CSS files -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <style>
+  html, body, #cesiumContainer{
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+  }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    // Your access token can be found at: https://ion.cesium.com/tokens.
+    // Replace `your_access_token` with your Cesium ion access token.
+    let Ist = Cesium.Rectangle.fromDegrees(28.646238242798773,40.931140446086175,29.538132517282705,41.273739333978995)
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNmQ3ZWM1ZS00YTRmLTRkYjktYWQxNi0zZWNiZTllODgzZTkiLCJpZCI6MTU4MjUsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1Njg4ODg1OTJ9.LFvQbACK9dUUMLRurJQ10kyT5Zc-IChMLKNnJqDj8iw';
+    Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Ist;
+    // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      animation:false,
+      geocoder:false,
+      fullscreenButton: false,
+      baseLayerPicker: false,
+      homeButton: false,
+      infoBox: false,
+      sceneModePicker: false,
+      selectionIndicator: false,
+      timeline: false,
+      navigationInstructionsInitiallyVisible: false,
+      navigationHelpButton: false,
+      showRenderLoopErrors: false,
+      shadows: true,
+      baseLayer: new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+        url : 'https://a.tile.openstreetmap.org/'
+      })),
+      sceneMode: Cesium.SceneMode.SCENE2D,
+      mapProjection: new Cesium.WebMercatorProjection()
+    });
+  </script>
+ </div>
+</body>
+</html>
