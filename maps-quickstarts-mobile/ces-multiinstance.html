@@ -102,16 +102,17 @@
     var h = window.innerHeight;
     instanceWidth = w/5;
     instanceHeight = h/5;
-    document.createElement("div");
-    div.style.width = instanceWidth;
-    div.style.height = instanceHeight;
-    div.style.position = absolute;
-    div.style.left = left + "px";
-    div.style.top = top + "px";
-    div.id = "cesiumContainer" + left + top;
+    var d = document.createElement("div");
+    d.style.width = instanceWidth;
+    d.style.height = instanceHeight;
+    d.style.position = absolute;
+    d.style.left = left + "px";
+    d.style.top = top + "px";
+    d.id = "cesiumContainer" + left + top;
     left = top + instanceHeight >= h ? left + instanceWidth : left;
     top = top + instanceHeight >= h ? 0 : top + instanceHeight;
-    var v = new Cesium.Viewer(div.id, {
+    document.body.appendChild(d);
+    var v = new Cesium.Viewer(d.id, {
       animation:false,
       geocoder:false,
       fullscreenButton: false,
