@@ -69,8 +69,8 @@
       var lon = Cesium.Math.toDegrees(carto.longitude);
       var lat = Cesium.Math.toDegrees(carto.latitude);
       var prevRotation = b.rotation
-      b.rotation =  prevRotation + 2 * DEGREE_IN_RADIAN + 90 * DEGREE_IN_RADIAN;
-      b.position = Cesium.Cartesian3.fromDegrees(lon + movementDiff*Math.sin(prevRotation + 2 * DEGREE_IN_RADIAN ), lat + movementDiff*Math.cos(b.rotation + 2 * DEGREE_IN_RADIAN));
+      b.rotation =  b.rotation + 2 * DEGREE_IN_RADIAN;
+      b.position = Cesium.Cartesian3.fromDegrees(lon + movementDiff*Math.cos(b.rotation), lat + movementDiff*Math.sin(b.rotation));
     });
     
     requestAnimationFrame(animate);
