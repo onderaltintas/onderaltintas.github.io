@@ -108,7 +108,7 @@
     d.style.position = "absolute";
     d.style.left = l + "px";
     d.style.top = t + "px";
-    d.id = "cesiumContainer" + left + top;
+    d.id = "cesiumContainer" + l + t;
     l = t + instanceHeight >= h ? l + instanceWidth : l;
     t = t + instanceHeight >= h ? 0 : t + instanceHeight;
     document.body.appendChild(d);
