@@ -21,7 +21,14 @@
   <script>
     // Your access token can be found at: https://ion.cesium.com/tokens.
     // Replace `your_access_token` with your Cesium ion access token.
-    let Ist = Cesium.Rectangle.fromDegrees(28.646238242798773,40.931140446086175,29.538132517282705,41.273739333978995)
+    var DEGREE_IN_RADIAN = 0.034906585;
+    var numPoints = 5000;
+    var images = ["blue","red","green"];
+    const west = 28.646238242798773;
+    const south = 40.931140446086175;
+    const east = 29.538132517282705;
+    const north = 41.273739333978995;
+    let Ist = Cesium.Rectangle.fromDegrees(west,south,east,north);
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNmQ3ZWM1ZS00YTRmLTRkYjktYWQxNi0zZWNiZTllODgzZTkiLCJpZCI6MTU4MjUsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1Njg4ODg1OTJ9.LFvQbACK9dUUMLRurJQ10kyT5Zc-IChMLKNnJqDj8iw';
     Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Ist;
     // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
@@ -45,6 +52,46 @@
       sceneMode: Cesium.SceneMode.SCENE2D,
       mapProjection: new Cesium.WebMercatorProjection()
     });
+
+  viewer.camera.setView({
+    destination: Ist,
+  });  
+  var scene = viewer.getScene();
+  var billboards = scene.primitives.add(new Cesium.BillboardCollection());
+  addBillboardsWithRotations(numPoints, west, south, east, north, billboards);
+  animate();
+
+  function animate(){
+
+    requestAnimationFrame(animate);
+  }
+
+  function addBillboardsWithRotations(numPoints, west, south, east, north, billboards) {
+    var points = [];
+    var coord, rotation, image;
+    for(var i = 0; i < numPoints; i++){
+      coord = [getRandom(west,east),getRandom(south,north)];
+      rotation = toRadian(getRandom(0,360));
+      image = images[Math.floor(getRandom(0,2))] + "ship.PNG";
+      billboards.add({
+  			name : coord[0]+" "+coord[1],
+  			position : Cesium.Cartesian3.fromDegrees(coord[0], coord[1]),
+        rotation : rotation,
+  			billboard : {
+  				image : image
+  			}
+      });
+    }
+  }
+
+  function getRandom(min, max){
+    return Math.random() * (max - min) + min;
+  }
+
+  function toRadian(num){
+    return num * 0.0174532925;
+  }
+    
   </script>
  </div>
 </body>
