@@ -69,7 +69,7 @@
       var lon = Cesium.Math.toDegrees(carto.longitude);
       var lat = Cesium.Math.toDegrees(carto.latitude);
       b.rotation = b.rotation + 2 * DEGREE_IN_RADIAN;
-      b.position = [lon + dif*Math.sin(b.rotation),lat + dif*Math.cos(b.rotation)]
+      b.position = [lon + movementDiff*Math.sin(b.rotation),lat + movementDiff*Math.cos(b.rotation)]
     });
     
     requestAnimationFrame(animate);
