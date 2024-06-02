@@ -81,7 +81,7 @@
     for(var i = 0; i < numPoints; i++){
       coord = [getRandom(west,east),getRandom(south,north)];
       rotation = toRadian(getRandom(0,360));
-      img = "./"+images[Math.floor(getRandom(0,2))] + "ship.png";
+      img = "./"+images[Math.floor(getRandom(0,3))] + "ship.png";
       billboards.add({
   			position : Cesium.Cartesian3.fromDegrees(coord[0], coord[1]),
         rotation : rotation,
