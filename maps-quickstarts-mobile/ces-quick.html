@@ -45,6 +45,20 @@
       sceneMode: Cesium.SceneMode.SCENE2D,
       mapProjection: new Cesium.WebMercatorProjection()
     });
+  const west = 28.646238242798773;
+  const south = 40.931140446086175;
+  const east = 29.538132517282705;
+  const north = 41.273739333978995;
+
+  const rectangle = Cesium.Rectangle.fromDegrees(
+    west,
+    south,
+    east,
+    north
+  );
+  viewer.camera.setView({
+    destination: rectangle,
+  });    
   </script>
  </div>
 </body>
