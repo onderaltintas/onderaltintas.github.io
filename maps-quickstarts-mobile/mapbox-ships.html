@@ -97,18 +97,10 @@ bounds:[28.646238242798773,40.931140446086175,29.538132517282705,41.273739333978
         // Randomly generate new point locations.  These would be all responses from asset updates.
 	var dif = 0.005;
         points.features.forEach(function(f) {
-		var newRotation = f.properties.icon_rotate + 2 % 360;
-
+            var newRotation = f.properties.icon_rotate + 2 % 360;
             var newcoords = [f.geometry.coordinates[0] + dif*Math.sin(newRotation*0.0174533),f.geometry.coordinates[1] + dif*Math.cos(newRotation*0.0174533)];
             var newPoint = turf.point(newcoords);
 	    newPoint.properties.icon_rotate = newRotation;	
-            if (changeicon) {
-                //Change the asset icon every 2 seconds
-                newPoint.properties.icon_type = icontypes[getRandomIntInclusive(0, 2).toString()]
-            } else {
-                newPoint.properties.icon_type = f.properties.icon_type
-            }
-
             newFeatures.features.push(newPoint)
         });
 
@@ -135,13 +127,6 @@ bounds:[28.646238242798773,40.931140446086175,29.538132517282705,41.273739333978
                 "icon-image": {
                     "property": "icon_type",
                     "type": "identity"
-                },
-                "icon-size": {
-                    //Control the icon-size based on zoom level
-                    "stops": [
-                        [0, 0.5],
-                        [7, 2]
-                    ]
                 },
                 "icon-allow-overlap": true,
                 // Control the icon rotation with data driven styles
