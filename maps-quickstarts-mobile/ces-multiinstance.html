@@ -103,11 +103,11 @@
     if(instanceCount > 15) return;
     var w = window.innerWidth;
     var h = window.innerHeight;
-    instanceWidth = w/4;
+    instanceWidth = (w-300)/4;
     instanceHeight = h/4;
     var d = document.createElement("div");
-    d.style.width = instanceWidth;
-    d.style.height = instanceHeight;
+    d.style.width = instanceWidth + "px";
+    d.style.height = instanceHeight + "px";
     d.style.position = "absolute";
     d.style.left = l + "px";
     d.style.top = t + "px";
