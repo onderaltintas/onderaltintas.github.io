@@ -74,12 +74,9 @@
       rotation = toRadian(getRandom(0,360));
       img = "./"+images[Math.floor(getRandom(0,2))] + "ship.png";
       billboards.add({
-  			name : coord[0]+" "+coord[1],
   			position : Cesium.Cartesian3.fromDegrees(coord[0], coord[1]),
         rotation : rotation,
-  			billboard : {
-  				image : img
-  			}
+ 				image : img
       });
     }
   }
