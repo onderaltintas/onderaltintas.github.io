@@ -56,7 +56,7 @@
   viewer.camera.setView({
     destination: Ist,
   });  
-  var scene = viewer.getScene();
+  var scene = viewer.cesiumWidget._scene;
   var billboards = scene.primitives.add(new Cesium.BillboardCollection());
   addBillboardsWithRotations(numPoints, west, south, east, north, billboards);
   animate();
