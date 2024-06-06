@@ -23,6 +23,7 @@
     // Replace `your_access_token` with your Cesium ion access token.
     let Ist = Cesium.Rectangle.fromDegrees(28.646238242798773,40.931140446086175,29.538132517282705,41.273739333978995)
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNmQ3ZWM1ZS00YTRmLTRkYjktYWQxNi0zZWNiZTllODgzZTkiLCJpZCI6MTU4MjUsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1Njg4ODg1OTJ9.LFvQbACK9dUUMLRurJQ10kyT5Zc-IChMLKNnJqDj8iw';
+    Cesium.Camera.DEFAULT_VIEW_FACTOR = 0.0;
     Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Ist;
     // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
     const viewer = new Cesium.Viewer('cesiumContainer', {
