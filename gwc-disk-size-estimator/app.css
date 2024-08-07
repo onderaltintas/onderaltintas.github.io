@@ -1,0 +1,11 @@
+html, body,  #olContainer {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+#parametersContainer {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+}
