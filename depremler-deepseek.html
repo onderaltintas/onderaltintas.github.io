@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deprem Animasyonu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.3.0/ol.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/14.0.0/material-components-web.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 300px;
+        }
+        .controls label, .controls button, .controls input {
+            display: block;
+            margin: 10px 0;
+            width: 100%;
+        }
+        .info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .mdc-slider {
+            width: 100%;
+        }
+        .mdc-button {
+            margin: 5px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="controls">
+        <label for="speedSlider">Animasyon Hızı: <span id="speedValue">1000</span> ms</label>
+        <input type="range" id="speedSlider" class="mdc-slider" min="100" max="5000" value="1000">
+        <button id="playPauseBtn" class="mdc-button mdc-button--raised">
+            <span class="mdc-button__label">Durdur</span>
+        </button>
+        <button id="restartBtn" class="mdc-button mdc-button--raised">
+            <span class="mdc-button__label">Baştan Başlat</span>
+        </button>
+        <label for="timeSlider">Zaman: <span id="timeValue">0</span></label>
+        <input type="range" id="timeSlider" class="mdc-slider" min="0" value="0">
+    </div>
+    <div class="info">
+        <p id="earthquakeInfo">Deprem Bilgisi: -</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/14.0.0/material-components-web.min.js"></script>
+    <script>
+        // Material Design bileşenlerini başlat
+        mdc.autoInit();
+
+        const map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([35.2433, 39.4816]), // Türkiye merkezli
+                zoom: 6
+            })
+        });
+
+        const earthquakeLayer = new ol.layer.Vector({
+            source: new ol.source.Vector()
+        });
+        map.addLayer(earthquakeLayer);
+
+        let earthquakes = [];
+        let currentIndex = 0;
+        let animationInterval;
+        let isPlaying = true;
+        let minMagnitude = Infinity;
+        let maxMagnitude = -Infinity;
+
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const timeSlider = document.getElementById('timeSlider');
+        const timeValue = document.getElementById('timeValue');
+        const earthquakeInfo = document.getElementById('earthquakeInfo');
+
+        // AudioContext ile ses üretimi
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let oscillator;
+
+        // Animasyon hızını güncelle
+        speedSlider.addEventListener('input', () => {
+            speedValue.textContent = 5000 - speedSlider.value + 100;
+            if (isPlaying) {
+                clearInterval(animationInterval);
+                animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
+            }
+        });
+
+        // Oynat/Durdur butonu
+        playPauseBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playPauseBtn.querySelector('.mdc-button__label').textContent = isPlaying ? 'Durdur' : 'Oynat';
+            if (isPlaying) {
+                animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
+            } else {
+                clearInterval(animationInterval);
+            }
+        });
+
+        // Baştan başlat butonu
+        restartBtn.addEventListener('click', () => {
+            currentIndex = 0;
+            timeSlider.value = 0;
+            timeValue.textContent = 0;
+            earthquakeLayer.getSource().clear();
+            if (isPlaying) {
+                clearInterval(animationInterval);
+                animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
+            }
+        });
+
+        // Zaman slider'ı
+        timeSlider.addEventListener('input', () => {
+            currentIndex = parseInt(timeSlider.value);
+            timeValue.textContent = currentIndex;
+            earthquakeLayer.getSource().clear();
+            for (let i = 0; i < currentIndex; i++) {
+                showEarthquake(earthquakes[i]);
+            }
+        });
+
+        async function fetchEarthquakeData() {
+            const proxyUrl = 'https://api.allorigins.win/raw?url=';
+            const targetUrl = 'http://www.koeri.boun.edu.tr/scripts/lst7.asp';
+            const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
+            const text = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            const rows = doc.querySelectorAll('pre')[0].textContent.split('\n').slice(7, -1);
+
+            const earthquakes = rows.map(row => {
+                const columns = row.split(/\s+/);
+                const magnitude = parseFloat(columns[6]) || parseFloat(columns[7]) || parseFloat(columns[8]); // ML, Mw, Md
+                return {
+                    date: columns[0],
+                    time: columns[1],
+                    latitude: parseFloat(columns[2]),
+                    longitude: parseFloat(columns[3]),
+                    depth: parseFloat(columns[4]),
+                    magnitude: magnitude
+                };
+            }).filter(earthquake => !isNaN(earthquake.magnitude)); // NaN değerleri filtrele
+
+            // En düşük ve en yüksek büyüklükleri bul
+            minMagnitude = Math.min(...earthquakes.map(e => e.magnitude));
+            maxMagnitude = Math.max(...earthquakes.map(e => e.magnitude));
+
+            return earthquakes;
+        }
+
+        function getColor(magnitude) {
+            const normalizedMagnitude = (magnitude - minMagnitude) / (maxMagnitude - minMagnitude);
+            if (normalizedMagnitude < 0.5) {
+                // Yeşilden sarıya
+                return [255 * 2 * normalizedMagnitude, 255, 0, 0.7];
+            } else {
+                // Sarıdan kırmızıya
+                return [255, 255 * 2 * (1 - normalizedMagnitude), 0, 0.7];
+            }
+        }
+
+        function getRadius(magnitude) {
+            return (magnitude - minMagnitude) / (maxMagnitude - minMagnitude) * 20 + 5; // Daire büyüklüğü
+        }
+
+        function playSound(magnitude) {
+            if (oscillator) oscillator.stop();
+            oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const frequency = 100 + (magnitude - minMagnitude) / (maxMagnitude - minMagnitude) * 200; // Frekans büyüklüğe göre değişir
+            oscillator.frequency.value = frequency;
+            gainNode.gain.value = 0.5;
+            oscillator.type = 'sine'; // Davul sesi efekti için
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.5); // 0.5 saniye ses çal
+        }
+
+        function showEarthquake(earthquake) {
+            const point = new ol.geom.Point(ol.proj.fromLonLat([earthquake.longitude, earthquake.latitude]));
+            const feature = new ol.Feature({
+                geometry: point,
+                magnitude: earthquake.magnitude,
+                depth: earthquake.depth
+            });
+
+            const color = getColor(earthquake.magnitude);
+            const radius = getRadius(earthquake.magnitude);
+            const style = new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: radius,
+                    fill: new ol.style.Fill({
+                        color: color
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: 'black',
+                        width: 1
+                    })
+                })
+            });
+
+            feature.setStyle(style);
+            earthquakeLayer.getSource().addFeature(feature);
+
+            // Deprem bilgilerini göster
+            earthquakeInfo.textContent = `Deprem Bilgisi: ${earthquake.date} ${earthquake.time} - Büyüklük: ${earthquake.magnitude}`;
+
+            // Haritayı son depreme odakla (animasyonlu)
+            const view = map.getView();
+            const targetCenter = ol.proj.fromLonLat([earthquake.longitude, earthquake.latitude]);
+            view.animate({
+                center: targetCenter,
+                duration: 1000
+            });
+
+            // Ses çal
+            playSound(earthquake.magnitude);
+        }
+
+        function showNextEarthquake() {
+            if (currentIndex >= earthquakes.length) {
+                clearInterval(animationInterval);
+                isPlaying = false;
+                playPauseBtn.querySelector('.mdc-button__label').textContent = 'Oynat';
+                currentIndex = 0; // Baştan başlat
+                timeSlider.value = 0;
+                timeValue.textContent = 0;
+                earthquakeLayer.getSource().clear();
+                animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
+                return;
+            }
+
+            showEarthquake(earthquakes[currentIndex]);
+            currentIndex++;
+            timeSlider.value = currentIndex;
+            timeValue.textContent = currentIndex;
+        }
+
+        (async function() {
+            try {
+                earthquakes = await fetchEarthquakeData();
+                timeSlider.max = earthquakes.length - 1;
+                animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
+            } catch (error) {
+                console.error('Veri çekme hatası:', error);
+            }
+        })();
+    </script>
+</body>
+</html>
