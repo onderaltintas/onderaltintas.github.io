@@ -190,7 +190,8 @@ export class EarthquakeApp {
         font: '20px Arial Bold', // Büyük ve bold font
         fillColor: Cesium.Color.BLACK, // Siyah renk
         outlineColor: Cesium.Color.WHITE, // Beyaz outline
-        outlineWidth: 2,
+        outlineWidth: 4, // Outline genişliği artırıldı
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE, // Hem fill hem outline kullan
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
         horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
         eyeOffset: new Cesium.Cartesian3(0, 0, -100) // Label'ı öne çıkar
@@ -257,13 +258,13 @@ export class EarthquakeApp {
       green = 2 * (1 - normalizedMagnitude); // 1.0 - 0.0 arası
       blue = 0.0;
     }
-    return [red, green, blue, 1.0]; // Alpha değeri 1.0 (tam opak)
+    return [red, green, blue, 0.5]; // Alpha değeri 0.5 (yarı opak)
   }
 
   getRadius(magnitude) {
     // Küre boyutunu metre cinsinden hesapla
-    const minRadius = 1000; // Minimum yarıçap (1 km)
-    const maxRadius = 10000; // Maksimum yarıçap (10 km)
+    const minRadius = 5000; // Minimum yarıçap 5 km (daha büyük)
+    const maxRadius = 10000; // Maksimum yarıçap 10 km
     return (magnitude - this.minMagnitude) / (this.maxMagnitude - this.minMagnitude) * (maxRadius - minRadius) + minRadius;
   }
 
