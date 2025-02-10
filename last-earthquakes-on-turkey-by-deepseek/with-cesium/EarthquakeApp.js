@@ -167,8 +167,8 @@ export class EarthquakeApp {
 
   showEarthquake(earthquake) {
     const position = Cesium.Cartesian3.fromDegrees(earthquake.longitude, earthquake.latitude, -earthquake.depth * 1000);
-    const color = this.getColor(earthquake.magnitude);
-    const radius = this.getRadius(earthquake.magnitude);
+    const radius = this.calculateEffectRadius(earthquake.magnitude, earthquake.depth); // Etki yarıçapını hesapla
+    const color = this.getColor(radius); // Renk hesapla (etki yarıçapına göre)
 
     // Deprem noktası
     const sphereEntity = this.entities.add({
@@ -194,7 +194,7 @@ export class EarthquakeApp {
         text: `${earthquake.magnitude.toFixed(1)}\n${earthquake.depth.toFixed(1)} km`,
         font: '20px Helvetica', // Helvetica font
         fillColor: new Cesium.Color(color.red, color.green, color.blue, 1.0), // Küre rengiyle aynı
-        outlineColor: Cesium.Color.BLACK, // Beyaz outline
+        outlineColor: Cesium.Color.WHITE, // Beyaz outline
         outlineWidth: 3, // Outline genişliği 3
         style: Cesium.LabelStyle.FILL_AND_OUTLINE, // Hem fill hem outline kullan
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM, // Label'ı kürenin tepesine yerleştir
@@ -231,7 +231,37 @@ export class EarthquakeApp {
       });
     }
   }
-  
+
+  calculateEffectRadius(magnitude, depth) {
+    const baseRadius = Math.pow(10, (magnitude - 2) / 3);
+    const depthFactor = Math.max(1, depth / 10);
+    return baseRadius * depthFactor * 1000; // Metre cinsinden
+  }
+
+  getColor(radius) {
+    // Etki yarıçapına göre renk hesapla
+    const minRadius = 3000; // Minimum etki yarıçapı (3 km)
+    const maxRadius = 7500; // Maksimum etki yarıçapı (7.5 km)
+    const normalizedRadius = (radius - minRadius) / (maxRadius - minRadius);
+
+    let red, green, blue;
+    if (normalizedRadius < 0.5) {
+      red = 2 * normalizedRadius; // 0.0 - 1.0 arası
+      green = 1.0;
+      blue = 0.0;
+    } else {
+      red = 1.0;
+      green = 2 * (1 - normalizedRadius); // 1.0 - 0.0 arası
+      blue = 0.0;
+    }
+    return {
+      red: red,
+      green: green,
+      blue: blue,
+      alpha: 0.5 // Yarı opak
+    };
+  }
+
   showNextEarthquake() {
     if (this.currentIndex >= this.earthquakes.length) {
       clearInterval(this.animationInterval);
@@ -249,33 +279,6 @@ export class EarthquakeApp {
     this.currentIndex++;
     this.timeSlider.value = this.currentIndex;
     this.timeValue.textContent = `${this.earthquakes[this.currentIndex - 1].date} ${this.earthquakes[this.currentIndex - 1].time}`;
-  }
-
-  getColor(magnitude) {
-    const normalizedMagnitude = (magnitude - this.minMagnitude) / (this.maxMagnitude - this.minMagnitude);
-    let red, green, blue;
-    if (normalizedMagnitude < 0.5) {
-      red = 2 * normalizedMagnitude; // 0.0 - 1.0 arası
-      green = 1.0;
-      blue = 0.0;
-    } else {
-      red = 1.0;
-      green = 2 * (1 - normalizedMagnitude); // 1.0 - 0.0 arası
-      blue = 0.0;
-    }
-    return {
-      red: red,
-      green: green,
-      blue: blue,
-      alpha: 0.5 // Yarı opak
-    };
-  }
-
-  getRadius(magnitude) {
-    // Küre boyutunu metre cinsinden hesapla
-    const minRadius = 3000; // Minimum yarıçap 3 km
-    const maxRadius = 7500; // Maksimum yarıçap 7.5 km
-    return (magnitude - this.minMagnitude) / (this.maxMagnitude - this.minMagnitude) * (maxRadius - minRadius) + minRadius;
   }
 
   playSound(magnitude) {
