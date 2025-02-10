@@ -185,13 +185,14 @@ export class EarthquakeApp {
       position: position,
       label: {
         text: `${earthquake.magnitude.toFixed(1)}\n${earthquake.depth.toFixed(1)} km`,
-        font: '20px Arial Bold', // Büyük ve bold font
-        fillColor: Cesium.Color.BLACK, // Siyah renk
+        font: '20px Helvetica', // Helvetica font
+        fillColor: new Cesium.Color(color.red, color.green, color.blue, 1.0), // Küre rengiyle aynı
         outlineColor: Cesium.Color.WHITE, // Beyaz outline
-        outlineWidth: 4, // Outline genişliği artırıldı
+        outlineWidth: 3, // Outline genişliği 3
         style: Cesium.LabelStyle.FILL_AND_OUTLINE, // Hem fill hem outline kullan
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM, // Label'ı kürenin tepesine yerleştir
         horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+        pixelOffset: new Cesium.Cartesian2(0, -radius * 0.8), // Label'ı kürenin üstüne yerleştir
         eyeOffset: new Cesium.Cartesian3(0, 0, -100) // Label'ı öne çıkar
       }
     });
@@ -224,7 +225,7 @@ export class EarthquakeApp {
       });
     }
   }
-  
+
   showNextEarthquake() {
     if (this.currentIndex >= this.earthquakes.length) {
       clearInterval(this.animationInterval);
