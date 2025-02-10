@@ -175,10 +175,8 @@ export class EarthquakeApp {
       position: position,
       ellipsoid: {
         radii: new Cesium.Cartesian3(radius, radius, radius),
-        material: new Cesium.Color(...color), // Renk ve alpha değerleri
-        outline: true,
-        outlineColor: Cesium.Color.BLACK,
-        outlineWidth: 1
+        material: new Cesium.Color(color.red, color.green, color.blue, color.alpha), // Doğru renk formatı
+        outline: false // Outline kaldırıldı
       }
     });
 
@@ -258,13 +256,18 @@ export class EarthquakeApp {
       green = 2 * (1 - normalizedMagnitude); // 1.0 - 0.0 arası
       blue = 0.0;
     }
-    return [red, green, blue, 0.5]; // Alpha değeri 0.5 (yarı opak)
+    return {
+      red: red,
+      green: green,
+      blue: blue,
+      alpha: 0.5 // Yarı opak
+    };
   }
 
   getRadius(magnitude) {
     // Küre boyutunu metre cinsinden hesapla
-    const minRadius = 5000; // Minimum yarıçap 5 km (daha büyük)
-    const maxRadius = 10000; // Maksimum yarıçap 10 km
+    const minRadius = 3000; // Minimum yarıçap 3 km
+    const maxRadius = 7500; // Maksimum yarıçap 7.5 km
     return (magnitude - this.minMagnitude) / (this.maxMagnitude - this.minMagnitude) * (maxRadius - minRadius) + minRadius;
   }
 
