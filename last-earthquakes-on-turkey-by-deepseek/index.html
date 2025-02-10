@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deprem Animasyonu</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.3.0/ol.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/14.0.0/material-components-web.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    .controls {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      width: 280px;
+    }
+    .controls label, .controls button, .controls input {
+      display: block;
+      margin: 5px 0;
+      width: 100%;
+    }
+    .info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    .mdc-slider {
+      width: 100%;
+    }
+    .mdc-button {
+      margin: 5px 0;
+      width: 100%;
+      font-size: 0.8em;
+    }
+    .update-notification {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 1001;
+      display: none;
+    }
+    @media (max-width: 600px) {
+      .controls {
+        width: 90%;
+        left: 5%;
+        bottom: 5px;
+        padding: 5px;
+      }
+      .mdc-button {
+        font-size: 0.7em;
+        padding: 5px;
+      }
+      .info {
+        top: 5px;
+        left: 5px;
+        padding: 5px;
+        font-size: 0.8em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="controls">
+    <label for="language">Dil:</label>
+    <select id="language" class="mdc-select">
+      <option value="tr">Türkçe</option>
+      <option value="en">English</option>
+    </select>
+    <label><input type="checkbox" id="soundCheckbox"> <span id="soundLabel">Ses Aç</span></label>
+    <label><input type="checkbox" id="focusCheckbox"> <span id="focusLabel">Son Depreme Odaklan</span></label>
+    <label for="speedSlider"><span id="speedLabel">Animasyon Hızı:</span> <span id="speedValue">1000</span> ms</label>
+    <input type="range" id="speedSlider" class="mdc-slider" min="100" max="5000" value="1000">
+    <label for="timeSlider"><span id="timeLabel">Zaman:</span> <span id="timeValue">-</span></label>
+    <input type="range" id="timeSlider" class="mdc-slider" min="0" value="0">
+    <button id="playPauseBtn" class="mdc-button mdc-button--raised">
+      <span class="mdc-button__label">Durdur</span>
+    </button>
+    <button id="restartBtn" class="mdc-button mdc-button--raised">
+      <span class="mdc-button__label">Baştan Başlat</span>
+    </button>
+    <button id="refreshBtn" class="mdc-button mdc-button--raised">
+      <span class="mdc-button__label">Son Depremlerle Güncelle</span>
+    </button>
+  </div>
+  <div class="info">
+    <p id="earthquakeInfo">Deprem Bilgisi: -</p>
+    <p id="sourceInfo">Kaynak: <a href="http://www.koeri.boun.edu.tr/sismo/2/tr/" target="_blank">Boğaziçi Üniversitesi Kandilli Rasathanesi ve Deprem Araştırma Enstitüsü Bölgesel Deprem-Tsunami İzleme ve Değerlendirme Merkezi</a></p>
+  </div>
+  <div class="update-notification" id="updateNotification">
+    1 dakika sonra güncellenecek...
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/14.0.0/material-components-web.min.js"></script>
+  <script>
+    const texts = {
+      tr: {
+        speedLabel: "Animasyon Hızı:",
+        timeLabel: "Zaman:",
+        playPause: "Durdur",
+        restart: "Baştan Başlat",
+        refresh: "Son Depremlerle Güncelle",
+        source: "Kaynak: <a href='http://www.koeri.boun.edu.tr/sismo/2/tr/' target='_blank'>Boğaziçi Üniversitesi Kandilli Rasathanesi ve Deprem Araştırma Enstitüsü Bölgesel Deprem-Tsunami İzleme ve Değerlendirme Merkezi</a>",
+        updateNotification: "1 dakika sonra güncellenecek...",
+        soundLabel: "Ses Aç",
+        focusLabel: "Son Depreme Odaklan"
+      },
+      en: {
+        speedLabel: "Animation Speed:",
+        timeLabel: "Time:",
+        playPause: "Pause",
+        restart: "Restart",
+        refresh: "Update with Latest Earthquakes",
+        source: "Source: <a href='http://www.koeri.boun.edu.tr/sismo/2/tr/' target='_blank'>Boğaziçi University Kandilli Observatory and Earthquake Research Institute Regional Earthquake-Tsunami Monitoring Center</a>",
+        updateNotification: "Updating in 1 minute...",
+        soundLabel: "Enable Sound",
+        focusLabel: "Focus on Last Earthquake"
+      }
+    };
+
+    const map = new ol.Map({
+      target: 'map',
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.OSM()
+        })
+      ],
+      view: new ol.View({
+        center: ol.proj.fromLonLat([35.2433, 39.4816]),
+        zoom: 6
+      })
+    });
+
+    const earthquakeLayer = new ol.layer.Vector({
+      source: new ol.source.Vector()
+    });
+    map.addLayer(earthquakeLayer);
+
+    let earthquakes = [];
+    let currentIndex = 0;
+    let animationInterval;
+    let isPlaying = true;
+    let minMagnitude = Infinity;
+    let maxMagnitude = -Infinity;
+    let minDepth = Infinity;
+    let maxDepth = -Infinity;
+
+    const speedSlider = document.getElementById('speedSlider');
+    const speedValue = document.getElementById('speedValue');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const timeSlider = document.getElementById('timeSlider');
+    const timeValue = document.getElementById('timeValue');
+    const earthquakeInfo = document.getElementById('earthquakeInfo');
+    const sourceInfo = document.getElementById('sourceInfo');
+    const updateNotification = document.getElementById('updateNotification');
+    const languageSelect = document.getElementById('language');
+    const soundCheckbox = document.getElementById('soundCheckbox');
+    const focusCheckbox = document.getElementById('focusCheckbox');
+    const soundLabel = document.getElementById('soundLabel');
+    const focusLabel = document.getElementById('focusLabel');
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    let oscillator;
+
+    function updateTexts(lang) {
+      const text = texts[lang];
+      document.getElementById('speedLabel').textContent = text.speedLabel;
+      document.getElementById('timeLabel').textContent = text.timeLabel;
+      playPauseBtn.querySelector('.mdc-button__label').textContent = isPlaying ? text.playPause : "Oynat";
+      restartBtn.querySelector('.mdc-button__label').textContent = text.restart;
+      refreshBtn.querySelector('.mdc-button__label').textContent = text.refresh;
+      sourceInfo.innerHTML = text.source;
+      updateNotification.textContent = text.updateNotification;
+      soundLabel.textContent = text.soundLabel;
+      focusLabel.textContent = text.focusLabel;
+    }
+
+    languageSelect.addEventListener('change', () => {
+      updateTexts(languageSelect.value);
+    });
+
+    speedSlider.addEventListener('input', () => {
+      speedValue.textContent = 5000 - speedSlider.value + 100;
+      if (isPlaying) {
+        clearInterval(animationInterval);
+        animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
+      }
+    });
+
+    playPauseBtn.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      updateTexts(languageSelect.value);
+      if (isPlaying) {
+        animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
+      } else {
+        clearInterval(animationInterval);
+      }
+    });
+
+    restartBtn.addEventListener('click', () => {
+      currentIndex = 0;
+      timeSlider.value = 0;
+      timeValue.textContent = '-';
+      earthquakeLayer.getSource().clear();
+      if (isPlaying) {
+        clearInterval(animationInterval);
+        animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
+      }
+    });
+
+    refreshBtn.addEventListener('click', () => {
+      location.reload();
+    });
+
+    timeSlider.addEventListener('input', () => {
+      currentIndex = parseInt(timeSlider.value);
+      if (earthquakes[currentIndex]) {
+        timeValue.textContent = `${earthquakes[currentIndex].date} ${earthquakes[currentIndex].time}`;
+      }
+      earthquakeLayer.getSource().clear();
+      for (let i = 0; i < currentIndex; i++) {
+        showEarthquake(earthquakes[i]);
+      }
+    });
+
+    let updateTimer = setInterval(() => {
+      updateNotification.style.display = 'block';
+      setTimeout(() => {
+        updateNotification.style.display = 'none';
+      }, 5000);
+      setTimeout(() => {
+        location.reload();
+      }, 60000);
+    }, 29 * 60 * 1000);
+
+    async function fetchEarthquakeData() {
+      const proxyUrl = 'https://api.allorigins.win/raw?url=';
+      const targetUrl = 'http://www.koeri.boun.edu.tr/scripts/lst7.asp';
+      const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
+      const text = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, 'text/html');
+      const rows = doc.querySelectorAll('pre')[0].textContent.split('\n').slice(7, -1);
+
+      const earthquakes = rows.map(row => {
+        const columns = row.split(/\s+/);
+        const magnitude = parseFloat(columns[6]) || parseFloat(columns[7]) || parseFloat(columns[8]);
+        const depth = parseFloat(columns[4]);
+        return {
+          date: columns[0],
+          time: columns[1],
+          latitude: parseFloat(columns[2]),
+          longitude: parseFloat(columns[3]),
+          depth: depth,
+          magnitude: magnitude
+        };
+      }).filter(earthquake => !isNaN(earthquake.magnitude));
+
+      minMagnitude = Math.min(...earthquakes.map(e => e.magnitude));
+      maxMagnitude = Math.max(...earthquakes.map(e => e.magnitude));
+      minDepth = Math.min(...earthquakes.map(e => e.depth));
+      maxDepth = Math.max(...earthquakes.map(e => e.depth));
+
+      return earthquakes;
+    }
+
+    function getColor(magnitude) {
+      const normalizedMagnitude = (magnitude - minMagnitude) / (maxMagnitude - minMagnitude);
+      if (normalizedMagnitude < 0.5) {
+        return [255 * 2 * normalizedMagnitude, 255, 0, 0.7];
+      } else {
+        return [255, 255 * 2 * (1 - normalizedMagnitude), 0, 0.7];
+      }
+    }
+
+    function getRadius(magnitude) {
+      return (magnitude - minMagnitude) / (maxMagnitude - minMagnitude) * 20 + 5;
+    }
+
+    function getOpacity(depth) {
+      return 0.9 - (depth - minDepth) / (maxDepth - minDepth) * 0.89;
+    }
+
+    function playSound(magnitude) {
+      if (!soundCheckbox.checked) return;
+      if (oscillator) oscillator.stop();
+      oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      const frequency = 100 + (magnitude - minMagnitude) / (maxMagnitude - minMagnitude) * 200;
+      oscillator.frequency.value = frequency;
+      gainNode.gain.value = 0.5;
+      oscillator.type = 'sine';
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.03);
+    }
+
+    function showEarthquake(earthquake) {
+      const point = new ol.geom.Point(ol.proj.fromLonLat([earthquake.longitude, earthquake.latitude]));
+      const feature = new ol.Feature({
+        geometry: point,
+        magnitude: earthquake.magnitude,
+        depth: earthquake.depth
+      });
+
+      const color = getColor(earthquake.magnitude);
+      const radius = getRadius(earthquake.magnitude);
+      const opacity = getOpacity(earthquake.depth);
+      const style = new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: radius,
+          fill: new ol.style.Fill({
+            color: [...color.slice(0, 3), opacity]
+          }),
+          stroke: new ol.style.Stroke({
+            color: 'black',
+            width: 1
+          })
+        }),
+        text: new ol.style.Text({
+          text: `${earthquake.magnitude.toFixed(1)}\n${earthquake.depth.toFixed(1)} km`,
+          fill: new ol.style.Fill({
+            color: '#000000'
+          }),
+          stroke: new ol.style.Stroke({
+            color: '#ffffff',
+            width: 2
+          }),
+          offsetY: 0,
+          textAlign: 'center',
+          textBaseline: 'middle'
+        })
+      });
+
+      feature.setStyle(style);
+      earthquakeLayer.getSource().addFeature(feature);
+
+      const pulseFeature = new ol.Feature({
+        geometry: point
+      });
+      const pulseStyle = new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: radius,
+          stroke: new ol.style.Stroke({
+            color: 'rgba(255, 0, 0, 1)',
+            width: 2
+          }),
+          fill: new ol.style.Fill({
+            color: 'rgba(255, 0, 0, 0)'
+          })
+        })
+      });
+      pulseFeature.setStyle(pulseStyle);
+      earthquakeLayer.getSource().addFeature(pulseFeature);
+
+      let currentRadius = radius;
+      const maxPulseRadius = radius * 2;
+      const animationDuration = 2000;
+      const startTime = Date.now();
+      const animatePulse = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / animationDuration, 1);
+        currentRadius = radius + (maxPulseRadius - radius) * progress;
+        pulseStyle.getImage().setRadius(currentRadius);
+        pulseStyle.getImage().getStroke().setColor(`rgba(255, 0, 0, ${1 - progress})`);
+        if (progress < 1) {
+          requestAnimationFrame(animatePulse);
+        } else {
+          earthquakeLayer.getSource().removeFeature(pulseFeature);
+        }
+      };
+      animatePulse();
+
+      earthquakeInfo.textContent = `Deprem Bilgisi: ${earthquake.date} ${earthquake.time} - Büyüklük: ${earthquake.magnitude} - Derinlik: ${earthquake.depth} km`;
+
+      playSound(earthquake.magnitude);
+
+      if (focusCheckbox.checked) {
+        const view = map.getView();
+        const targetCenter = ol.proj.fromLonLat([earthquake.longitude, earthquake.latitude]);
+        view.animate({
+          center: targetCenter,
+          duration: 500
+        });
+      }
+    }
+
+    function showNextEarthquake() {
+      if (currentIndex >= earthquakes.length) {
+        clearInterval(animationInterval);
+        isPlaying = false;
+        playPauseBtn.querySelector('.mdc-button__label').textContent = "Oynat";
+        currentIndex = 0;
+        timeSlider.value = 0;
+        timeValue.textContent = '-';
+        earthquakeLayer.getSource().clear();
+        animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
+        return;
+      }
+
+      showEarthquake(earthquakes[currentIndex]);
+      currentIndex++;
+      timeSlider.value = currentIndex;
+      timeValue.textContent = `${earthquakes[currentIndex - 1].date} ${earthquakes[currentIndex - 1].time}`;
+    }
+
+    (async function() {
+      try {
+        earthquakes = await fetchEarthquakeData();
+        timeSlider.max = earthquakes.length - 1;
+        animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
+      } catch (error) {
+        console.error('Veri çekme hatası:', error);
+      }
+    })();
+  </script>
+</body>
+</html>
