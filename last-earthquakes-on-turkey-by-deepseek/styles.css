@@ -1,0 +1,76 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f5f5f5;
+}
+#map {
+  width: 100%;
+  height: 100%;
+}
+.controls {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 280px;
+}
+.controls label, .controls button, .controls input {
+  display: block;
+  margin: 5px 0;
+  width: 100%;
+}
+.info {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+.mdc-slider {
+  width: 100%;
+}
+.mdc-button {
+  margin: 5px 0;
+  width: 100%;
+  font-size: 0.8em;
+}
+.update-notification {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1001;
+  display: none;
+}
+@media (max-width: 600px) {
+  .controls {
+    width: 90%;
+    left: 5%;
+    bottom: 5px;
+    padding: 5px;
+  }
+  .mdc-button {
+    font-size: 0.7em;
+    padding: 5px;
+  }
+  .info {
+    top: 5px;
+    left: 5px;
+    padding: 5px;
+    font-size: 0.8em;
+  }
+}
