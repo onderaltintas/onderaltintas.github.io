@@ -1,13 +1,9 @@
 export class EarthquakeApp {
   constructor() {
     this.viewer = new Cesium.Viewer('cesiumContainer', {
-      terrainProvider: Cesium.createWorldTerrain(),
+      terrainProvider: await Cesium.CesiumTerrainProvider.fromIonAssetId(2426648),
       sceneMode: Cesium.SceneMode.SCENE3D,
     });
-
-    this.viewer.scene.setTerrain(
-      new Cesium.Terrain(Cesium.CesiumTerrainProvider.fromIonAssetId(2426648))
-    );
 
     // Türkiye'ye odaklan
     this.viewer.camera.setView({
