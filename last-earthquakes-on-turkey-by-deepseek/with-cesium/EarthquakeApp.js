@@ -225,7 +225,7 @@ export class EarthquakeApp {
       });
     }
   }
-
+  
   showNextEarthquake() {
     if (this.currentIndex >= this.earthquakes.length) {
       clearInterval(this.animationInterval);
