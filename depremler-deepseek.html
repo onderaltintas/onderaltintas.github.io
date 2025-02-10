@@ -22,26 +22,26 @@
         }
         .controls {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
+            bottom: 10px;
+            left: 10px;
             background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
+            padding: 10px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 1000;
-            width: 300px;
+            width: 280px;
         }
         .controls label, .controls button, .controls input {
             display: block;
-            margin: 10px 0;
+            margin: 5px 0;
             width: 100%;
         }
         .info {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 10px;
+            left: 10px;
             background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
+            padding: 10px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 1000;
@@ -52,6 +52,37 @@
         .mdc-button {
             margin: 5px 0;
             width: 100%;
+            font-size: 0.8em;
+        }
+        .update-notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1001;
+            display: none;
+        }
+        @media (max-width: 600px) {
+            .controls {
+                width: 90%;
+                left: 5%;
+                bottom: 5px;
+                padding: 5px;
+            }
+            .mdc-button {
+                font-size: 0.7em;
+                padding: 5px;
+            }
+            .info {
+                top: 5px;
+                left: 5px;
+                padding: 5px;
+                font-size: 0.8em;
+            }
         }
     </style>
 </head>
@@ -60,17 +91,24 @@
     <div class="controls">
         <label for="speedSlider">Animasyon Hızı: <span id="speedValue">1000</span> ms</label>
         <input type="range" id="speedSlider" class="mdc-slider" min="100" max="5000" value="1000">
+        <label for="timeSlider">Zaman: <span id="timeValue">-</span></label>
+        <input type="range" id="timeSlider" class="mdc-slider" min="0" value="0">
         <button id="playPauseBtn" class="mdc-button mdc-button--raised">
             <span class="mdc-button__label">Durdur</span>
         </button>
         <button id="restartBtn" class="mdc-button mdc-button--raised">
             <span class="mdc-button__label">Baştan Başlat</span>
         </button>
-        <label for="timeSlider">Zaman: <span id="timeValue">0</span></label>
-        <input type="range" id="timeSlider" class="mdc-slider" min="0" value="0">
+        <button id="refreshBtn" class="mdc-button mdc-button--raised">
+            <span class="mdc-button__label">Son Depremlerle Güncelle</span>
+        </button>
     </div>
     <div class="info">
         <p id="earthquakeInfo">Deprem Bilgisi: -</p>
+        <p>Kaynak: <a href="http://www.koeri.boun.edu.tr/scripts/lst6.asp" target="_blank">http://www.koeri.boun.edu.tr/scripts/lst6.asp</a></p>
+    </div>
+    <div class="update-notification" id="updateNotification">
+        1 dakika sonra güncellenecek...
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js"></script>
@@ -108,9 +146,11 @@
         const speedValue = document.getElementById('speedValue');
         const playPauseBtn = document.getElementById('playPauseBtn');
         const restartBtn = document.getElementById('restartBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
         const timeSlider = document.getElementById('timeSlider');
         const timeValue = document.getElementById('timeValue');
         const earthquakeInfo = document.getElementById('earthquakeInfo');
+        const updateNotification = document.getElementById('updateNotification');
 
         // AudioContext ile ses üretimi
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -140,7 +180,7 @@
         restartBtn.addEventListener('click', () => {
             currentIndex = 0;
             timeSlider.value = 0;
-            timeValue.textContent = 0;
+            timeValue.textContent = '-';
             earthquakeLayer.getSource().clear();
             if (isPlaying) {
                 clearInterval(animationInterval);
@@ -148,15 +188,33 @@
             }
         });
 
+        // Son depremlerle güncelle butonu
+        refreshBtn.addEventListener('click', () => {
+            location.reload();
+        });
+
         // Zaman slider'ı
         timeSlider.addEventListener('input', () => {
             currentIndex = parseInt(timeSlider.value);
-            timeValue.textContent = currentIndex;
+            if (earthquakes[currentIndex]) {
+                timeValue.textContent = `${earthquakes[currentIndex].date} ${earthquakes[currentIndex].time}`;
+            }
             earthquakeLayer.getSource().clear();
             for (let i = 0; i < currentIndex; i++) {
                 showEarthquake(earthquakes[i]);
             }
         });
+
+        // 30 dakikada bir otomatik güncelleme
+        let updateTimer = setInterval(() => {
+            updateNotification.style.display = 'block';
+            setTimeout(() => {
+                updateNotification.style.display = 'none';
+            }, 5000);
+            setTimeout(() => {
+                location.reload();
+            }, 60000);
+        }, 29 * 60 * 1000);
 
         async function fetchEarthquakeData() {
             const proxyUrl = 'https://api.allorigins.win/raw?url=';
@@ -202,6 +260,10 @@
             return (magnitude - minMagnitude) / (maxMagnitude - minMagnitude) * 20 + 5; // Daire büyüklüğü
         }
 
+        function getOpacity(depth) {
+            return 1 - (depth / 100); // Derinlik arttıkça opaklık düşer
+        }
+
         function playSound(magnitude) {
             if (oscillator) oscillator.stop();
             oscillator = audioContext.createOscillator();
@@ -226,39 +288,75 @@
 
             const color = getColor(earthquake.magnitude);
             const radius = getRadius(earthquake.magnitude);
+            const opacity = getOpacity(earthquake.depth);
             const style = new ol.style.Style({
                 image: new ol.style.Circle({
-                    radius: 0, // Başlangıçta daire boyutu 0
+                    radius: radius,
                     fill: new ol.style.Fill({
-                        color: color
+                        color: [...color.slice(0, 3), opacity]
                     }),
                     stroke: new ol.style.Stroke({
                         color: 'black',
                         width: 1
                     })
+                }),
+                text: new ol.style.Text({
+                    text: `${earthquake.magnitude.toFixed(1)}\n${earthquake.depth.toFixed(1)} km`,
+                    fill: new ol.style.Fill({
+                        color: '#000000'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: '#ffffff',
+                        width: 2
+                    }),
+                    offsetY: 0,
+                    textAlign: 'center',
+                    textBaseline: 'middle'
                 })
             });
 
             feature.setStyle(style);
             earthquakeLayer.getSource().addFeature(feature);
 
-            // Daireyi animasyonla büyüt
-            let currentRadius = 0;
-            const animationDuration = 500; // Animasyon süresi (ms)
+            // Büyüyen kırmızı daire animasyonu
+            const pulseFeature = new ol.Feature({
+                geometry: point
+            });
+            const pulseStyle = new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: radius,
+                    stroke: new ol.style.Stroke({
+                        color: 'rgba(255, 0, 0, 1)',
+                        width: 2
+                    }),
+                    fill: new ol.style.Fill({
+                        color: 'rgba(255, 0, 0, 0)'
+                    })
+                })
+            });
+            pulseFeature.setStyle(pulseStyle);
+            earthquakeLayer.getSource().addFeature(pulseFeature);
+
+            let currentRadius = radius;
+            const maxPulseRadius = radius * 2;
+            const animationDuration = 1000; // Animasyon süresi (ms)
             const startTime = Date.now();
-            const animate = () => {
+            const animatePulse = () => {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / animationDuration, 1);
-                currentRadius = radius * progress;
-                style.getImage().setRadius(currentRadius);
+                currentRadius = radius + (maxPulseRadius - radius) * progress;
+                pulseStyle.getImage().setRadius(currentRadius);
+                pulseStyle.getImage().getStroke().setColor(`rgba(255, 0, 0, ${1 - progress})`);
                 if (progress < 1) {
-                    requestAnimationFrame(animate);
+                    requestAnimationFrame(animatePulse);
+                } else {
+                    earthquakeLayer.getSource().removeFeature(pulseFeature);
                 }
             };
-            animate();
+            animatePulse();
 
             // Deprem bilgilerini göster
-            earthquakeInfo.textContent = `Deprem Bilgisi: ${earthquake.date} ${earthquake.time} - Büyüklük: ${earthquake.magnitude}`;
+            earthquakeInfo.textContent = `Deprem Bilgisi: ${earthquake.date} ${earthquake.time} - Büyüklük: ${earthquake.magnitude} - Derinlik: ${earthquake.depth} km`;
 
             // Ses çal
             playSound(earthquake.magnitude);
@@ -279,7 +377,7 @@
                 playPauseBtn.querySelector('.mdc-button__label').textContent = 'Oynat';
                 currentIndex = 0; // Baştan başlat
                 timeSlider.value = 0;
-                timeValue.textContent = 0;
+                timeValue.textContent = '-';
                 earthquakeLayer.getSource().clear();
                 animationInterval = setInterval(showNextEarthquake, 5000 - speedSlider.value + 100);
                 return;
@@ -288,7 +386,7 @@
             showEarthquake(earthquakes[currentIndex]);
             currentIndex++;
             timeSlider.value = currentIndex;
-            timeValue.textContent = currentIndex;
+            timeValue.textContent = `${earthquakes[currentIndex - 1].date} ${earthquakes[currentIndex - 1].time}`;
         }
 
         (async function() {
