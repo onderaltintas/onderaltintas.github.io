@@ -5,17 +5,17 @@ export class EarthquakeApp {
       sceneMode: Cesium.SceneMode.SCENE3D,
     });
 
-    viewer.scene.setTerrain(
+    this.viewer.scene.setTerrain(
       new Cesium.Terrain(Cesium.CesiumTerrainProvider.fromIonAssetId(2426648))
     );
 
     // Türkiye'ye odaklan
     this.viewer.camera.setView({
-      destination: Cesium.Cartesian3.fromDegrees(35.2433, 39.4816, 1000000), // Türkiye merkezli
+      destination: Cesium.Cartesian3.fromDegrees(35.2433, 39.4816, 100000000), // Türkiye merkezli
     });
 
     // Depth testi kapat
-    this.viewer.scene.globe.depthTestAgainstTerrain = false;
+    this.viewer.scene.globe.depthTestAgainstTerrain = true;
 
     this.entities = this.viewer.entities;
     this.earthquakes = [];
