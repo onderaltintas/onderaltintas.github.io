@@ -180,9 +180,16 @@ export class EarthquakeApp {
       }
     });
 
+    // Label pozisyonunu kürenin tepesine yerleştir
+    const labelPosition = Cesium.Cartesian3.fromDegrees(
+      earthquake.longitude,
+      earthquake.latitude,
+      -earthquake.depth * 1000 + radius // Kürenin tepesine yerleştir
+    );
+
     // Label
     const labelEntity = this.entities.add({
-      position: position,
+      position: labelPosition, // Kürenin tepesindeki pozisyon
       label: {
         text: `${earthquake.magnitude.toFixed(1)}\n${earthquake.depth.toFixed(1)} km`,
         font: '20px Helvetica', // Helvetica font
@@ -192,7 +199,6 @@ export class EarthquakeApp {
         style: Cesium.LabelStyle.FILL_AND_OUTLINE, // Hem fill hem outline kullan
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM, // Label'ı kürenin tepesine yerleştir
         horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-        pixelOffset: new Cesium.Cartesian2(0, -radius * 0.8), // Label'ı kürenin üstüne yerleştir
         eyeOffset: new Cesium.Cartesian3(0, 0, -100) // Label'ı öne çıkar
       }
     });
@@ -225,7 +231,7 @@ export class EarthquakeApp {
       });
     }
   }
-
+  
   showNextEarthquake() {
     if (this.currentIndex >= this.earthquakes.length) {
       clearInterval(this.animationInterval);
