@@ -194,7 +194,7 @@ export class EarthquakeApp {
         text: `${earthquake.magnitude.toFixed(1)}\n${earthquake.depth.toFixed(1)} km`,
         font: '20px Helvetica', // Helvetica font
         fillColor: new Cesium.Color(color.red, color.green, color.blue, 1.0), // Küre rengiyle aynı
-        outlineColor: Cesium.Color.WHITE, // Beyaz outline
+        outlineColor: Cesium.Color.BLACK, // Beyaz outline
         outlineWidth: 3, // Outline genişliği 3
         style: Cesium.LabelStyle.FILL_AND_OUTLINE, // Hem fill hem outline kullan
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM, // Label'ı kürenin tepesine yerleştir
