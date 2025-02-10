@@ -228,7 +228,7 @@
             const radius = getRadius(earthquake.magnitude);
             const style = new ol.style.Style({
                 image: new ol.style.Circle({
-                    radius: radius,
+                    radius: 0, // Başlangıçta daire boyutu 0
                     fill: new ol.style.Fill({
                         color: color
                     }),
@@ -242,19 +242,34 @@
             feature.setStyle(style);
             earthquakeLayer.getSource().addFeature(feature);
 
+            // Daireyi animasyonla büyüt
+            let currentRadius = 0;
+            const animationDuration = 500; // Animasyon süresi (ms)
+            const startTime = Date.now();
+            const animate = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / animationDuration, 1);
+                currentRadius = radius * progress;
+                style.getImage().setRadius(currentRadius);
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            };
+            animate();
+
             // Deprem bilgilerini göster
             earthquakeInfo.textContent = `Deprem Bilgisi: ${earthquake.date} ${earthquake.time} - Büyüklük: ${earthquake.magnitude}`;
+
+            // Ses çal
+            playSound(earthquake.magnitude);
 
             // Haritayı son depreme odakla (animasyonlu)
             const view = map.getView();
             const targetCenter = ol.proj.fromLonLat([earthquake.longitude, earthquake.latitude]);
             view.animate({
                 center: targetCenter,
-                duration: 1000
+                duration: 500 // Odaklanma animasyonu daha hızlı
             });
-
-            // Ses çal
-            playSound(earthquake.magnitude);
         }
 
         function showNextEarthquake() {
