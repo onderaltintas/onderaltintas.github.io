@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deprem Animasyonu</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.3.0/ol.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/14.0.0/material-components-web.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="map"></div>
+  <div class="controls">
+    <label for="language">Dil:</label>
+    <select id="language" class="mdc-select">
+      <option value="tr">Türkçe</option>
+      <option value="en">English</option>
+    </select>
+    <label><input type="checkbox" id="soundCheckbox"> <span id="soundLabel">Ses Aç</span></label>
+    <label><input type="checkbox" id="focusCheckbox"> <span id="focusLabel">Son Depreme Odaklan</span></label>
+    <label for="speedSlider"><span id="speedLabel">Animasyon Hızı:</span> <span id="speedValue">1000</span> ms</label>
+    <input type="range" id="speedSlider" class="mdc-slider" min="100" max="5000" value="1000">
+    <label for="timeSlider"><span id="timeLabel">Zaman:</span> <span id="timeValue">-</span></label>
+    <input type="range" id="timeSlider" class="mdc-slider" min="0" value="0">
+    <button id="playPauseBtn" class="mdc-button mdc-button--raised">
+      <span class="mdc-button__label">Durdur</span>
+    </button>
+    <button id="restartBtn" class="mdc-button mdc-button--raised">
+      <span class="mdc-button__label">Baştan Başlat</span>
+    </button>
+    <button id="refreshBtn" class="mdc-button mdc-button--raised">
+      <span class="mdc-button__label">Son Depremlerle Güncelle</span>
+    </button>
+  </div>
+  <div class="info">
+    <p id="earthquakeInfo">Deprem Bilgisi: -</p>
+    <p id="sourceInfo">Kaynak: <a href="http://www.koeri.boun.edu.tr/sismo/2/tr/" target="_blank">Boğaziçi Üniversitesi Kandilli Rasathanesi ve Deprem Araştırma Enstitüsü Bölgesel Deprem-Tsunami İzleme ve Değerlendirme Merkezi</a></p>
+  </div>
+  <div class="update-notification" id="updateNotification">
+    1 dakika sonra güncellenecek...
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/14.0.0/material-components-web.min.js"></script>
+  <script src="app.js" type="module"></script>
+</body>
+</html>
