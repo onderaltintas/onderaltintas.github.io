@@ -225,65 +225,6 @@ export class EarthquakeApp {
       });
     }
   }
-    const position = Cesium.Cartesian3.fromDegrees(earthquake.longitude, earthquake.latitude, -earthquake.depth * 1000);
-    const color = this.getColor(earthquake.magnitude);
-    const radius = this.getRadius(earthquake.magnitude);
-
-    // Deprem noktası
-    const sphereEntity = this.entities.add({
-      position: position,
-      ellipsoid: {
-        radii: new Cesium.Cartesian3(radius, radius, radius),
-        material: Cesium.Color.fromBytes(...color),
-        outline: true,
-        outlineColor: Cesium.Color.BLACK,
-        outlineWidth: 1
-      }
-    });
-
-    // Label
-    const labelEntity = this.entities.add({
-      position: position,
-      label: {
-        text: `${earthquake.magnitude.toFixed(1)}\n${earthquake.depth.toFixed(1)} km`,
-        font: '20px Arial Bold', // Büyük ve bold font
-        fillColor: Cesium.Color.BLACK, // Siyah renk
-        outlineColor: Cesium.Color.WHITE, // Beyaz outline
-        outlineWidth: 2,
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-        eyeOffset: new Cesium.Cartesian3(0, 0, -100) // Label'ı öne çıkar
-      }
-    });
-
-    // Animasyonlu küre
-    let currentRadius = 0;
-    const maxRadius = radius;
-    const animationDuration = 1000; // 1 saniye
-    const startTime = Date.now();
-    const animateSphere = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / animationDuration, 1);
-      currentRadius = maxRadius * progress;
-      sphereEntity.ellipsoid.radii = new Cesium.Cartesian3(currentRadius, currentRadius, currentRadius);
-      if (progress < 1) {
-        requestAnimationFrame(animateSphere);
-      }
-    };
-    animateSphere();
-
-    this.earthquakeInfo.textContent = `Deprem Bilgisi: ${earthquake.date} ${earthquake.time} - Büyüklük: ${earthquake.magnitude} - Derinlik: ${earthquake.depth} km`;
-
-    this.playSound(earthquake.magnitude);
-
-    if (this.focusCheckbox.checked) {
-      const currentCameraHeight = this.viewer.camera.positionCartographic.height;
-      this.viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(earthquake.longitude, earthquake.latitude, currentCameraHeight),
-        duration: 1
-      });
-    }
-  }
 
   showNextEarthquake() {
     if (this.currentIndex >= this.earthquakes.length) {
