@@ -171,11 +171,12 @@ export class EarthquakeApp {
     const radius = this.getRadius(earthquake.magnitude);
 
     // Deprem noktası
-    const pointEntity = this.entities.add({
+    const sphereEntity = this.entities.add({
       position: position,
-      point: {
-        pixelSize: radius,
-        color: Cesium.Color.fromBytes(...color),
+      ellipsoid: {
+        radii: new Cesium.Cartesian3(radius, radius, radius),
+        material: Cesium.Color.fromBytes(...color),
+        outline: true,
         outlineColor: Cesium.Color.BLACK,
         outlineWidth: 1
       }
@@ -186,9 +187,9 @@ export class EarthquakeApp {
       position: position,
       label: {
         text: `${earthquake.magnitude.toFixed(1)}\n${earthquake.depth.toFixed(1)} km`,
-        font: '14px Arial',
-        fillColor: Cesium.Color.WHITE,
-        outlineColor: Cesium.Color.BLACK,
+        font: '20px Arial Bold', // Büyük ve bold font
+        fillColor: Cesium.Color.BLACK, // Siyah renk
+        outlineColor: Cesium.Color.WHITE, // Beyaz outline
         outlineWidth: 2,
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
         horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
@@ -196,38 +197,21 @@ export class EarthquakeApp {
       }
     });
 
-    // Animasyonlu kırmızı daire
-    const pulseEntity = this.entities.add({
-      position: position,
-      ellipse: {
-        semiMinorAxis: new Cesium.CallbackProperty(() => radius * 2, false),
-        semiMajorAxis: new Cesium.CallbackProperty(() => radius * 2, false),
-        material: Cesium.Color.RED.withAlpha(0.5),
-        outline: true,
-        outlineColor: Cesium.Color.RED,
-        outlineWidth: 2
-      }
-    });
-
-    // Animasyonu başlat
-    let currentRadius = radius;
-    const maxPulseRadius = radius * 4;
-    const animationDuration = 2000;
+    // Animasyonlu küre
+    let currentRadius = 0;
+    const maxRadius = radius;
+    const animationDuration = 1000; // 1 saniye
     const startTime = Date.now();
-    const animatePulse = () => {
+    const animateSphere = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / animationDuration, 1);
-      currentRadius = radius + (maxPulseRadius - radius) * progress;
-      pulseEntity.ellipse.semiMinorAxis = new Cesium.CallbackProperty(() => currentRadius, false);
-      pulseEntity.ellipse.semiMajorAxis = new Cesium.CallbackProperty(() => currentRadius, false);
-      pulseEntity.ellipse.material = Cesium.Color.RED.withAlpha(1 - progress);
+      currentRadius = maxRadius * progress;
+      sphereEntity.ellipsoid.radii = new Cesium.Cartesian3(currentRadius, currentRadius, currentRadius);
       if (progress < 1) {
-        requestAnimationFrame(animatePulse);
-      } else {
-        this.entities.remove(pulseEntity);
+        requestAnimationFrame(animateSphere);
       }
     };
-    animatePulse();
+    animateSphere();
 
     this.earthquakeInfo.textContent = `Deprem Bilgisi: ${earthquake.date} ${earthquake.time} - Büyüklük: ${earthquake.magnitude} - Derinlik: ${earthquake.depth} km`;
 
@@ -271,7 +255,7 @@ export class EarthquakeApp {
   }
 
   getRadius(magnitude) {
-    return (magnitude - this.minMagnitude) / (this.maxMagnitude - this.minMagnitude) * 30 + 10; // Daha büyük daireler
+    return (magnitude - this.minMagnitude) / (this.maxMagnitude - this.minMagnitude) * 30 + 10; // Daha büyük küreler
   }
 
   playSound(magnitude) {
