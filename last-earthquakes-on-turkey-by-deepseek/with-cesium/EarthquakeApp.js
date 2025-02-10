@@ -233,9 +233,8 @@ export class EarthquakeApp {
   }
 
   calculateEffectRadius(magnitude, depth) {
-    const baseRadius = Math.pow(10, (magnitude - 2) / 3);
-    const depthFactor = Math.max(1, depth / 10);
-    return baseRadius * depthFactor * 1000; // Metre cinsinden
+    // Yeni formül: 10^(0.45*M - 1.88) * sqrt(D)
+    return Math.pow(10, 0.45 * magnitude - 1.88) * Math.sqrt(depth) * 1000; //ref: https://www.reddit.com/r/Earthquakes/comments/11yy62h/how_to_guesstimate_felt_radius_of_an_eartquake/
   }
 
   getColor(radius) {
