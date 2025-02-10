@@ -2,7 +2,16 @@ export class EarthquakeApp {
   constructor() {
     this.viewer = new Cesium.Viewer('cesiumContainer', {
       terrainProvider: Cesium.createWorldTerrain(),
+      sceneMode: Cesium.SceneMode.SCENE3D,
     });
+
+    // Türkiye'ye odaklan
+    this.viewer.camera.setView({
+      destination: Cesium.Cartesian3.fromDegrees(35.2433, 39.4816, 1000000), // Türkiye merkezli
+    });
+
+    // Depth testi kapat
+    this.viewer.scene.globe.depthTestAgainstTerrain = false;
 
     this.entities = this.viewer.entities;
     this.earthquakes = [];
@@ -157,10 +166,9 @@ export class EarthquakeApp {
   }
 
   showEarthquake(earthquake) {
-    const position = Cesium.Cartesian3.fromDegrees(earthquake.longitude, earthquake.latitude, -earthquake.depth * 1000);
+    const position = Cesium.Cartesian3.fromDegrees(earthquake.longitude, earthquake.latitude);
     const color = this.getColor(earthquake.magnitude);
     const radius = this.getRadius(earthquake.magnitude);
-    const opacity = this.getOpacity(earthquake.depth);
 
     this.entities.add({
       position: position,
@@ -173,8 +181,8 @@ export class EarthquakeApp {
       label: {
         text: `${earthquake.magnitude.toFixed(1)}\n${earthquake.depth.toFixed(1)} km`,
         font: '14px Arial',
-        fillColor: Cesium.Color.BLACK,
-        outlineColor: Cesium.Color.WHITE,
+        fillColor: Cesium.Color.WHITE,
+        outlineColor: Cesium.Color.BLACK,
         outlineWidth: 2,
         verticalOrigin: Cesium.VerticalOrigin.CENTER,
         horizontalOrigin: Cesium.HorizontalOrigin.CENTER
@@ -188,7 +196,8 @@ export class EarthquakeApp {
     if (this.focusCheckbox.checked) {
       this.viewer.camera.flyTo({
         destination: position,
-        duration: 1
+        duration: 1,
+        offset: new Cesium.HeadingPitchRange(0, -90, 1000000) // Mevcut zoomu koru
       });
     }
   }
@@ -215,18 +224,14 @@ export class EarthquakeApp {
   getColor(magnitude) {
     const normalizedMagnitude = (magnitude - this.minMagnitude) / (this.maxMagnitude - this.minMagnitude);
     if (normalizedMagnitude < 0.5) {
-      return [255 * 2 * normalizedMagnitude, 255, 0, 0.7];
+      return [255 * 2 * normalizedMagnitude, 255, 0, 255];
     } else {
-      return [255, 255 * 2 * (1 - normalizedMagnitude), 0, 0.7];
+      return [255, 255 * 2 * (1 - normalizedMagnitude), 0, 255];
     }
   }
 
   getRadius(magnitude) {
     return (magnitude - this.minMagnitude) / (this.maxMagnitude - this.minMagnitude) * 20 + 5;
-  }
-
-  getOpacity(depth) {
-    return 0.9 - (depth - this.minDepth) / (this.maxDepth - this.minDepth) * 0.89;
   }
 
   playSound(magnitude) {
