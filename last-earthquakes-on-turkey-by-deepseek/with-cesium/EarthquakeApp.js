@@ -1,7 +1,8 @@
 export class EarthquakeApp {
   constructor() {
+    let bathymetry = await Cesium.createWorldBathymetryAsync({requestVertexNormals: true});
     this.viewer = new Cesium.Viewer('cesiumContainer', {
-      terrainProvider: await Cesium.createWorldBathymetryAsync({requestVertexNormals: true}),
+      terrainProvider: bathymetry,
       sceneMode: Cesium.SceneMode.SCENE3D,
     });
 
