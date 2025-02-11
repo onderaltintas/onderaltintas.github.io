@@ -7,7 +7,7 @@ export class EarthquakeApp {
 
     // Türkiye'ye odaklan
     this.viewer.camera.setView({
-      destination: Cesium.Cartesian3.fromDegrees(35.2433, 39.4816, 10000000), // Türkiye merkezli
+      destination: Cesium.Cartesian3.fromDegrees(35.2433, 39.4816, 1000000), // Türkiye merkezli
     });
 
     // Depth testi kapat
