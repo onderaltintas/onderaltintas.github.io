@@ -1,7 +1,7 @@
 export class EarthquakeApp {
   constructor(terrainProvider) {
     this.viewer = new Cesium.Viewer('cesiumContainer', {
-      terrainProvider: bathymetry,
+      terrainProvider: terrainProvider,
       sceneMode: Cesium.SceneMode.SCENE3D,
     });
 
