@@ -5,9 +5,17 @@ export class EarthquakeApp {
       sceneMode: Cesium.SceneMode.SCENE3D,
     });
 
-    // Türkiye'ye odaklan
+    // Türkiye ve Yunanistan'ı içine alan bounding box
+    const turkeyGreeceBoundingBox = Cesium.Rectangle.fromDegrees(
+      25.0,  // Batı boylamı (Türkiye ve Yunanistan'ın batı sınırı)
+      34.0,  // Güney enlemi (Türkiye ve Yunanistan'ın güney sınırı)
+      45.0,  // Doğu boylamı (Türkiye ve Yunanistan'ın doğu sınırı)
+      42.0   // Kuzey enlemi (Türkiye ve Yunanistan'ın kuzey sınırı)
+    );
+
+    // Kamerayı bounding box'a odakla
     this.viewer.camera.setView({
-      destination: Cesium.Cartesian3.fromDegrees(35.2433, 39.4816, 1000000), // Türkiye merkezli
+      destination: turkeyGreeceBoundingBox
     });
 
     // Depth testi kapat
