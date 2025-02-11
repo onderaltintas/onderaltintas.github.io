@@ -11,7 +11,7 @@ export class EarthquakeApp {
     });
 
     // Depth testi kapat
-    this.viewer.scene.globe.depthTestAgainstTerrain = true;
+    this.viewer.scene.globe.depthTestAgainstTerrain = false;
 
     this.entities = this.viewer.entities;
     this.earthquakes = [];
