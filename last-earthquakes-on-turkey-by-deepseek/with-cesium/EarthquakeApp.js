@@ -142,7 +142,7 @@ export class EarthquakeApp {
     }
   }
 
-  async function fetchEarthquakeData() {
+  async fetchEarthquakeData() {
     const proxyUrl = 'https://api.codetabs.com/v1/proxy?quest=';
     const targetUrl = 'http://www.koeri.boun.edu.tr/scripts/lst7.asp';
   
