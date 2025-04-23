@@ -267,13 +267,13 @@ export class EarthquakeApp {
   calculateEffectRadius(magnitude, depth) {
     const baseRadius = 10 ** (0.6 * magnitude - 1.5);
     const depthFactor = 1 / (1 + depth / 15);
-    return baseRadius * depthFactor * 4 * 1000; // metre cinsinden
+    return baseRadius * depthFactor * 10 * 1000; // metre cinsinden
   }
 
   getColor(radius) {
     // Etki yarıçapına göre renk hesapla
     const minRadius = 3000; // Minimum etki yarıçapı (3 km)
-    const maxRadius = 7500; // Maksimum etki yarıçapı (7.5 km)
+    const maxRadius = 60000; // Maksimum etki yarıçapı (7.5 km)
     const normalizedRadius = (radius - minRadius) / (maxRadius - minRadius);
 
     let red, green, blue;
