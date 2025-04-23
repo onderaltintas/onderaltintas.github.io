@@ -245,10 +245,29 @@ export class EarthquakeApp {
       });
     }
   }
-
+/*old calculation*/
+  /*
   calculateEffectRadius(magnitude, depth) {
     // Yeni formül: 10^(0.45*M - 1.88) * sqrt(D)
     return Math.pow(10, 0.45 * magnitude - 1.88) * Math.sqrt(depth) * 1000; //ref: https://www.reddit.com/r/Earthquakes/comments/11yy62h/how_to_guesstimate_felt_radius_of_an_eartquake/
+  }
+  */
+  
+  /**
+   * Depremin büyüklüğü (magnitüd) ve derinliğine göre hissedilen etki yarıçapını hesaplar.
+   *
+   * Bu formül, Türkiye'deki şehir yapısı ve zemin koşulları gibi faktörler göz önüne alınarak
+   * ampirik olarak ayarlanmıştır. Sonuç yaklaşık bir tahmindir ve gerçek hissedilme,
+   * zemin türü, bina yoğunluğu, hava durumu gibi etkenlere göre değişebilir.
+   *
+   * @param {number} magnitude - Depremin büyüklüğü (Magnitüd - örn: 6.2)
+   * @param {number} depth - Depremin yerin altındaki derinliği (kilometre cinsinden)
+   * @returns {number} Depremin yaklaşık hissedilen yarıçapı (metre cinsinden)
+   */
+  calculateEffectRadius(magnitude, depth) {
+    const baseRadius = 10 ** (0.6 * magnitude - 1.5);
+    const depthFactor = 1 / (1 + depth / 15);
+    return baseRadius * depthFactor * 4 * 1000; // metre cinsinden
   }
 
   getColor(radius) {
