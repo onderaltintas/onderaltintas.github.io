@@ -142,35 +142,41 @@ export class EarthquakeApp {
     }
   }
 
-  async fetchEarthquakeData() {
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+  async function fetchEarthquakeData() {
+    const proxyUrl = 'https://api.codetabs.com/v1/proxy?quest=';
     const targetUrl = 'http://www.koeri.boun.edu.tr/scripts/lst7.asp';
-    const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
-    const text = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(text, 'text/html');
-    const rows = doc.querySelectorAll('pre')[0].textContent.split('\n').slice(7, -1);
-
-    this.earthquakes = rows.map(row => {
-      const columns = row.split(/\s+/);
-      const magnitude = parseFloat(columns[6]) || parseFloat(columns[7]) || parseFloat(columns[8]);
-      const depth = parseFloat(columns[4]);
-      return {
-        date: columns[0],
-        time: columns[1],
-        latitude: parseFloat(columns[2]),
-        longitude: parseFloat(columns[3]),
-        depth: depth,
-        magnitude: magnitude
-      };
-    }).filter(earthquake => !isNaN(earthquake.magnitude));
-
-    this.minMagnitude = Math.min(...this.earthquakes.map(e => e.magnitude));
-    this.maxMagnitude = Math.max(...this.earthquakes.map(e => e.magnitude));
-    this.minDepth = Math.min(...this.earthquakes.map(e => e.depth));
-    this.maxDepth = Math.max(...this.earthquakes.map(e => e.depth));
-
-    this.animationInterval = setInterval(() => this.showNextEarthquake(), 5000 - this.speedSlider.value + 100);
+  
+  
+    try {
+      const response = await fetch(proxyUrl + targetUrl);
+      const text = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, 'text/html');
+      const rows = doc.querySelectorAll('pre')[0].textContent.split('\n').slice(7, -1);
+  
+      this.earthquakes = rows.map(row => {
+        const columns = row.trim().split(/\s+/);
+        const magnitude = parseFloat(columns[6]) || parseFloat(columns[7]) || parseFloat(columns[8]);
+        const depth = parseFloat(columns[4]);
+        return {
+          date: columns[0],
+          time: columns[1],
+          latitude: parseFloat(columns[2]),
+          longitude: parseFloat(columns[3]),
+          depth: depth,
+          magnitude: magnitude
+        };
+      }).filter(earthquake => !isNaN(earthquake.magnitude));
+  
+      this.minMagnitude = Math.min(...this.earthquakes.map(e => e.magnitude));
+      this.maxMagnitude = Math.max(...this.earthquakes.map(e => e.magnitude));
+      this.minDepth = Math.min(...this.earthquakes.map(e => e.depth));
+      this.maxDepth = Math.max(...this.earthquakes.map(e => e.depth));
+  
+      this.animationInterval = setInterval(() => this.showNextEarthquake(), 5000 - this.speedSlider.value + 100);
+    } catch (error) {
+      console.error('Deprem verisi alınırken hata:', error);
+    }
   }
 
   showEarthquake(earthquake) {
