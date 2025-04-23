@@ -264,10 +264,27 @@ export class EarthquakeApp {
    * @param {number} depth - Depremin yerin altındaki derinliği (kilometre cinsinden)
    * @returns {number} Depremin yaklaşık hissedilen yarıçapı (metre cinsinden)
    */
+  /*
   calculateEffectRadius(magnitude, depth) {
     const baseRadius = 10 ** (0.6 * magnitude - 1.5);
     const depthFactor = 1 / (1 + depth / 15);
     return baseRadius * depthFactor * 10 * 1000; // metre cinsinden
+  }
+*/
+  /**
+   * McCue formülüne göre, depremin büyüklüğüne (magnitüd) göre hissedilen
+   * yarıçapı (etki alanı) metre cinsinden hesaplar.
+   *
+   * Bu formül yüzeye yakın depremler için geçerlidir. Derinlik dikkate alınmaz.
+   * 
+   * Kaynak: https://cqsrg.org/tools/perceptionradius/
+   *
+   * @param {number} magnitude - Depremin büyüklüğü (örneğin: 6.2)
+   * @returns {number} Depremin yaklaşık hissedilen yarıçapı (metre cinsinden)
+   */
+  calculateEffectRadius(magnitude) {
+    const radiusKm = Math.exp(magnitude / 1.01 - 0.13); // kilometre cinsinden
+    return radiusKm * 1000; // metreye çevir
   }
 
   getColor(radius) {
