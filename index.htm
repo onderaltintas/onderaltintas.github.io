@@ -5,9 +5,9 @@
     <meta charset="utf-8">
     <title>Small Apps by Önder ALTINTAŞ</title>
     <meta name="description"
-        content="There are some web application demos -pure js mostly- with open source codes in Github. To show how to use recent technologies on web applications. For all.">
+        content="A collection of web application demos, mostly pure JavaScript, with open-source code on GitHub. Showcasing modern web technologies for everyone.">
     <meta name="keywords"
-        content="HTML,CSS,JavaScript,Canvas,HTML5,Monkey Island,Parallax,IDW,Inverse Distance,Önder ALTINTAŞ,Onder Altintas">
+        content="HTML,CSS,JavaScript,Canvas,HTML5,Monkey Island,Parallax,IDW,Inverse Distance,Önder ALTINTAŞ,Onder Altintas,Web Demos,Open Source">
     <meta name="author" content="Önder ALTINTAŞ">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="Small Apps by Önder ALTINTAŞ">
@@ -20,32 +20,29 @@
 
     <style>
         :root {
-            --primary-color: #424242; /* Dark Gray */
-            --primary-light-color: #616161;
-            --primary-dark-color: #212121;
-            --accent-color: #00bcd4; /* Cyan */
-            --accent-dark-color: #0097a7;
-            --text-color: #212121;
-            --text-light-color: #757575;
-            --background-color: #eceff1; /* Light Blue Gray */
+            --primary-color: #3f51b5; /* Indigo */
+            --primary-dark-color: #303f9f;
+            --primary-light-color: #7986cb;
+            --accent-color: #ff4081; /* Pink A200 */
+            --accent-dark-color: #f50057;
+            --text-color: #212121; /* Dark Gray for main text */
+            --text-light-color: #757575; /* Gray for secondary text */
+            --background-color: #e8eaf6; /* Light Indigo background */
             --card-background: #ffffff;
-            --shadow-color: rgba(0, 0, 0, 0.2);
-            --gradient-start: #2c3e50; /* Dark Blue */
-            --gradient-end: #34495e; /* Slightly lighter Dark Blue */
+            --shadow-color: rgba(0, 0, 0, 0.15);
+            --light-shadow-color: rgba(0, 0, 0, 0.08);
         }
 
         body {
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(to bottom right, var(--gradient-start), var(--gradient-end));
+            background-color: var(--background-color);
             margin: 0;
             padding: 0;
             color: var(--text-color);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            min-height: 100vh; /* Ensure full height for gradient */
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
         }
 
         .container {
@@ -53,16 +50,17 @@
             max-width: 960px;
             margin: 20px auto;
             padding: 0 15px;
-            box-sizing: border-box; /* Include padding in width */
+            box-sizing: border-box;
         }
 
         header {
-            background-color: var(--primary-dark-color);
+            background-color: var(--primary-color);
             color: #ffffff;
-            padding: 40px 0 20px; /* Increased top padding */
+            padding: 40px 0 20px;
             text-align: center;
             box-shadow: 0 4px 8px var(--shadow-color);
-            position: relative; /* For profile image positioning */
+            position: relative;
+            z-index: 1; /* Ensure header is above other content for visual stacking */
         }
 
         header h1 {
@@ -71,15 +69,21 @@
             margin: 0;
             font-weight: 700;
             letter-spacing: 1px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            opacity: 0; /* Initial state for animation */
+            transform: translateY(-20px); /* Initial state for animation */
+            animation: slideInFromTop 0.8s forwards 0.2s;
         }
 
         header h3 {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.4em;
-            margin: 5px 0 0; /* Adjusted margin */
+            margin: 5px 0 0;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.9);
+            opacity: 0; /* Initial state for animation */
+            transform: translateY(-20px); /* Initial state for animation */
+            animation: slideInFromTop 0.8s forwards 0.4s;
         }
 
         header a {
@@ -92,65 +96,75 @@
             color: var(--accent-color);
         }
 
-        .profile-image-container {
+        .profile-image-wrapper {
             text-align: center;
-            margin-top: -60px; /* Adjust to float over the header */
+            margin-top: -80px; /* Pull image up to overlap header slightly */
             position: relative;
-            z-index: 10;
+            z-index: 10; /* Ensure image is on top */
+            opacity: 0;
+            transform: scale(0.8);
+            animation: fadeInScale 0.8s forwards 0.6s;
         }
 
         .profile-image {
-            border: 5px solid #ffffff;
+            border: 6px solid #ffffff;
             border-radius: 50%;
-            width: 150px;
-            height: 150px;
+            width: 160px;
+            height: 160px;
             object-fit: cover;
-            box-shadow: 0 6px 12px var(--shadow-color);
-            transition: transform 0.3s ease;
+            box-shadow: 0 8px 16px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .profile-image:hover {
-            transform: scale(1.05);
+            transform: scale(1.05) rotate(3deg); /* Slight rotation on hover */
+            box-shadow: 0 12px 24px var(--shadow-color);
         }
 
         .section-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 2.5em;
-            color: #ffffff; /* White for contrast */
+            color: var(--primary-dark-color);
             text-align: center;
             margin-top: 40px;
             margin-bottom: 25px;
             font-weight: 700;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            text-shadow: 1px 1px 3px var(--light-shadow-color);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideInFromBottom 0.8s forwards 0.8s;
         }
 
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 25px;
             margin-top: 20px;
         }
 
         .card {
             background-color: var(--card-background);
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 10px var(--shadow-color);
             padding: 25px;
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            opacity: 0;
+            transform: scale(0.9);
+            animation: fadeInScale 0.8s forwards; /* Will be staggered by JS */
         }
 
         .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
         }
 
         .card a {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.4em;
-            color: var(--primary-color);
+            color: var(--primary-dark-color);
             text-decoration: none;
             font-weight: 600;
             display: block;
@@ -177,17 +191,25 @@
         }
 
         .notice {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
+            background-color: #c5cae9; /* Light Indigo for notices */
+            color: var(--text-color);
             padding: 15px 20px;
             border-radius: 8px;
             margin-bottom: 15px;
             font-size: 0.95em;
-            border-left: 5px solid var(--accent-color);
+            border-left: 5px solid var(--primary-dark-color);
+            box-shadow: 0 2px 5px var(--light-shadow-color);
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInFromLeft 0.8s forwards 1s; /* Staggered */
         }
 
+        .notice:nth-of-type(2) { animation-delay: 1.1s; }
+        .notice:nth-of-type(3) { animation-delay: 1.2s; }
+        .notice:nth-of-type(4) { animation-delay: 1.3s; }
+
         .notice a {
-            color: var(--accent-color);
+            color: var(--primary-dark-color);
             text-decoration: none;
             font-weight: 500;
         }
@@ -200,45 +222,51 @@
             background-color: var(--accent-color);
             color: #ffffff;
             border: none;
-            border-radius: 8px; /* Slightly more rounded */
+            border-radius: 8px;
             padding: 14px 30px;
             font-size: 1.1em;
             font-weight: 600;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 8px var(--shadow-color);
             transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-            display: block; /* Make it a block element */
-            width: fit-content; /* Adjust width to content */
-            margin: 30px auto; /* Center the button */
+            display: block;
+            width: fit-content;
+            margin: 30px auto;
             text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideInFromBottom 0.8s forwards 1.5s;
         }
 
         .btn:hover {
             background-color: var(--accent-dark-color);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+            transform: translateY(-2px) scale(1.02);
         }
 
         .footer-links {
             margin-top: 50px;
             padding-top: 25px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid var(--primary-light-color);
             text-align: center;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-light-color);
             font-size: 0.9em;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideInFromBottom 0.8s forwards 1.7s;
         }
 
         .footer-links h3 {
             font-size: 1.1em;
             margin-bottom: 10px;
             font-weight: 400;
-            color: inherit; /* Inherit color from parent */
+            color: inherit;
         }
 
         .footer-links a {
-            color: var(--accent-color);
+            color: var(--primary-dark-color);
             text-decoration: none;
             font-weight: 500;
         }
@@ -250,8 +278,11 @@
         .visitor-count {
             text-align: center;
             margin-top: 30px;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-light-color);
             padding-bottom: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideInFromBottom 0.8s forwards 1.9s;
         }
 
         .visitor-count h3 {
@@ -261,12 +292,60 @@
 
         iframe {
             width: 100%;
-            height: 450px; /* Adjusted for better mobile view */
+            height: 450px;
             border: none;
             margin-top: 30px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            background-color: var(--primary-dark-color); /* Dark background for video */
+            box-shadow: 0 4px 10px var(--shadow-color);
+            background-color: #ffffff;
+            opacity: 0;
+            transform: scale(0.95);
+            animation: fadeInScale 0.8s forwards 2.1s;
+        }
+
+        /* Keyframe Animations */
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         /* Responsive adjustments */
@@ -279,10 +358,13 @@
                 font-size: 1.1em;
             }
 
+            .profile-image-wrapper {
+                margin-top: -60px;
+            }
+
             .profile-image {
                 width: 120px;
                 height: 120px;
-                margin-top: -50px;
             }
 
             .section-title {
@@ -290,7 +372,7 @@
             }
 
             .card-grid {
-                grid-template-columns: 1fr; /* Single column on smaller screens */
+                grid-template-columns: 1fr;
             }
 
             .card a {
@@ -302,7 +384,7 @@
             }
 
             iframe {
-                height: 300px; /* Smaller height for mobile videos */
+                height: 300px;
             }
         }
 
@@ -315,10 +397,13 @@
                 font-size: 1em;
             }
 
+            .profile-image-wrapper {
+                margin-top: -50px;
+            }
+
             .profile-image {
                 width: 100px;
                 height: 100px;
-                margin-top: -40px;
             }
 
             .section-title {
@@ -363,6 +448,14 @@
                 advertisementPlayer.play();
             }
         }
+
+        // JavaScript for staggering card animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${1.2 + (index * 0.1)}s`; // Stagger cards
+            });
+        });
     </script>
 </head>
 
@@ -375,27 +468,25 @@
         <h3>onderaltintas@gmail.com</h3>
     </header>
 
-    <div class="profile-image-container">
+    <div class="profile-image-wrapper">
         <img class='profile-image' src='./kafa.jpg' alt="Önder ALTINTAŞ Profile" />
     </div>
 
     <div class="container">
         <p class="notice">
-            Notice: I am a Software Engineer. All projects here are non mobile friendly, non cross browser compatible,
-            made@night and half arsed implementations. Don't judge me with them.
+            **Note:** I am a Software Engineer. The projects here are primarily demos, often developed during my free time. They might not be fully mobile-friendly or cross-browser compatible, and some are early implementations. Please consider them as ongoing learning experiments rather than polished products.
         </p>
         <p class="notice">
-            Notice2: Decided to keep dates in list. So, I can check how and "when" I wasted my time.
+            **Note 2:** I've decided to keep the dates on the list to track my development journey and how I've spent my time on these projects.
         </p>
         <p class="notice">
-            You can access the source codes <a href="https://github.com/onderaltintas">here</a>.
+            You can access the source code for these projects on my <a href="https://github.com/onderaltintas">GitHub profile</a>.
         </p>
         <p class="notice">
-            You can also reach me by using <a
+            Feel free to reach out via <a
                 href="https://twitter.com/intent/tweet?screen_name=_onderaltintas_&ref_src=twsrc%5Etfw"
                 class="twitter-mention-button" data-show-count="false">Tweet to @_onderaltintas_</a>
-            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> or follow me @twitter
-            with using <a href="https://twitter.com/_onderaltintas_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> or follow me on Twitter: <a href="https://twitter.com/_onderaltintas_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
                 data-show-count="false">Follow @_onderaltintas_</a>
             <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
         </p>
@@ -406,125 +497,119 @@
             <div class="card">
                 <a href="https://play.google.com/store/apps/details?id=com.onder.youareawesome">
                     You Are Awesome Android App
-                    <span class="date">(30.03.2025)</span>
+                    <span class="date">(March 30, 2025)</span>
                 </a>
-                <p class="description">The Story of the App: Google sends a series of emails to developers, informing them
-                    that inactive accounts in the Google Play Developer program will be deleted. To prevent deletion, you
-                    either need to upload a new app or update an existing one. The deadline is April 4th. With time running
-                    out, I rushed to create a rather unpolished app and uploaded it just 4 days before the deadline. After
-                    that, thanks to ChatGPT, I had a song lyric written, used Suno AI to make a piece of music, and added
-                    it to the app. ChatGPT also provided the code for adding videos. At this point, I think AI should just
-                    take over our jobs. 😊</p>
+                <p class="description">The Story of the App: Google notified developers about deleting inactive accounts in the Google Play Developer program, with a deadline of April 4th. To prevent deletion, a new app upload or an update was required. With only 4 days left, I quickly developed this app. ChatGPT helped with the song lyrics, Suno AI composed the music, and ChatGPT also provided the video integration code. At this point, I believe AI should simply take over our jobs! 😊</p>
             </div>
 
             <div class="card">
                 <a
                     href="https://onderaltintas.github.io/last-earthquakes-on-turkey-by-deepseek/with-cesium/index-multifile-oop.html">
-                    Latest earthquakes on Turkey, written by DeepSeek(prompt: now, do this with cesium ehehe)
-                    <span class="date">(24.02.2025)</span>
+                    Latest Earthquakes in Turkey, coded by DeepSeek (Prompt: "Now, do this with Cesium, ehehe")
+                    <span class="date">(February 24, 2025)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./last-earthquakes-on-turkey-by-deepseek/">
-                    Latest earthquakes on Turkey, written by DeepSeek
-                    <span class="date">(10.02.2025)</span>
+                    Latest Earthquakes in Turkey, coded by DeepSeek
+                    <span class="date">(February 10, 2025)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./gwc-disk-size-estimator/">
-                    GeoWebCache Required Disk Size Estimator.
-                    <span class="date">(08.08.2024)(needs bugfixes =) )</span>
+                    GeoWebCache Required Disk Size Estimator
+                    <span class="date">(August 8, 2024 - Needs bug fixes =) )</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./maps-quickstarts-mobile/">
-                    For mobile user experience tests, quickstart pages for map frameworks.
-                    <span class="date">(04.04.2023)</span>
+                    Quickstart Pages for Map Frameworks (for mobile user experience tests)
+                    <span class="date">(April 4, 2023)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./webgl-sphere/">
-                    webGL World Sphere example
-                    <span class="date">(08.11.2022)</span>
+                    WebGL World Sphere Example
+                    <span class="date">(November 8, 2022)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./Üniversite Okumadan Yazılım Alanında Çalışılabilir mi.pdf">
-                    Üniversite'de okumadan yazılımcı olmak üzerine bir instagram şeyi
-                    <span class="date">(11.10.2022)</span>
+                    An Instagram post about becoming a software developer without a university degree
+                    <span class="date">(October 11, 2022)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./bescalculator/">
-                    Turkish BES system calculator (For Turkish citizens)
-                    <span class="date">(26.03.2022)</span>
+                    Turkish BES System Calculator (For Turkish citizens)
+                    <span class="date">(March 26, 2022)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./i8-spinner/">
-                    i8 smooth spinner (smooth animation work in progress)
+                    i8 Smooth Spinner (Smooth animation work in progress)
                 </a>
             </div>
 
             <div class="card">
                 <a href="./covid-19-visualization-nightly-challenge/">
-                    COVID-19 3d Visualization Challenge
-                    <span class="date">(17.04.2020)</span>
+                    COVID-19 3D Visualization Challenge
+                    <span class="date">(April 17, 2020)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./arz/">
                     Arz (Earth - Gaia)
-                    <span class="date">(New! 22.05.2019)</span>
+                    <span class="date">(New! May 22, 2019)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="https://play.google.com/store/apps/details?id=com.onderaltintas.approvestickers">
-                    Approve Everything Whatsapp Stickers(Google Play)
-                    <span class="date">(07.04.2020)</span>
+                    Approve Everything Whatsapp Stickers (Google Play)
+                    <span class="date">(April 7, 2020)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./serdar-ortach-like-song-lyrics-creator/">
-                    Song lyrics creator with Kareoke features(Serdar Ortach styla)
-                    <span class="date">(13.05.2019)</span>
+                    Song Lyrics Creator with Karaoke Features (Serdar Ortach style)
+                    <span class="date">(May 13, 2019)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./shallowest-gift-exchange-generator/">
                     Shallowest Gift Exchange Generator
-                    <span class="date">(18.02.2019)</span>
+                    <span class="date">(February 18, 2019)</span>
                 </a>
             </div>
 
             <div class="card">
                 <a href="./guess-the-words/">
-                    Guess the words game
-                    <span class="date">(11.02.2019)</span>
+                    Guess the Words Game
+                    <span class="date">(February 11, 2019)</span>
                 </a>
             </div>
 
             <div class="card">
-                <a href="./parallax-game/">Parallax Game(css-coordinates)</a>
+                <a href="./parallax-game/">Parallax Game (CSS-Coordinates)</a>
             </div>
 
             <div class="card">
-                <a href="./chibi-rpg/">Chibi RPG(Canvas-Early)</a>
+                <a href="./chibi-rpg/">Chibi RPG (Canvas - Early Stage)</a>
             </div>
 
             <div class="card">
-                <a href="./wood-chuck-conversation/">Wood Chuck Conversation(speech synth)</a>
+                <a href="./wood-chuck-conversation/">Wood Chuck Conversation (Speech Synthesis)</a>
             </div>
 
             <div class="card">
@@ -536,7 +621,7 @@
             </div>
 
             <div class="card">
-                <a href="./colorization/">Colorization (with inverse distance weighting)</a>
+                <a href="./colorization/">Colorization (with Inverse Distance Weighting)</a>
             </div>
 
             <div class="card">
@@ -545,22 +630,21 @@
         </div>
 
         <p class="notice">
-            You can listen my own advertisement by clicking "Play Advertisement" button which is dubbed by professional
-            voice actor <a style="font-size:20px;" href="javascript:void(0);">Ertuğrul Ulutaş</a>. I am so happy that
-            he did not reject my request. It is in turkish language.
+            You can listen to my personal advertisement by clicking the "Play Advertisement" button. It was professionally
+            dubbed by voice actor <a style="font-size:20px;" href="javascript:void(0);">Ertuğrul Ulutaş</a>, and I'm
+            very grateful he accepted my request. The advertisement is in Turkish.
         </p>
         <button class='btn' onclick="playAdvertisement()">Play advertisement</button>
 
         <div class="footer-links">
-            <h3>This page's css's were obtained from codepen: <a href="https://codepen.io/brenden/pen/RNZXqx">by Brenden
+            <h3>The CSS for this page was inspired by a CodePen: <a href="https://codepen.io/brenden/pen/RNZXqx">by Brenden
                     Palmer</a></h3>
-            <h3>Text color @notice place was obtained with finding safe color fitting for background with using <a
-                    href="http://colorsafe.co/">http://colorsafe.co/</a>
-                . Copy to clipboard functionality doesn't work by the way.</h3>
+            <h3>The text color for the notice section was chosen using <a
+                    href="http://colorsafe.co/">http://colorsafe.co/</a> to ensure good contrast with the background. (Note: The copy-to-clipboard functionality on that site doesn't work.)</h3>
         </div>
 
         <div class="visitor-count">
-            <h3>#of ppl visited this site</h3>
+            <h3># of people visited this site</h3>
             <br />
             <script type="text/javascript" src="//widget.supercounters.com/ssl/hit.js"></script>
             <script type="text/javascript">
