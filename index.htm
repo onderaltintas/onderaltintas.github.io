@@ -15,19 +15,21 @@
     <meta property="og:image" content="https://onderaltintas.github.io/kafa.jpg">
     <link rel="icon" type="image/png" href="favicon.png" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@600;700&display=swap"
+        rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <style>
         :root {
-            --primary-color: #3f51b5; /* Indigo */
+            --primary-color: #3f51b5;
             --primary-dark-color: #303f9f;
             --primary-light-color: #7986cb;
-            --accent-color: #ff4081; /* Pink A200 */
+            --accent-color: #ff4081;
             --accent-dark-color: #f50057;
-            --text-color: #212121; /* Dark Gray for main text */
-            --text-light-color: #757575; /* Gray for secondary text */
-            --background-color: #e8eaf6; /* Light Indigo background */
+            --text-color: #212121;
+            --text-light-color: #757575;
+            --background-color: #e8eaf6;
             --card-background: #ffffff;
             --shadow-color: rgba(0, 0, 0, 0.15);
             --light-shadow-color: rgba(0, 0, 0, 0.08);
@@ -42,7 +44,7 @@
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            overflow-x: hidden; /* Prevent horizontal scroll from animations */
+            overflow-x: hidden;
         }
 
         .container {
@@ -51,6 +53,9 @@
             margin: 20px auto;
             padding: 0 15px;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content within the container */
         }
 
         header {
@@ -59,8 +64,7 @@
             padding: 40px 0 20px;
             text-align: center;
             box-shadow: 0 4px 8px var(--shadow-color);
-            position: relative;
-            z-index: 1; /* Ensure header is above other content for visual stacking */
+            width: 100%; /* Header takes full width */
         }
 
         header h1 {
@@ -69,9 +73,9 @@
             margin: 0;
             font-weight: 700;
             letter-spacing: 1px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            opacity: 0; /* Initial state for animation */
-            transform: translateY(-20px); /* Initial state for animation */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(-20px);
             animation: slideInFromTop 0.8s forwards 0.2s;
         }
 
@@ -81,8 +85,8 @@
             margin: 5px 0 0;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
-            opacity: 0; /* Initial state for animation */
-            transform: translateY(-20px); /* Initial state for animation */
+            opacity: 0;
+            transform: translateY(-20px);
             animation: slideInFromTop 0.8s forwards 0.4s;
         }
 
@@ -98,9 +102,10 @@
 
         .profile-image-wrapper {
             text-align: center;
-            margin-top: -80px; /* Pull image up to overlap header slightly */
+            margin-top: 20px; /* Space below the header */
+            margin-bottom: 20px; /* Space above the notices */
             position: relative;
-            z-index: 10; /* Ensure image is on top */
+            z-index: 10;
             opacity: 0;
             transform: scale(0.8);
             animation: fadeInScale 0.8s forwards 0.6s;
@@ -117,7 +122,7 @@
         }
 
         .profile-image:hover {
-            transform: scale(1.05) rotate(3deg); /* Slight rotation on hover */
+            transform: scale(1.05) rotate(3deg);
             box-shadow: 0 12px 24px var(--shadow-color);
         }
 
@@ -133,6 +138,7 @@
             opacity: 0;
             transform: translateY(20px);
             animation: slideInFromBottom 0.8s forwards 0.8s;
+            width: 100%; /* Section title takes full width */
         }
 
         .card-grid {
@@ -140,6 +146,7 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
             margin-top: 20px;
+            width: 100%; /* Card grid takes full container width */
         }
 
         .card {
@@ -153,7 +160,7 @@
             justify-content: space-between;
             opacity: 0;
             transform: scale(0.9);
-            animation: fadeInScale 0.8s forwards; /* Will be staggered by JS */
+            animation: fadeInScale 0.8s forwards;
         }
 
         .card:hover {
@@ -191,7 +198,7 @@
         }
 
         .notice {
-            background-color: #c5cae9; /* Light Indigo for notices */
+            background-color: #c5cae9;
             color: var(--text-color);
             padding: 15px 20px;
             border-radius: 8px;
@@ -201,12 +208,22 @@
             box-shadow: 0 2px 5px var(--light-shadow-color);
             opacity: 0;
             transform: translateX(-20px);
-            animation: slideInFromLeft 0.8s forwards 1s; /* Staggered */
+            animation: slideInFromLeft 0.8s forwards 1s;
+            width: 100%; /* Notices take full container width */
+            box-sizing: border-box; /* Ensure padding doesn't break layout */
         }
 
-        .notice:nth-of-type(2) { animation-delay: 1.1s; }
-        .notice:nth-of-type(3) { animation-delay: 1.2s; }
-        .notice:nth-of-type(4) { animation-delay: 1.3s; }
+        .notice:nth-of-type(2) {
+            animation-delay: 1.1s;
+        }
+
+        .notice:nth-of-type(3) {
+            animation-delay: 1.2s;
+        }
+
+        .notice:nth-of-type(4) {
+            animation-delay: 1.3s;
+        }
 
         .notice a {
             color: var(--primary-dark-color);
@@ -256,6 +273,7 @@
             opacity: 0;
             transform: translateY(20px);
             animation: slideInFromBottom 0.8s forwards 1.7s;
+            width: 100%; /* Footer takes full container width */
         }
 
         .footer-links h3 {
@@ -309,6 +327,7 @@
                 opacity: 0;
                 transform: translateY(-50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -320,6 +339,7 @@
                 opacity: 0;
                 transform: scale(0.8);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -331,6 +351,7 @@
                 opacity: 0;
                 transform: translateY(50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -342,6 +363,7 @@
                 opacity: 0;
                 transform: translateX(-50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -359,7 +381,8 @@
             }
 
             .profile-image-wrapper {
-                margin-top: -60px;
+                margin-top: 15px;
+                margin-bottom: 15px;
             }
 
             .profile-image {
@@ -398,7 +421,8 @@
             }
 
             .profile-image-wrapper {
-                margin-top: -50px;
+                margin-top: 10px;
+                margin-bottom: 10px;
             }
 
             .profile-image {
@@ -449,11 +473,10 @@
             }
         }
 
-        // JavaScript for staggering card animations
         document.addEventListener('DOMContentLoaded', () => {
             const cards = document.querySelectorAll('.card');
             cards.forEach((card, index) => {
-                card.style.animationDelay = `${1.2 + (index * 0.1)}s`; // Stagger cards
+                card.style.animationDelay = `${1.2 + (index * 0.1)}s`;
             });
         });
     </script>
@@ -468,25 +491,30 @@
         <h3>onderaltintas@gmail.com</h3>
     </header>
 
-    <div class="profile-image-wrapper">
-        <img class='profile-image' src='./kafa.jpg' alt="Önder ALTINTAŞ Profile" />
-    </div>
-
     <div class="container">
+        <div class="profile-image-wrapper">
+            <img class='profile-image' src='./kafa.jpg' alt="Önder ALTINTAŞ Profile" />
+        </div>
+
         <p class="notice">
-            **Note:** I am a Software Engineer. The projects here are primarily demos, often developed during my free time. They might not be fully mobile-friendly or cross-browser compatible, and some are early implementations. Please consider them as ongoing learning experiments rather than polished products.
+            **Note:** I am a Software Engineer. The projects here are primarily demos, often developed during my free time.
+            They might not be fully mobile-friendly or cross-browser compatible, and some are early implementations. Please
+            consider them as ongoing learning experiments rather than polished products.
         </p>
         <p class="notice">
-            **Note 2:** I've decided to keep the dates on the list to track my development journey and how I've spent my time on these projects.
+            **Note 2:** I've decided to keep the dates on the list to track my development journey and how I've spent my
+            time on these projects.
         </p>
         <p class="notice">
-            You can access the source code for these projects on my <a href="https://github.com/onderaltintas">GitHub profile</a>.
+            You can access the source code for these projects on my <a href="https://github.com/onderaltintas">GitHub
+                profile</a>.
         </p>
         <p class="notice">
             Feel free to reach out via <a
                 href="https://twitter.com/intent/tweet?screen_name=_onderaltintas_&ref_src=twsrc%5Etfw"
                 class="twitter-mention-button" data-show-count="false">Tweet to @_onderaltintas_</a>
-            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> or follow me on Twitter: <a href="https://twitter.com/_onderaltintas_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> or follow me on
+            Twitter: <a href="https://twitter.com/_onderaltintas_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
                 data-show-count="false">Follow @_onderaltintas_</a>
             <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
         </p>
@@ -499,7 +527,11 @@
                     You Are Awesome Android App
                     <span class="date">(March 30, 2025)</span>
                 </a>
-                <p class="description">The Story of the App: Google notified developers about deleting inactive accounts in the Google Play Developer program, with a deadline of April 4th. To prevent deletion, a new app upload or an update was required. With only 4 days left, I quickly developed this app. ChatGPT helped with the song lyrics, Suno AI composed the music, and ChatGPT also provided the video integration code. At this point, I believe AI should simply take over our jobs! 😊</p>
+                <p class="description">The Story of the App: Google notified developers about deleting inactive accounts
+                    in the Google Play Developer program, with a deadline of April 4th. To prevent deletion, a new app
+                    upload or an update was required. With only 4 days left, I quickly developed this app. ChatGPT helped
+                    with the song lyrics, Suno AI composed the music, and ChatGPT also provided the video integration
+                    code. At this point, I believe AI should simply take over our jobs! 😊</p>
             </div>
 
             <div class="card">
@@ -630,17 +662,20 @@
         </div>
 
         <p class="notice">
-            You can listen to my personal advertisement by clicking the "Play Advertisement" button. It was professionally
+            You can listen to my personal advertisement by clicking the "Play Advertisement" button. It was
+            professionally
             dubbed by voice actor <a style="font-size:20px;" href="javascript:void(0);">Ertuğrul Ulutaş</a>, and I'm
             very grateful he accepted my request. The advertisement is in Turkish.
         </p>
         <button class='btn' onclick="playAdvertisement()">Play advertisement</button>
 
         <div class="footer-links">
-            <h3>The CSS for this page was inspired by a CodePen: <a href="https://codepen.io/brenden/pen/RNZXqx">by Brenden
+            <h3>The CSS for this page was inspired by a CodePen: <a
+                    href="https://codepen.io/brenden/pen/RNZXqx">by Brenden
                     Palmer</a></h3>
             <h3>The text color for the notice section was chosen using <a
-                    href="http://colorsafe.co/">http://colorsafe.co/</a> to ensure good contrast with the background. (Note: The copy-to-clipboard functionality on that site doesn't work.)</h3>
+                    href="http://colorsafe.co/">http://colorsafe.co/</a> to ensure good contrast with the background.
+                (Note: The copy-to-clipboard functionality on that site doesn't work.)</h3>
         </div>
 
         <div class="visitor-count">
