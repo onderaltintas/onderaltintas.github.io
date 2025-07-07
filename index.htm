@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Small Apps by Önder ALTINTAŞ</title>
+    <meta name="description"
+        content="There are some web application demos -pure js mostly- with open source codes in Github. To show how to use recent technologies on web applications. For all.">
+    <meta name="keywords"
+        content="HTML,CSS,JavaScript,Canvas,HTML5,Monkey Island,Parallax,IDW,Inverse Distance,Önder ALTINTAŞ,Onder Altintas">
+    <meta name="author" content="Önder ALTINTAŞ">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Small Apps by Önder ALTINTAŞ">
+    <meta property="og:description" content="Small Applications by Önder ALTINTAŞ">
+    <meta property="og:image" content="https://onderaltintas.github.io/kafa.jpg">
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #3f51b5; /* Indigo */
+            --primary-dark-color: #303f9f;
+            --accent-color: #ff4081; /* Pink A200 */
+            --text-color: #212121; /* Dark Gray */
+            --text-light-color: #757575; /* Gray */
+            --background-color: #f5f5f5; /* Light Gray */
+            --card-background: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        header h3 {
+            font-size: 1.2em;
+            margin: 5px 0;
+            font-weight: 300;
+        }
+
+        header a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        header a:hover {
+            color: var(--accent-color);
+        }
+
+        .profile-image {
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            margin-top: -80px; /* Adjust to float over the header */
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: var(--primary-dark-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            margin-bottom: 20px;
+            padding: 20px;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card a {
+            font-size: 1.3em;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 400;
+            display: block; /* Make the whole card clickable area */
+            padding-bottom: 5px; /* Spacing for date */
+        }
+
+        .card a:hover {
+            color: var(--accent-color);
+        }
+
+        .card .date {
+            font-size: 0.9em;
+            color: var(--text-light-color);
+            margin-top: 5px;
+            display: block;
+        }
+
+        .card .description {
+            font-size: 0.95em;
+            color: var(--text-light-color);
+            margin-top: 10px;
+        }
+
+        .notice {
+            color: var(--text-light-color);
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+
+        .notice a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .notice a:hover {
+            color: var(--accent-color);
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            display: inline-block;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #e91e63; /* Darker accent */
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        .footer-links {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: var(--text-light-color);
+        }
+
+        .footer-links h3 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .footer-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 400;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .visitor-count {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-light-color);
+        }
+
+        iframe {
+            width: 100%;
+            height: 400px; /* Adjusted for better mobile view */
+            border: none;
+            margin-top: 30px;
+            background-color: var(--background-color); /* Matches body background */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            header h3 {
+                font-size: 1em;
+            }
+
+            .profile-image {
+                width: 100px;
+                height: 100px;
+                margin-top: -60px;
+            }
+
+            .card a {
+                font-size: 1.1em;
+            }
+
+            .btn {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+    <script>
+        var advertisementPlayer;
+
+        function browserCanPlay(format) {
+            var a = document.createElement('audio');
+            return !!(a.canPlayType && a.canPlayType(format + ';').replace(/no/, ''));
+        }
+
+        function loadAdvertisement() {
+            advertisementPlayer = document.createElement('audio');
+            advertisementPlayer.preload = "auto";
+            if (browserCanPlay('audio/mpeg')) {
+                advertisementPlayer.setAttribute('src', './superOnder.mp3');
+            } else if (browserCanPlay('audio/webm')) {
+                advertisementPlayer.setAttribute('src', './superOnder.webm');
+            } else if (browserCanPlay('audio/ogg')) {
+                advertisementPlayer.setAttribute('src', './superOnder.ogg');
+            }
+        }
+
+        function playAdvertisement() {
+            if (advertisementPlayer) {
+                advertisementPlayer.play();
+            }
+        }
+    </script>
+</head>
+
+<body onload="loadAdvertisement()">
+    <header>
+        <h1>Small Apps</h1>
+        <a href="http://github.com/onderaltintas/">
+            <h3>by Önder ALTINTAŞ</h3>
+        </a>
+        <h3>onderaltintas@gmail.com</h3>
+    </header>
+
+    <div class="container" style="text-align: center;">
+        <img class='profile-image' src='./kafa.jpg' alt="Önder ALTINTAŞ Profile" />
+    </div>
+
+    <div class="container">
+        <p class="notice">
+            Notice: I am a Software Engineer. All projects here are non mobile friendly, non cross browser compatible,
+            made@night and half arsed implementations. Don't judge me with them.
+        </p>
+        <p class="notice">
+            Notice2: Decided to keep dates in list. So, I can check how and "when" I wasted my time.
+        </p>
+        <p class="notice">
+            You can access the source codes <a href="https://github.com/onderaltintas">here</a>.
+        </p>
+        <p class="notice">
+            You can also reach me by using <a
+                href="https://twitter.com/intent/tweet?screen_name=_onderaltintas_&ref_src=twsrc%5Etfw"
+                class="twitter-mention-button" data-show-count="false">Tweet to @_onderaltintas_</a>
+            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> or follow me @twitter
+            with using <a href="https://twitter.com/_onderaltintas_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+                data-show-count="false">Follow @_onderaltintas_</a>
+            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        </p>
+
+        <h2 class="section-title">My Projects</h2>
+
+        <div class="card">
+            <a href="https://play.google.com/store/apps/details?id=com.onder.youareawesome">
+                You Are Awesome Android App
+                <span class="date">(30.03.2025)</span>
+            </a>
+            <p class="description">The Story of the App: Google sends a series of emails to developers, informing them
+                that inactive accounts in the Google Play Developer program will be deleted. To prevent deletion, you
+                either need to upload a new app or update an existing one. The deadline is April 4th. With time running
+                out, I rushed to create a rather unpolished app and uploaded it just 4 days before the deadline. After
+                that, thanks to ChatGPT, I had a song lyric written, used Suno AI to make a piece of music, and added
+                it to the app. ChatGPT also provided the code for adding videos. At this point, I think AI should just
+                take over our jobs. 😊</p>
+        </div>
+
+        <div class="card">
+            <a
+                href="https://onderaltintas.github.io/last-earthquakes-on-turkey-by-deepseek/with-cesium/index-multifile-oop.html">
+                Latest earthquakes on Turkey, written by DeepSeek(prompt: now, do this with cesium ehehe)
+                <span class="date">(24.02.2025)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./last-earthquakes-on-turkey-by-deepseek/">
+                Latest earthquakes on Turkey, written by DeepSeek
+                <span class="date">(10.02.2025)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./gwc-disk-size-estimator/">
+                GeoWebCache Required Disk Size Estimator.
+                <span class="date">(08.08.2024)(needs bugfixes =) )</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./maps-quickstarts-mobile/">
+                For mobile user experience tests, quickstart pages for map frameworks.
+                <span class="date">(04.04.2023)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./webgl-sphere/">
+                webGL World Sphere example
+                <span class="date">(08.11.2022)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./Üniversite Okumadan Yazılım Alanında Çalışılabilir mi.pdf">
+                Üniversite'de okumadan yazılımcı olmak üzerine bir instagram şeyi
+                <span class="date">(11.10.2022)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./bescalculator/">
+                Turkish BES system calculator (For Turkish citizens)
+                <span class="date">(26.03.2022)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./i8-spinner/">
+                i8 smooth spinner (smooth animation work in progress)
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./covid-19-visualization-nightly-challenge/">
+                COVID-19 3d Visualization Challenge
+                <span class="date">(17.04.2020)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./arz/">
+                Arz (Earth - Gaia)
+                <span class="date">(New! 22.05.2019)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="https://play.google.com/store/apps/details?id=com.onderaltintas.approvestickers">
+                Approve Everything Whatsapp Stickers(Google Play)
+                <span class="date">(07.04.2020)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./serdar-ortach-like-song-lyrics-creator/">
+                Song lyrics creator with Kareoke features(Serdar Ortach styla)
+                <span class="date">(13.05.2019)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./shallowest-gift-exchange-generator/">
+                Shallowest Gift Exchange Generator
+                <span class="date">(18.02.2019)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./guess-the-words/">
+                Guess the words game
+                <span class="date">(11.02.2019)</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="./parallax-game/">Parallax Game(css-coordinates)</a>
+        </div>
+
+        <div class="card">
+            <a href="./chibi-rpg/">Chibi RPG(Canvas-Early)</a>
+        </div>
+
+        <div class="card">
+            <a href="./wood-chuck-conversation/">Wood Chuck Conversation(speech synth)</a>
+        </div>
+
+        <div class="card">
+            <a href="./favicon-changer/">Favicon Changer</a>
+        </div>
+
+        <div class="card">
+            <a href="./visual-notifier/">Visual Notifier</a>
+        </div>
+
+        <div class="card">
+            <a href="./colorization/">Colorization (with inverse distance weighting)</a>
+        </div>
+
+        <div class="card">
+            <a href="./fill-polygon-with-squares/">OpenLayers Example (3+)</a>
+        </div>
+
+
+        <p class="notice">
+            You can listen my own advertisement by clicking "Play Advertisement" button which is dubbed by professional
+            voice actor <a style="font-size:20px;" href="javascript:void(0);">Ertuğrul Ulutaş</a>. I am so happy that
+            he did not reject my request. It is in turkish language.
+        </p>
+        <button class='btn' onclick="playAdvertisement()">Play advertisement</button>
+
+        <div class="footer-links">
+            <h3>This page's css's were obtained from codepen: <a href="https://codepen.io/brenden/pen/RNZXqx">by Brenden
+                    Palmer</a></h3>
+            <h3>Text color @notice place was obtained with finding safe color fitting for background with using <a
+                    href="http://colorsafe.co/">http://colorsafe.co/</a>
+                . Copy to clipboard functionality doesn't work by the way.</h3>
+        </div>
+
+        <div class="visitor-count">
+            <h3>#of ppl visited this site</h3>
+            <br />
+            <script type="text/javascript" src="//widget.supercounters.com/ssl/hit.js"></script>
+            <script type="text/javascript">
+                sc_hit(1542942, 0, 9);
+            </script>
+        </div>
+
+        <iframe src="https://www.youtube-nocookie.com/embed/jAO2j_ufAPM?controls=0&autoplay=1" frameborder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</body>
+
+</html>
