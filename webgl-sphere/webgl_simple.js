@@ -1,8 +1,12 @@
 "use strict";
+
+// DEĞİŞİKLİK: canvas değişkenini global kapsamda tanımla
+var canvas = null; // Canvas global olarak tanımlandı, main içinde atanacak
+
 function main() {
   // Get A WebGL context
   /** @type {HTMLCanvasElement} */
-  var canvas = document.querySelector("#c");
+  canvas = document.querySelector("#c"); // DEĞİŞİKLİK: canvas global değişkene atanıyor
   var gl = canvas.getContext("webgl");
   if (!gl) {
     return;
@@ -44,8 +48,8 @@ function main() {
       rotationMatrix = m4.multiply(m4.axisRotation([0, 1, 0], toRadian(autoRotateAngle / zoomFactor)), rotationMatrix);
     }
 
-    resizeCanvasToDisplaySize(gl.canvas);
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    resizeCanvasToDisplaySize(canvas);
+    gl.viewport(0, 0, canvas.width, canvas.height);
     gl.textureEnabled = true;
     gl.clearColor(0,0,0,1);
     // Clear the canvas.
@@ -65,7 +69,7 @@ function main() {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sphere.vboIndex);
 
     // Compute the matrices
-    var projectionMatrix = m4.perspective(Math.PI/180*45, gl.canvas.width/gl.canvas.height, 0.1, 1000);
+    var projectionMatrix = m4.perspective(Math.PI/180*45, canvas.width/canvas.height, 0.1, 1000);
     var modelView = m4.identity();
     modelView = m4.multiply(modelView, m4.inverse(m4.lookAt([0,0,5], [0,0,0],[0,1,0])));
     // DEĞİŞİKLİK: xAngle ve yAngle yerine rotationMatrix kullanılarak daha hassas rotasyon
@@ -208,7 +212,7 @@ function toRadian(value) {
 // DEĞİŞİKLİK: Fare pozisyonunu sanal küre yüzeyine projekte eden yeni fonksiyon
 function getMouseOnSphere(clientX, clientY) {
   // Fare koordinatlarını normalize et: [-1, 1]
-  const rect = canvas.getBoundingClientRect();
+  const rect = canvas.getBoundingClientRect(); // DEĞİŞİKLİK: Global canvas değişkeni kullanılıyor
   const x = ((clientX - rect.left) / canvas.clientWidth) * 2 - 1;
   const y = -((clientY - rect.top) / canvas.clientHeight) * 2 + 1;
 
