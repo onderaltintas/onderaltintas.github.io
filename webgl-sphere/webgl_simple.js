@@ -1,6 +1,6 @@
 "use strict";
 
-// DEĞİŞİKLİK: canvas değişkenini global kapsamda tanımla
+// DEĞİŞİKLİK: canvas değişkenini global kapsamda tanımla (önceki hata çözümü)
 var canvas = null; // Canvas global olarak tanımlandı, main içinde atanacak
 
 function main() {
@@ -42,9 +42,7 @@ function main() {
     }
     
     if(autoRotate){
-      xAngle = xAngle + autoRotateAngle / zoomFactor;
-      lastXAngle += autoRotateAngle / zoomFactor;
-      // DEĞİŞİKLİK: Otomatik rotasyonun mevcut rotationMatrix'e uygulanması için güncelleme
+      // DEĞİŞİKLİK: Otomatik rotasyon, rotationMatrix üzerine y-ekseni etrafında uygulanıyor
       rotationMatrix = m4.multiply(m4.axisRotation([0, 1, 0], toRadian(autoRotateAngle / zoomFactor)), rotationMatrix);
     }
 
@@ -71,9 +69,9 @@ function main() {
     // Compute the matrices
     var projectionMatrix = m4.perspective(Math.PI/180*45, canvas.width/canvas.height, 0.1, 1000);
     var modelView = m4.identity();
-    modelView = m4.multiply(modelView, m4.inverse(m4.lookAt([0,0,5], [0,0,0],[0,1,0])));
-    // DEĞİŞİKLİK: xAngle ve yAngle yerine rotationMatrix kullanılarak daha hassas rotasyon
-    modelView = m4.multiply(modelView, rotationMatrix);
+    // DEĞİŞİKLİK: -90 derece x-rotasyonu kaldırıldı, kuzey kutbu yukarıda olacak şekilde
+    modelView = m4.multiply(modelView, m4.inverse(m4.lookAt([0, 0, 5], [0, 0, 0], [0, 1, 0])));
+    modelView = m4.multiply(modelView, rotationMatrix); // Raycasting ile hesaplanan rotasyon
     modelView = m4.scale(modelView, zoomFactor, zoomFactor, zoomFactor);
     // Set the matrix.
     gl.uniformMatrix4fv(projectionMatrixLocation, false, projectionMatrix);
@@ -129,17 +127,14 @@ function loadTexture(gl, textureUrl, callback){
 var mouseDragging = false;
 var firstPosX = 0;
 var firstPosY = 0;
-var xAngle = 0;
-var yAngle = 0;
-var lastXAngle = 0;
-var lastYAngle = 0;
 var zoomFactor = 1;
 var autoRotateAngle = 0.01;
 var autoRotate = true;
 var rotateTimeouts = [];
-// DEĞİŞİKLİK: Küre üzerindeki başlangıç noktasını ve rotasyonu saklamak için yeni değişkenler
+// DEĞİŞİKLİK: Raycasting için başlangıç ve mevcut noktaları saklama
 var startPoint = null; // Küre üzerindeki başlangıç noktası (3D vektör)
 var rotationMatrix = m4.identity(); // Mevcut rotasyonu saklamak için
+// DEĞİŞİKLİK: xAngle, yAngle, lastXAngle, lastYAngle kaldırıldı, çünkü raycasting kullanıyoruz
 
 window.addEventListener("mousedown", mouseDown, false);
 window.addEventListener("mousemove", mouseMove, false);
@@ -151,33 +146,33 @@ function mouseDown(event) {
   firstPosY = event.clientY;
   stopRotate();
   mouseDragging = true;
-  // DEĞİŞİKLİK: Fare pozisyonunu sanal küre yüzeyine projekte et
-  const mouse = getMouseOnSphere(event.clientX, event.clientY);
-  startPoint = mouse; // Başlangıç noktası (örn. İstanbul) 3D vektör olarak saklanır
+  // DEĞİŞİKLİK: Raycasting ile fare pozisyonunu küre üzerindeki 3D noktaya eşle
+  startPoint = getRaycastPoint(event.clientX, event.clientY);
 }
 
 function mouseUp(event) {
   mouseDragging = false;
-  // DEĞİŞİKLİK: lastXAngle ve lastYAngle kaldırıldı, çünkü rotationMatrix zaten rotasyonu tutuyor
+  // DEĞİŞİKLİK: Raycasting ile son noktayı güncelle, rotasyon matrix zaten tutuyor
+  startPoint = getRaycastPoint(event.clientX, event.clientY);
   startRotate();
 }
 
 function mouseMove(event) {
   if (mouseDragging) {
-    // DEĞİŞİKLİK: Fare hareketini arcball rotasyonuyla işlemek için yeni mantık
-    const mouse = getMouseOnSphere(event.clientX, event.clientY);
-    if (startPoint && mouse) {
+    // DEĞİŞİKLİK: Raycasting ile mevcut fare pozisyonunu al ve rotasyonu hesapla
+    const currentPoint = getRaycastPoint(event.clientX, event.clientY);
+    if (startPoint && currentPoint) {
       // Başlangıç ve mevcut noktalar arasında rotasyon hesapla
-      const axis = m4.cross(startPoint, mouse); // Dönüş ekseni
-      const dot = m4.dot(startPoint, mouse); // Açıyı hesaplamak için
+      const axis = m4.cross(startPoint, currentPoint); // Dönüş ekseni
+      const dot = m4.dot(startPoint, currentPoint); // Açıyı hesaplamak için
       const angle = Math.acos(Math.min(Math.max(dot, -1), 1)); // Açı (radyan)
 
       if (angle > 0.0001) { // Küçük hareketleri yoksay
-        const rotation = m4.axisRotation(axis, angle); // Quaternion benzeri rotasyon matrisi
+        const rotation = m4.axisRotation(axis, angle); // Rotasyon matrisi
         rotationMatrix = m4.multiply(rotation, rotationMatrix); // Mevcut rotasyonu güncelle
       }
 
-      startPoint = mouse; // Yeni başlangıç noktası
+      startPoint = currentPoint; // Yeni başlangıç noktası
     }
   }
 }
@@ -206,22 +201,51 @@ function startRotate() {
 
 //geometry!
 function toRadian(value) {
-  return value/57.29577951308232; // DEĞİŞİKLİK: Daha hassas radyan dönüşümü için sabit kullanıldı
+  return value / 57.29577951308232; // DEĞİŞİKLİK: Hassas radyan dönüşümü
 }
 
-// DEĞİŞİKLİK: Fare pozisyonunu sanal küre yüzeyine projekte eden yeni fonksiyon
-function getMouseOnSphere(clientX, clientY) {
+// DEĞİŞİKLİK: Raycasting ile fare pozisyonunu küre üzerindeki 3D noktaya eşleme
+function getRaycastPoint(clientX, clientY) {
   // Fare koordinatlarını normalize et: [-1, 1]
-  const rect = canvas.getBoundingClientRect(); // DEĞİŞİKLİK: Global canvas değişkeni kullanılıyor
+  const rect = canvas.getBoundingClientRect();
   const x = ((clientX - rect.left) / canvas.clientWidth) * 2 - 1;
   const y = -((clientY - rect.top) / canvas.clientHeight) * 2 + 1;
 
-  // Sanal küre yüzeyine projekte et (kamera z=5 mesafede)
-  const mag = x * x + y * y;
-  if (mag > 1) return null; // Fare küre dışında
+  // Kamera ve projeksiyon parametreleri
+  const aspect = canvas.width / canvas.height;
+  const fov = Math.PI / 180 * 45; // 45 derece FOV
+  const near = 0.1;
+  const far = 1000;
+  const projectionMatrix = m4.perspective(fov, aspect, near, far);
+  const viewMatrix = m4.inverse(m4.lookAt([0, 0, 5], [0, 0, 0], [0, 1, 0]));
 
-  const zCoord = Math.sqrt(1 - mag); // Küre yüzeyinde z koordinatı
-  const point = [x, y, zCoord]; // Küre üzerindeki 3D nokta
-  const length = Math.sqrt(m4.dot(point, point));
-  return length > 0 ? m4.scale(point, 1 / length) : point; // Normalleştir
+  // Ekran koordinatlarından dünya koordinatlarına ışın oluştur
+  const rayClip = [x, y, -1, 1]; // Clip uzayında ışın başlangıcı
+  const rayEye = m4.multiplyVector(m4.inverse(projectionMatrix), rayClip);
+  rayEye[2] = -1; // İleri yön
+  rayEye[3] = 0; // Yön vektörü için
+  const rayWorld = m4.multiplyVector(m4.inverse(viewMatrix), rayEye);
+  const rayDir = m4.normalize([rayWorld[0], rayWorld[1], rayWorld[2]]); // Normalleştirilmiş yön
+  const rayOrigin = [0, 0, 5]; // Kamera pozisyonu
+
+  // Küre ile kesişim hesapla (radius=1)
+  const sphereCenter = [0, 0, 0];
+  const oc = m4.subtractVectors(rayOrigin, sphereCenter);
+  const a = m4.dot(rayDir, rayDir);
+  const b = 2 * m4.dot(oc, rayDir);
+  const c = m4.dot(oc, oc) - 1; // radius^2
+  const discriminant = b * b - 4 * a * c;
+
+  if (discriminant < 0) return null; // Kesişim yok
+
+  const t = (-b - Math.sqrt(discriminant)) / (2 * a); // Yakın kesişim noktası
+  if (t < 0) return null; // Kesişim kamera arkasında
+
+  const intersection = [
+    rayOrigin[0] + t * rayDir[0],
+    rayOrigin[1] + t * rayDir[1],
+    rayOrigin[2] + t * rayDir[2]
+  ];
+
+  return m4.normalize(intersection); // Küre yüzeyindeki normalleştirilmiş nokta
 }
