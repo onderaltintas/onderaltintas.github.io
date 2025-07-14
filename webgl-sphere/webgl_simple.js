@@ -63,7 +63,7 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, sphere.vboVertex);
     gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 32, 0);
     gl.vertexAttribPointer(normalAttributeLocation, 3, gl.FLOAT, false, 32, 12);
-    gl.vertexAttribPointer(texCoordAttributeLocation, 2, gl.FLOAT, false, 32, 24);
+    gl.vertexAttribPointer(texCoordAttributeSavings, 2, gl.FLOAT, false, 32, 24);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sphere.vboIndex);
 
     // Compute the matrices
@@ -115,12 +115,34 @@ function loadTexture(gl, textureUrl, callback){
   var image = new Image();
   image.src = textureUrl;
   image.addEventListener('load', function() {
-    // Now that the image has loaded make copy it to the texture.
+    // Now that the image2D has loaded make copy it to the texture.
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
     gl.generateMipmap(gl.TEXTURE_2D);
     callback(true);
   });  
+}
+
+// DEĞİŞİKLİK: m4.js'de olmayan dot, cross ve subtractVectors için yardımcı fonksiyonlar
+function vectorDot(a, b) {
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+function vectorCross(a, b) {
+  return [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0]
+  ];
+}
+
+function vectorSubtract(a, b) {
+  return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+}
+
+function vectorNormalize(v) {
+  const length = Math.sqrt(vectorDot(v, v));
+  return length > 0 ? [v[0] / length, v[1] / length, v[2] / length] : v;
 }
 
 //mouse!
@@ -134,7 +156,6 @@ var rotateTimeouts = [];
 // DEĞİŞİKLİK: Raycasting için başlangıç ve mevcut noktaları saklama
 var startPoint = null; // Küre üzerindeki başlangıç noktası (3D vektör)
 var rotationMatrix = m4.identity(); // Mevcut rotasyonu saklamak için
-// DEĞİŞİKLİK: xAngle, yAngle, lastXAngle, lastYAngle kaldırıldı, çünkü raycasting kullanıyoruz
 
 window.addEventListener("mousedown", mouseDown, false);
 window.addEventListener("mousemove", mouseMove, false);
@@ -152,7 +173,7 @@ function mouseDown(event) {
 
 function mouseUp(event) {
   mouseDragging = false;
-  // DEĞİŞİKLİK: Raycasting ile son noktayı güncelle, rotasyon matrix zaten tutuyor
+  // DEĞİŞİKLİK: Raycasting ile son noktayı güncelle
   startPoint = getRaycastPoint(event.clientX, event.clientY);
   startRotate();
 }
@@ -163,8 +184,8 @@ function mouseMove(event) {
     const currentPoint = getRaycastPoint(event.clientX, event.clientY);
     if (startPoint && currentPoint) {
       // Başlangıç ve mevcut noktalar arasında rotasyon hesapla
-      const axis = m4.cross(startPoint, currentPoint); // Dönüş ekseni
-      const dot = m4.dot(startPoint, currentPoint); // Açıyı hesaplamak için
+      const axis = vectorCross(startPoint, currentPoint); // Dönüş ekseni
+      const dot = vectorDot(startPoint, currentPoint); // Açıyı hesaplamak için
       const angle = Math.acos(Math.min(Math.max(dot, -1), 1)); // Açı (radyan)
 
       if (angle > 0.0001) { // Küçük hareketleri yoksay
@@ -204,7 +225,7 @@ function toRadian(value) {
   return value / 57.29577951308232; // DEĞİŞİKLİK: Hassas radyan dönüşümü
 }
 
-// DEĞİŞİKLİK: Raycasting ile fare pozisyonunu küre üzerindeki 3D noktaya eşleme
+// DEĞİŞİKLİK: Raycasting ile fare pozisyonunu küre üzerindeki 3D noktaya eşleme, m4.multiplyVector yerine m4.transformVector kullanıldı
 function getRaycastPoint(clientX, clientY) {
   // Fare koordinatlarını normalize et: [-1, 1]
   const rect = canvas.getBoundingClientRect();
@@ -221,19 +242,19 @@ function getRaycastPoint(clientX, clientY) {
 
   // Ekran koordinatlarından dünya koordinatlarına ışın oluştur
   const rayClip = [x, y, -1, 1]; // Clip uzayında ışın başlangıcı
-  const rayEye = m4.multiplyVector(m4.inverse(projectionMatrix), rayClip);
+  const rayEye = m4.transformVector(m4.inverse(projectionMatrix), rayClip); // DEĞİŞİKLİK: m4.multiplyVector yerine m4.transformVector
   rayEye[2] = -1; // İleri yön
   rayEye[3] = 0; // Yön vektörü için
-  const rayWorld = m4.multiplyVector(m4.inverse(viewMatrix), rayEye);
-  const rayDir = m4.normalize([rayWorld[0], rayWorld[1], rayWorld[2]]); // Normalleştirilmiş yön
+  const rayWorld = m4.transformVector(m4.inverse(viewMatrix), rayEye); // DEĞİŞİKLİK: m4.multiplyVector yerine m4.transformVector
+  const rayDir = vectorNormalize([rayWorld[0], rayWorld[1], rayWorld[2]]); // Normalleştirilmiş yön
   const rayOrigin = [0, 0, 5]; // Kamera pozisyonu
 
   // Küre ile kesişim hesapla (radius=1)
   const sphereCenter = [0, 0, 0];
-  const oc = m4.subtractVectors(rayOrigin, sphereCenter);
-  const a = m4.dot(rayDir, rayDir);
-  const b = 2 * m4.dot(oc, rayDir);
-  const c = m4.dot(oc, oc) - 1; // radius^2
+  const oc = vectorSubtract(rayOrigin, sphereCenter); // DEĞİŞİKLİK: m4.subtractVectors yerine vectorSubtract
+  const a = vectorDot(rayDir, rayDir); // DEĞİŞİKLİK: m4.dot yerine vectorDot
+  const b = 2 * vectorDot(oc, rayDir); // DEĞİŞİKLİK: m4.dot yerine vectorDot
+  const c = vectorDot(oc, oc) - 1; // radius^2
   const discriminant = b * b - 4 * a * c;
 
   if (discriminant < 0) return null; // Kesişim yok
@@ -247,5 +268,5 @@ function getRaycastPoint(clientX, clientY) {
     rayOrigin[2] + t * rayDir[2]
   ];
 
-  return m4.normalize(intersection); // Küre yüzeyindeki normalleştirilmiş nokta
+  return vectorNormalize(intersection); // DEĞİŞİKLİK: m4.normalize yerine vectorNormalize
 }
