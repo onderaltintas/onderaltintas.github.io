@@ -23,7 +23,6 @@ function main() {
   var normalAttributeLocation = gl.getAttribLocation(program, "normal");
   var texCoordAttributeLocation = gl.getAttribLocation(program, "texCoord");
 
-
   // lookup uniforms
   var projectionMatrixLocation = gl.getUniformLocation(program, "projection");
   var modelviewMatrixLocation = gl.getUniformLocation(program, "modelView");
@@ -41,6 +40,8 @@ function main() {
     if(autoRotate){
       xAngle = xAngle + autoRotateAngle / zoomFactor;
       lastXAngle += autoRotateAngle / zoomFactor;
+      // DEĞİŞİKLİK: Otomatik rotasyonun mevcut rotationMatrix'e uygulanması için güncelleme
+      rotationMatrix = m4.multiply(m4.axisRotation([0, 1, 0], toRadian(autoRotateAngle / zoomFactor)), rotationMatrix);
     }
 
     resizeCanvasToDisplaySize(gl.canvas);
@@ -57,7 +58,6 @@ function main() {
     gl.enableVertexAttribArray(normalAttributeLocation);
     gl.enableVertexAttribArray(texCoordAttributeLocation);
 
-
     gl.bindBuffer(gl.ARRAY_BUFFER, sphere.vboVertex);
     gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 32, 0);
     gl.vertexAttribPointer(normalAttributeLocation, 3, gl.FLOAT, false, 32, 12);
@@ -68,24 +68,20 @@ function main() {
     var projectionMatrix = m4.perspective(Math.PI/180*45, gl.canvas.width/gl.canvas.height, 0.1, 1000);
     var modelView = m4.identity();
     modelView = m4.multiply(modelView, m4.inverse(m4.lookAt([0,0,5], [0,0,0],[0,1,0])));
-    modelView = m4.xRotate(modelView, toRadian(-90));
-    yAngle = yAngle > 90 ? 90 : yAngle;
-    yAngle = yAngle < -90 ? -90 : yAngle;
-    modelView = m4.xRotate(modelView, toRadian(yAngle));
-    modelView = m4.zRotate(modelView, toRadian(xAngle));
-    modelView = m4.scale( modelView, zoomFactor,zoomFactor,zoomFactor);
+    // DEĞİŞİKLİK: xAngle ve yAngle yerine rotationMatrix kullanılarak daha hassas rotasyon
+    modelView = m4.multiply(modelView, rotationMatrix);
+    modelView = m4.scale(modelView, zoomFactor, zoomFactor, zoomFactor);
     // Set the matrix.
     gl.uniformMatrix4fv(projectionMatrixLocation, false, projectionMatrix);
     gl.uniformMatrix4fv(modelviewMatrixLocation, false, modelView);
 
     // Draw in red
     gl.drawElements(gl.TRIANGLES, sphere.getIndexCount(), gl.UNSIGNED_SHORT, 0);
-    //gl.drawElements(gl.LINE_STRIP, sphere.getIndexCount(), gl.UNSIGNED_SHORT, 0);
     requestAnimationFrame(drawScene);
   }
 
-//canvas!
-function resizeCanvasToDisplaySize(canvas) {
+  //canvas!
+  function resizeCanvasToDisplaySize(canvas) {
     // Lookup the size the browser is displaying the canvas in CSS pixels.
     const displayWidth  = canvas.clientWidth;
     const displayHeight = canvas.clientHeight;
@@ -102,7 +98,6 @@ function resizeCanvasToDisplaySize(canvas) {
     return needResize;
   }
 }
-
 
 main();
 
@@ -138,36 +133,52 @@ var zoomFactor = 1;
 var autoRotateAngle = 0.01;
 var autoRotate = true;
 var rotateTimeouts = [];
+// DEĞİŞİKLİK: Küre üzerindeki başlangıç noktasını ve rotasyonu saklamak için yeni değişkenler
+var startPoint = null; // Küre üzerindeki başlangıç noktası (3D vektör)
+var rotationMatrix = m4.identity(); // Mevcut rotasyonu saklamak için
 
 window.addEventListener("mousedown", mouseDown, false);
 window.addEventListener("mousemove", mouseMove, false);
 window.addEventListener("mouseup", mouseUp, false);
 window.addEventListener('wheel', wheel);
 
-function mouseDown(event){
+function mouseDown(event) {
   firstPosX = event.clientX;
   firstPosY = event.clientY;
   stopRotate();
   mouseDragging = true;
+  // DEĞİŞİKLİK: Fare pozisyonunu sanal küre yüzeyine projekte et
+  const mouse = getMouseOnSphere(event.clientX, event.clientY);
+  startPoint = mouse; // Başlangıç noktası (örn. İstanbul) 3D vektör olarak saklanır
 }
 
-function mouseUp(event){
-  lastXAngle = xAngle;
-  lastYAngle = yAngle;
-  startRotate();
+function mouseUp(event) {
   mouseDragging = false;
+  // DEĞİŞİKLİK: lastXAngle ve lastYAngle kaldırıldı, çünkü rotationMatrix zaten rotasyonu tutuyor
+  startRotate();
 }
 
 function mouseMove(event) {
-  if(mouseDragging){
-    var dX = (event.clientX - firstPosX)/(zoomFactor*zoomFactor);
-    var dY = (event.clientY - firstPosY)/(zoomFactor*zoomFactor);
-    xAngle = (dX + lastXAngle);
-    yAngle = (dY + lastYAngle);
+  if (mouseDragging) {
+    // DEĞİŞİKLİK: Fare hareketini arcball rotasyonuyla işlemek için yeni mantık
+    const mouse = getMouseOnSphere(event.clientX, event.clientY);
+    if (startPoint && mouse) {
+      // Başlangıç ve mevcut noktalar arasında rotasyon hesapla
+      const axis = m4.cross(startPoint, mouse); // Dönüş ekseni
+      const dot = m4.dot(startPoint, mouse); // Açıyı hesaplamak için
+      const angle = Math.acos(Math.min(Math.max(dot, -1), 1)); // Açı (radyan)
+
+      if (angle > 0.0001) { // Küçük hareketleri yoksay
+        const rotation = m4.axisRotation(axis, angle); // Quaternion benzeri rotasyon matrisi
+        rotationMatrix = m4.multiply(rotation, rotationMatrix); // Mevcut rotasyonu güncelle
+      }
+
+      startPoint = mouse; // Yeni başlangıç noktası
+    }
   }
 }
 
-function wheel(event){
+function wheel(event) {
   zoomFactor -= event.deltaY / 750;
   zoomFactor = zoomFactor > 4.5 ? 4.5 : zoomFactor;
   zoomFactor = zoomFactor <= 0.2 ? 0.2 : zoomFactor;
@@ -175,23 +186,38 @@ function wheel(event){
   startRotate();
 }
 
-function stopRotate(){
-  while(rotateTimeouts.length){
+function stopRotate() {
+  while(rotateTimeouts.length) {
     clearTimeout(rotateTimeouts.pop());
   }
-  
   autoRotate = false;
 }
 
-function startRotate(){
+function startRotate() {
   var rotateTimeout = setTimeout(function(){
     autoRotate = true;
-  },2000);
-  
+  }, 2000);
   rotateTimeouts.push(rotateTimeout);
 }
 
 //geometry!
-function toRadian(value){
-  return value/180*Math.PI;
+function toRadian(value) {
+  return value/57.29577951308232; // DEĞİŞİKLİK: Daha hassas radyan dönüşümü için sabit kullanıldı
+}
+
+// DEĞİŞİKLİK: Fare pozisyonunu sanal küre yüzeyine projekte eden yeni fonksiyon
+function getMouseOnSphere(clientX, clientY) {
+  // Fare koordinatlarını normalize et: [-1, 1]
+  const rect = canvas.getBoundingClientRect();
+  const x = ((clientX - rect.left) / canvas.clientWidth) * 2 - 1;
+  const y = -((clientY - rect.top) / canvas.clientHeight) * 2 + 1;
+
+  // Sanal küre yüzeyine projekte et (kamera z=5 mesafede)
+  const mag = x * x + y * y;
+  if (mag > 1) return null; // Fare küre dışında
+
+  const zCoord = Math.sqrt(1 - mag); // Küre yüzeyinde z koordinatı
+  const point = [x, y, zCoord]; // Küre üzerindeki 3D nokta
+  const length = Math.sqrt(m4.dot(point, point));
+  return length > 0 ? m4.scale(point, 1 / length) : point; // Normalleştir
 }
