@@ -1,11 +1,15 @@
+<!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="webgl.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arz Globe Example</title>
+<link rel="stylesheet" href="reset.css">
 </head>
 <body>
-<canvas id="c" width="1200" height="1000" style="width: 100%; height: 100%; margin:0; padding:0;"></canvas>
+<canvas id="c" width="1200" height="1000"></canvas>
  
-<script  id="vertex-shader-2d" type="x-shader/x-vertex">
+<script id="vertex-shader-2d" type="x-shader/x-vertex">
 attribute vec3 vertex;
 attribute vec3 normal;
 attribute vec2 texCoord;
@@ -20,10 +24,9 @@ void main(void)
 	vNormal = normal;
   vTexCoord = texCoord;
 }
-
 </script>
-<!-- fragment shader -->
-<script  id="fragment-shader-2d" type="x-shader/x-fragment">
+
+<script id="fragment-shader-2d" type="x-shader/x-fragment">
 #ifdef GL_FRAGMENT_PRECISION_HIGH
     precision highp float;
 #else
@@ -40,10 +43,86 @@ void main(void)
 }
 </script>
 
+<script id="atmosphere-vertex-shader" type="x-shader/x-vertex">
+attribute vec3 vertex;
+attribute vec2 texCoord;
+uniform mat4 projection;
+uniform mat4 modelView;
+varying vec2 vTexCoord;
+
+void main(void)
+{
+    gl_Position = projection * modelView * vec4(vertex, 1);
+    vTexCoord = texCoord;
+}
+</script>
+
+<script id="atmosphere-fragment-shader" type="x-shader/x-fragment">
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+    precision highp float;
+#else
+    precision mediump float;
+#endif
+
+varying vec2 vTexCoord;
+uniform sampler2D uCloudTexture;
+uniform float uCameraDistance; // Yeni eklenen uniform
+
+void main(void)
+{
+    vec4 cloudColor = texture2D(uCloudTexture, vTexCoord);
+
+    // Pikselin neredeyse siyah olup olmadığını kontrol et.
+    // Eşik değerini (0.05) bulut dokunuzun siyahlık seviyesine göre ayarlayabilirsiniz.
+    if (cloudColor.r < 0.4 && cloudColor.g < 0.4 && cloudColor.b < 0.4) {
+        // Eğer piksel siyaha yakınsa, tamamen şeffaf yap.
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0); // Tamamen şeffaf siyah
+    } else {
+        // Kamera mesafesine göre şeffaflığı ayarla
+        // Belirli bir mesafeden sonra (örneğin 3.5'ten küçükse) fade out başlasın
+        // Ve 1.5'e (minCameraDistance) ulaştığında tamamen şeffaf olsun.
+        // Bu değerleri Arz.js'deki minCameraDistance ve maxCameraDistance ile uyumlu hale getirmelisiniz.
+        float fadeStartDistance = 3.5; // Bu mesafeden sonra fade out başlar
+        float fadeEndDistance = 1.5;   // Bu mesafede tamamen şeffaf olur (minCameraDistance ile aynı veya yakın)
+
+        float alpha = 1.0; // Varsayılan olarak tam opak
+        if (uCameraDistance < fadeStartDistance) {
+            alpha = (uCameraDistance - fadeEndDistance) / (fadeStartDistance - fadeEndDistance);
+            alpha = clamp(alpha, 0.0, 1.0); // Alfa değerini 0 ile 1 arasına sıkıştır
+        }
+
+        // Siyah olmayan pikseller (bulutlar) için kendi renklerini ve hesaplanan şeffaflık kullan.
+        gl_FragColor = vec4(cloudColor.rgb, cloudColor.a * alpha * 0.5); // 0.5 sabitini burada alpha ile çarpıyoruz
+    }
+}
+</script>
+
 <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
 <script src="https://webglfundamentals.org/webgl/resources/m3.js"></script>
 <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
-<script src="Sphere.js"></script>
-<script src="webgl_simple.js"></script>
+
+<script type="module">
+    import Arz from './Arz.js';
+
+    // Example initialization of Arz
+    // This will create a globe rendering on the canvas with id "c"
+    window.addEventListener('load', () => {
+        try {
+            const globe = new Arz("#c");
+            console.log("Arz globe initialized successfully!");
+        } catch (error) {
+            console.error("Failed to initialize Arz globe:", error);
+            // Optionally display a message to the user
+            const canvasElement = document.getElementById("c");
+            if (canvasElement) {
+                canvasElement.style.display = 'none'; // Hide canvas if WebGL not supported
+                const errorMessage = document.createElement('p');
+                errorMessage.textContent = `Error: ${error.message}. Please ensure your browser supports WebGL.`;
+                errorMessage.style.color = 'red';
+                document.body.prepend(errorMessage);
+            }
+        }
+    });
+</script>
 </body>
 </html>
