@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="reset.css">
 </head>
 <body>
-<canvas id="c" width="1200" height="1000"></canvas>
+<canvas id="c" width="1200" height="1000" style="background:red;"></canvas>
  
 <script id="vertex-shader-2d" type="x-shader/x-vertex">
 attribute vec3 vertex;
@@ -71,28 +71,20 @@ uniform float uCameraDistance; // Yeni eklenen uniform
 void main(void)
 {
     vec4 cloudColor = texture2D(uCloudTexture, vTexCoord);
-
-    // Pikselin neredeyse siyah olup olmadığını kontrol et.
-    // Eşik değerini (0.05) bulut dokunuzun siyahlık seviyesine göre ayarlayabilirsiniz.
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0); 
     if (cloudColor.r < 0.4 && cloudColor.g < 0.4 && cloudColor.b < 0.4) {
-        // Eğer piksel siyaha yakınsa, tamamen şeffaf yap.
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0); // Tamamen şeffaf siyah
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0); 
     } else {
-        // Kamera mesafesine göre şeffaflığı ayarla
-        // Belirli bir mesafeden sonra (örneğin 3.5'ten küçükse) fade out başlasın
-        // Ve 1.5'e (minCameraDistance) ulaştığında tamamen şeffaf olsun.
-        // Bu değerleri Arz.js'deki minCameraDistance ve maxCameraDistance ile uyumlu hale getirmelisiniz.
-        float fadeStartDistance = 3.5; // Bu mesafeden sonra fade out başlar
-        float fadeEndDistance = 1.5;   // Bu mesafede tamamen şeffaf olur (minCameraDistance ile aynı veya yakın)
+        float fadeStartDistance = 3.5; 
+        float fadeEndDistance = 1.5;   
 
-        float alpha = 1.0; // Varsayılan olarak tam opak
+        float alpha = 1.0; 
         if (uCameraDistance < fadeStartDistance) {
             alpha = (uCameraDistance - fadeEndDistance) / (fadeStartDistance - fadeEndDistance);
-            alpha = clamp(alpha, 0.0, 1.0); // Alfa değerini 0 ile 1 arasına sıkıştır
+            alpha = clamp(alpha, 0.0, 1.0); 
         }
 
-        // Siyah olmayan pikseller (bulutlar) için kendi renklerini ve hesaplanan şeffaflık kullan.
-        gl_FragColor = vec4(cloudColor.rgb, cloudColor.a * alpha * 0.5); // 0.5 sabitini burada alpha ile çarpıyoruz
+        gl_FragColor = vec4(cloudColor.rgb, cloudColor.a * alpha * 0.5);
     }
 }
 </script>

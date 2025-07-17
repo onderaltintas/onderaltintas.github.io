@@ -227,7 +227,7 @@ class Arz {
             throw new Error(`Canvas element with selector "${selector}" not found.`);
         }
 
-        this.gl = this.canvas.getContext("webgl");
+        this.gl = this.canvas.getContext("webgl", { alpha: false });
         if (!this.gl) {
             throw new Error("WebGL not supported.");
         }
@@ -278,6 +278,13 @@ class Arz {
         this.atmosphereModelviewMatrixLocation = this.gl.getUniformLocation(this.atmosphereProgram, "modelView");
         this.atmosphereUniformTextureLocation = this.gl.getUniformLocation(this.atmosphereProgram, "uCloudTexture");
         this.atmosphereCameraDistanceUniformLocation = this.gl.getUniformLocation(this.atmosphereProgram, "uCameraDistance"); // YENİ EKLENEN
+        // Burayı ekleyin:
+        if (this.atmosphereUniformTextureLocation === null) {
+            console.error("HATA: atmosphereProgram içinde 'uCloudTexture' uniform konumu bulunamadı!");
+        } else {
+            console.log("atmosphereUniformTextureLocation başarıyla alındı:", this.atmosphereUniformTextureLocation);
+        }
+        // Ekleyeceğiniz kısım burası bitti.
 
         this.addEventListeners();
         requestAnimationFrame(this.drawScene.bind(this));
@@ -651,7 +658,7 @@ class Arz {
      * @param {DOMHighResTimeStamp} now - The current time provided by requestAnimationFrame.
      * @private
      */
-    drawScene(now) {
+   drawScene(now) {
         // Her iki doku da yüklenene kadar bekleyin
         if (!this.textureLoaded || !this.atmosphereTextureLoaded) {
             requestAnimationFrame(this.drawScene.bind(this));
@@ -665,6 +672,7 @@ class Arz {
         this.resizeCanvasToDisplaySize(this.canvas);
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         this.gl.clearColor(0, 0, 0, 1); // Siyah arka plan
+        this.gl.clearColor(0.0, 0.0, 0.0, 0.0); // RGBA, alfa 0 ise tamamen şeffaf
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT); // Hem renk hem derinlik tamponunu temizle
 
         // --- Şeffaflığı etkinleştir ---
@@ -697,12 +705,19 @@ class Arz {
 
         this.gl.drawElements(this.gl.TRIANGLES, this.sphere.getIndexCount(), this.gl.UNSIGNED_SHORT, 0);
 
+        // --- ÖNEMLİ DEĞİŞİKLİK BURADA BAŞLIYOR ---
+        // Dünya programının tüm etkin attribute array'lerini devre dışı bırak
+        this.gl.disableVertexAttribArray(this.positionAttributeLocation);
+        this.gl.disableVertexAttribArray(this.normalAttributeLocation);
+        this.gl.disableVertexAttribArray(this.texCoordAttributeLocation);
+        // --- DEĞİŞİKLİK BURADA BİTİYOR ---
+
         // --- Atmosfer Küresini Çiz (Şeffaf Nesneler) ---
         this.gl.useProgram(this.atmosphereProgram);
         this.gl.enableVertexAttribArray(this.atmospherePositionAttributeLocation);
         this.gl.enableVertexAttribArray(this.atmosphereTexCoordAttributeLocation);
         // Normal attributu atmosfer shader'ında kullanılmadığı için disable et
-        this.gl.disableVertexAttribArray(this.normalAttributeLocation);
+        this.gl.disableVertexAttribArray(this.normalAttributeLocation); // Bu satır zaten vardı, olduğu gibi kaldı.
 
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.atmosphereSphere.vboVertex);
         this.gl.vertexAttribPointer(this.atmospherePositionAttributeLocation, 3, this.gl.FLOAT, false, 32, 0);
@@ -721,8 +736,7 @@ class Arz {
         this.gl.drawElements(this.gl.TRIANGLES, this.atmosphereSphere.getIndexCount(), this.gl.UNSIGNED_SHORT, 0);
 
         // --- Şeffaflığı devre dışı bırak (isteğe bağlı, başka opak nesne çizilmeyecekse gerekli değil) ---
-        // this.gl.disable(this.gl.BLEND);
-        
+        //this.gl.disable(this.gl.BLEND);      
         requestAnimationFrame(this.drawScene.bind(this));
     }
 }
