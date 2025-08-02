@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aristotle's Wheel Paradox - Gelişmiş Simülasyon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f1a3a, #1a237e, #311b92);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(0, 0, 20, 0.6);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3949ab;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+            color: #ffeb3b;
+            background: linear-gradient(to right, #4fc3f7, #29b6f6, #03a9f4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 15px auto 0;
+            line-height: 1.6;
+            color: #e3f2fd;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .simulation-panel {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(25, 25, 45, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3f51b5;
+        }
+        
+        .controls {
+            background: rgba(35, 35, 65, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(40, 40, 70, 0.6);
+            border-radius: 10px;
+        }
+        
+        .control-title {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #bbdefb;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            height: 10px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #1e88e5, #0d47a1);
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #ffca28;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            border: 2px solid #ffa000;
+        }
+        
+        .value-display {
+            min-width: 60px;
+            text-align: center;
+            background: rgba(70, 70, 150, 0.6);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.15rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(to bottom, #5c6bc0, #3949ab);
+            border: 1px solid #7986cb;
+        }
+        
+        #startBtn {
+            background: linear-gradient(to bottom, #66bb6a, #2e7d32);
+        }
+        
+        #resetBtn {
+            background: linear-gradient(to bottom, #ef5350, #c62828);
+        }
+        
+        #pauseBtn {
+            background: linear-gradient(to bottom, #42a5f5, #1565c0);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .canvas-container {
+            position: relative;
+            background: #0a0a1a;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+            border: 1px solid #5c6bc0;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        .info-panel {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(25, 25, 45, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3f51b5;
+        }
+        
+        .info-title {
+            color: #ffb74d;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.9rem;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3949ab;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .info-content {
+            background: rgba(35, 35, 65, 0.7);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .info-content h3 {
+            color: #81d4fa;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .info-content p {
+            margin-bottom: 15px;
+            line-height: 1.7;
+            color: #e3f2fd;
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(45, 45, 85, 0.7);
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            border: 1px solid #5c6bc0;
+        }
+        
+        .color-box {
+            width: 22px;
+            height: 22px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .outer-color { background: #e53935; }
+        .inner-color { background: #1e88e5; }
+        .outer-road { background: #8d6e63; }
+        .inner-road { background: #5d4037; }
+        .center-color { background: #ffd54f; }
+        .marker-color { background: #ab47bc; }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(40, 40, 70, 0.9);
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 25px;
+            font-size: 1.15rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #5c6bc0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 0 10px;
+        }
+        
+        .stat-label {
+            font-size: 0.95rem;
+            color: #bbdefb;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #ffeb3b;
+            font-size: 1.25rem;
+            margin-top: 8px;
+            text-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        .highlight {
+            color: #ffb74d;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Aristotle's Wheel Paradox</h1>
+            <p class="subtitle">
+                Bu simülasyon, farklı yarıçaplara sahip iki konsantrik dairenin aynı açısal hızla dönerken 
+                farklı mesafeler kat etmesini gösterir. İç tekerin yolda sürttüğünü ve kayma yaptığını gözlemleyin.
+            </p>
+        </header>
+        
+        <div class="content">
+            <div class="simulation-panel">
+                <h2 style="text-align:center; margin-bottom:25px; color:#29b6f6; text-shadow:0 2px 4px rgba(0,0,0,0.4);">Simülasyon Kontrolleri</h2>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <div class="control-title">
+                            <span>Dış Daire Yarıçapı:</span>
+                            <span class="value-display" id="outerValue">100</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="outerRadius" min="70" max="150" value="100">
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-title">
+                            <span>İç Daire Yarıçapı:</span>
+                            <span class="value-display" id="innerValue">50</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="innerRadius" min="20" max="100" value="50">
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-title">
+                            <span>Animasyon Hızı:</span>
+                            <span class="value-display" id="speedValue">1.0x</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="speedControl" min="0.1" max="3" step="0.1" value="1.0">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button id="startBtn">Başlat</button>
+                    <button id="pauseBtn">Duraklat</button>
+                    <button id="resetBtn">Sıfırla</button>
+                </div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="color-box outer-color"></div>
+                        <span>Dış Daire</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box inner-color"></div>
+                        <span>İç Daire</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box outer-road"></div>
+                        <span>Dış Yol</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box inner-road"></div>
+                        <span>İç Yol</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box center-color"></div>
+                        <span>Merkez</span>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Dönüş Açısı</div>
+                        <div class="stat-value" id="rotationValue">0°</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Kat Edilen Mesafe</div>
+                        <div class="stat-value" id="distanceValue">0px</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Kayma Miktarı</div>
+                        <div class="stat-value" id="slipValue">0px</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="canvas-container">
+                <canvas id="wheelCanvas" width="800" height="500"></canvas>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h2 class="info-title">Paradoks Hakkında</h2>
+            
+            <div class="info-content">
+                <h3>Paradoks Nedir?</h3>
+                <p>
+                    Aristotle'ın tekerlek paradoksu, aynı merkez etrafında dönen iki farklı büyüklükteki tekerleğin 
+                    hareketindeki görünür çelişkiyi açıklar. Dış tekerlek bir tam tur attığında, iç tekerlek de bir 
+                    tam tur atar. Ancak dış tekerleğin kat ettiği mesafe (<span class="highlight">2πR</span>) iç tekerleğin kat etmesi gereken 
+                    mesafeden (<span class="highlight">2πr</span>) daha büyüktür (<span class="highlight">R > r</span>).
+                </p>
+                
+                <h3>Çözümü</h3>
+                <p>
+                    Paradoksun çözümü, iç tekerleğin yol boyunca kayma yapması gerçeğinde yatar. Dış tekerlek 
+                    yolunda kaymadan dönerken, iç tekerlek hem dönme hem de kayma hareketi yapar. Bu nedenle 
+                    iç tekerlek, kendi çevresinden daha fazla mesafe kat eder ve bu da sürtünmeye neden olur.
+                </p>
+                
+                <h3>Simülasyon Nasıl Çalışır?</h3>
+                <p>
+                    Simülasyonda, dış tekerlek altındaki düz yolda kaymadan döner. İç tekerlek ise kendi yolunda 
+                    ilerlerken aynı merkezli dönüşe bağlı olarak kayma yapar. Her iki dairedeki işaretler dönüşü 
+                    ve kaymayı görselleştirmenizi sağlar. İç tekerleğin yolda sürttüğünü ve kaydığını gözlemleyebilirsiniz.
+                </p>
+                
+                <h3>İç Teker Neden Sürtünür?</h3>
+                <p>
+                    İç tekerin sürtünmesinin nedeni, dış teker ile aynı merkez açısal hızla dönmesidir. Ancak iç tekerin 
+                    çevresi daha küçük olduğu için, dış tekerin kat ettiği mesafeyi tamamlayabilmek için kayması gerekir. 
+                    Bu kayma hareketi sürtünmeye ve enerji kaybına neden olur.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const centerY = 350;
+        
+        // Initial parameters
+        let outerRadius = 100;
+        let innerRadius = 50;
+        let rotationAngle = 0;
+        let positionX = 150;
+        let isAnimating = false;
+        let animationId = null;
+        let distanceTraveled = 0;
+        let animationSpeed = 1.0;
+        
+        // Get DOM elements
+        const outerRadiusSlider = document.getElementById('outerRadius');
+        const innerRadiusSlider = document.getElementById('innerRadius');
+        const speedControl = document.getElementById('speedControl');
+        const outerValueDisplay = document.getElementById('outerValue');
+        const innerValueDisplay = document.getElementById('innerValue');
+        const speedValueDisplay = document.getElementById('speedValue');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const rotationValue = document.getElementById('rotationValue');
+        const distanceValue = document.getElementById('distanceValue');
+        const slipValue = document.getElementById('slipValue');
+        
+        // Initialize display values
+        outerValueDisplay.textContent = outerRadius;
+        innerValueDisplay.textContent = innerRadius;
+        speedValueDisplay.textContent = animationSpeed.toFixed(1) + 'x';
+        
+        // Event listeners
+        outerRadiusSlider.addEventListener('input', function() {
+            outerRadius = parseInt(this.value);
+            outerValueDisplay.textContent = outerRadius;
+            if (innerRadius > outerRadius) {
+                innerRadius = Math.min(innerRadius, outerRadius - 10);
+                innerRadiusSlider.value = innerRadius;
+                innerValueDisplay.textContent = innerRadius;
+            }
+            if (!isAnimating) drawScene();
+        });
+        
+        innerRadiusSlider.addEventListener('input', function() {
+            innerRadius = parseInt(this.value);
+            if (innerRadius >= outerRadius) {
+                innerRadius = outerRadius - 10;
+                this.value = innerRadius;
+            }
+            innerValueDisplay.textContent = innerRadius;
+            if (!isAnimating) drawScene();
+        });
+        
+        speedControl.addEventListener('input', function() {
+            animationSpeed = parseFloat(this.value);
+            speedValueDisplay.textContent = animationSpeed.toFixed(1) + 'x';
+        });
+        
+        startBtn.addEventListener('click', function() {
+            if (isAnimating) return;
+            isAnimating = true;
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            animate();
+        });
+        
+        pauseBtn.addEventListener('click', function() {
+            if (!isAnimating) return;
+            isAnimating = false;
+            cancelAnimationFrame(animationId);
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        });
+        
+        resetBtn.addEventListener('click', function() {
+            if (isAnimating) {
+                cancelAnimationFrame(animationId);
+                isAnimating = false;
+            }
+            rotationAngle = 0;
+            positionX = 150;
+            distanceTraveled = 0;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            updateStats();
+            drawScene();
+        });
+        
+        // Update statistics
+        function updateStats() {
+            rotationValue.textContent = Math.round(rotationAngle) + '°';
+            distanceValue.textContent = Math.round(distanceTraveled) + 'px';
+            
+            // Calculate slip - difference between distance traveled and inner wheel circumference
+            const innerCircumference = 2 * Math.PI * innerRadius;
+            const slip = Math.max(0, distanceTraveled - innerCircumference);
+            slipValue.textContent = Math.round(slip) + 'px';
+        }
+        
+        // Draw the scene
+        function drawScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw roads
+            const outerRoadY = centerY + outerRadius;
+            const innerRoadY = centerY + innerRadius;
+            
+            // Outer road
+            ctx.beginPath();
+            ctx.moveTo(0, outerRoadY);
+            ctx.lineTo(canvas.width, outerRoadY);
+            ctx.strokeStyle = '#8d6e63';
+            ctx.lineWidth = 10;
+            ctx.stroke();
+            
+            // Inner road
+            ctx.beginPath();
+            ctx.moveTo(0, innerRoadY);
+            ctx.lineTo(canvas.width, innerRoadY);
+            ctx.strokeStyle = '#5d4037';
+            ctx.lineWidth = 10;
+            ctx.stroke();
+            
+            // Draw wheel system
+            drawWheelSystem(positionX, centerY);
+        }
+        
+        // Draw the wheel system
+        function drawWheelSystem(x, y) {
+            // Draw outer circle
+            ctx.beginPath();
+            ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#e53935';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            // Draw inner circle
+            ctx.beginPath();
+            ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#1e88e5';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            // Draw center point
+            ctx.beginPath();
+            ctx.arc(x, y, 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffd54f';
+            ctx.fill();
+            ctx.strokeStyle = '#ffa000';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw markers on outer circle (every 15 degrees)
+            for (let angle = 0; angle < 360; angle += 15) {
+                const rad = (angle + rotationAngle) * Math.PI / 180;
+                const markerX = x + outerRadius * Math.cos(rad);
+                const markerY = y + outerRadius * Math.sin(rad);
+                
+                ctx.beginPath();
+                ctx.arc(markerX, markerY, 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#e53935';
+                ctx.fill();
+                ctx.strokeStyle = '#b71c1c';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+            
+            // Draw markers on inner circle (every 15 degrees)
+            for (let angle = 0; angle < 360; angle += 15) {
+                const rad = (angle + rotationAngle) * Math.PI / 180;
+                const markerX = x + innerRadius * Math.cos(rad);
+                const markerY = y + innerRadius * Math.sin(rad);
+                
+                ctx.beginPath();
+                ctx.arc(markerX, markerY, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#1e88e5';
+                ctx.fill();
+                ctx.strokeStyle = '#0d47a1';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+            
+            // Draw contact points
+            drawContactPoints(x, y);
+        }
+        
+        // Draw contact points with roads
+        function drawContactPoints(x, y) {
+            const outerRoadY = centerY + outerRadius;
+            const innerRoadY = centerY + innerRadius;
+            
+            // Outer wheel contact point
+            ctx.beginPath();
+            ctx.arc(x, outerRoadY, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff9800';
+            ctx.fill();
+            ctx.strokeStyle = '#e65100';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Inner wheel contact point
+            ctx.beginPath();
+            ctx.arc(x, innerRoadY, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#4caf50';
+            ctx.fill();
+            ctx.strokeStyle = '#1b5e20';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw line from center to contact points
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, outerRoadY);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, innerRoadY);
+            ctx.stroke();
+        }
+        
+        // Animation function
+        function animate() {
+            // Calculate movement based on outer circumference and speed
+            const circumference = 2 * Math.PI * outerRadius;
+            const distancePerFrame = circumference / 360 * animationSpeed;
+            
+            rotationAngle += 2 * animationSpeed;
+            positionX += distancePerFrame;
+            distanceTraveled += distancePerFrame;
+            
+            // Reset after full rotation
+            if (rotationAngle >= 360) {
+                rotationAngle = 0;
+                positionX = 150;
+                distanceTraveled = 0;
+                isAnimating = false;
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                drawScene();
+                updateStats();
+                return;
+            }
+            
+            // Reset position if wheel goes too far
+            if (positionX > canvas.width - 100) {
+                positionX = 150;
+            }
+            
+            drawScene();
+            updateStats();
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // Initial draw
+        drawScene();
+    </script>
+</body>
+</html>
