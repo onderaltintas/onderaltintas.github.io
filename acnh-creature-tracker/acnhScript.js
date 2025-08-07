@@ -63,10 +63,40 @@ async function loadCreatureData() {
     }
 }
 
-// Create table rows with hemisphere support
+// Save capture status to localStorage
+function saveCaptureStatus(type, name, isCaptured) {
+    const key = `captured_${type}_${name}`;
+    localStorage.setItem(key, isCaptured ? 'true' : 'false');
+}
+
+// Load capture status from localStorage
+function loadCaptureStatus(type, name) {
+    const key = `captured_${type}_${name}`;
+    return localStorage.getItem(key) === 'true';
+}
+
+// Create table rows with capture checkbox
 function createTableRow(creature, type) {
     const row = document.createElement('tr');
     row.className = `${type}North`;
+    
+    // Add capture checkbox
+    const captureCell = document.createElement('td');
+    const captureCheckbox = document.createElement('input');
+    captureCheckbox.type = 'checkbox';
+    captureCheckbox.className = 'capture-checkbox';
+    
+    // Load capture status from localStorage
+    const isCaptured = loadCaptureStatus(type, creature.name);
+    captureCheckbox.checked = isCaptured;
+    
+    // Save status when checkbox changes
+    captureCheckbox.addEventListener('change', function() {
+        saveCaptureStatus(type, creature.name, this.checked);
+    });
+    
+    captureCell.appendChild(captureCheckbox);
+    row.appendChild(captureCell);
     
     // Add name
     const nameCell = document.createElement('td');
@@ -127,7 +157,7 @@ function displayMonth(selectedMonth) {
     if (northHemFish.length > 0) {
         Array.from(northHemFish).forEach(row => {
             // Get creature name to find in JSON
-            const name = row.cells[0].textContent;
+            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
             const creature = creatureData.fish.find(f => f.name === name);
             
             if (creature) {
@@ -144,7 +174,7 @@ function displayMonth(selectedMonth) {
     // Filter bugs
     if (northHemBugs.length > 0) {
         Array.from(northHemBugs).forEach(row => {
-            const name = row.cells[0].textContent;
+            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
             const creature = creatureData.bugs.find(b => b.name === name);
             
             if (creature) {
@@ -161,7 +191,7 @@ function displayMonth(selectedMonth) {
     // Filter sea creatures
     if (northHemSeaCr.length > 0) {
         Array.from(northHemSeaCr).forEach(row => {
-            const name = row.cells[0].textContent;
+            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
             const creature = creatureData.seaCreatures.find(s => s.name === name);
             
             if (creature) {
