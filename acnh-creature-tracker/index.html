@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name= "viewport" content= "width=device-width, initial-scale=1.0">
+  <title id="appTitle">ACNH- Fish and Bug Tracker</title>
+  <link rel="stylesheet" href="acnhStyles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+  <script src="creatures.json"></script>
+  <script src="translations.json"></script>
+  <script src="acnhScript.js" defer></script>
+</head>
+
+<body>
+<div id="topHeading">
+  <h1 id="mainHeader">Animal Crossing New Horizons</h1>
+  <h2 id="subHeader">Fish, Bug and Sea Creature Checklist </h2>
+</div>
+
+<div id="charts">
+  <div class="header-controls">
+    <div class="language-selector">
+      <label for="language-select" id="langLabel"></label>
+      <select id="language-select">
+        <option value="tr">Türkçe</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="filter-controls">
+    <div class="radio-buttons">
+      <label for="thisMonthRadio">
+        <input type="radio" name="filter-type" id="thisMonthRadio">
+        <span class="label-text" data-key="thisMonth"></span>
+      </label>
+      <label for="activeCreaturesRadio">
+        <input type="radio" name="filter-type" id="activeCreaturesRadio">
+        <span class="label-text" data-key="activeCreatures"></span>
+      </label>
+      <label for="allCreaturesRadio">
+        <input type="radio" name="filter-type" id="allCreaturesRadio">
+        <span class="label-text" data-key="allCreatures"></span>
+      </label>
+    </div>
+    <div class="checkbox-options">
+      <label for="showUncaughtCheckbox">
+        <input type="checkbox" id="showUncaughtCheckbox">
+        <span class="label-text" data-key="showUncaught"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="tab">
+    <button class="tablinks" id="fishTab" data-tab="fish"></button>
+    <button class="tablinks" id="bugsTab" data-tab="bugs"></button>
+    <button class="tablinks" id="seaCreaturesTab" data-tab="seaCreatures"></button>
+  </div>
+
+  <div id="fish" class="tabcontent active">
+    <div id="fishList" class="creature-grid"></div>
+  </div>
+  <div id="bugs" class="tabcontent">
+    <div id="bugsList" class="creature-grid"></div>
+  </div>
+  <div id="seaCreatures" class="tabcontent">
+    <div id="seaCreaturesList" class="creature-grid"></div>
+  </div>
+</div>
+</body>
+</html>
