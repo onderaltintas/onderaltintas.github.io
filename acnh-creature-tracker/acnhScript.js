@@ -92,12 +92,38 @@ function changeLanguage(lang) {
     }
 }
 
-// Translate a string
+// Translate a string with case-insensitive and partial matching
 function translate(text) {
     if (!text) return '';
     
     const t = translationData[currentLanguage] || {};
-    return t[text] || text;
+    
+    // First try exact match
+    if (t[text]) {
+        return t[text];
+    }
+    
+    // Then try case-insensitive match
+    const lowerText = text.toLowerCase();
+    for (const key in t) {
+        if (key.toLowerCase() === lowerText) {
+            return t[key];
+        }
+    }
+    
+    // Finally, try to match known patterns
+    if (lowerText.includes("small")) return t["Small"] || text;
+    if (lowerText.includes("medium")) return t["Medium"] || text;
+    if (lowerText.includes("large")) return t["Large"] || text;
+    if (lowerText.includes("huge")) return t["Huge"] || text;
+    if (lowerText.includes("narrow")) return t["Narrow"] || text;
+    if (lowerText.includes("on tree")) return t["On Trees"] || text;
+    if (lowerText.includes("slow")) return t["Slow"] || text;
+    if (lowerText.includes("quick")) return t["Quick"] || text;
+    if (lowerText.includes("moderate")) return t["Moderate"] || text;
+    if (lowerText.includes("fast")) return t["Fast"] || text;
+    
+    return text;
 }
 
 // Event listeners
