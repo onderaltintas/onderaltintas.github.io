@@ -6,7 +6,7 @@
       "image": "Images/Fish/bitterling.png",
       "price": 900,
       "location": "River",
-      "shadowSize": 1,
+      "shadowSize": "Tiny",
       "months": [1, 2, 3, 11, 12],
       "hours": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     },
@@ -16,7 +16,7 @@
       "image": "Images/Fish/palechub.png",
       "price": 200,
       "location": "River",
-      "shadowSize": 1,
+      "shadowSize": "Tiny",
       "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       "hours": [9, 10, 11, 12, 13, 14, 15]
     },
@@ -26,7 +26,7 @@
       "image": "Images/Fish/crucianCarp.png",
       "price": 160,
       "location": "River",
-      "shadowSize": 2,
+      "shadowSize": "Small",
       "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       "hours": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     },
@@ -36,9 +36,39 @@
       "image": "Images/Fish/dace.png",
       "price": 240,
       "location": "River",
-      "shadowSize": 3,
+      "shadowSize": "Medium",
       "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       "hours": [16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8]
+    },
+    {
+      "id": "fish-05",
+      "name": "Carp",
+      "image": "Images/Fish/carp.png",
+      "price": 300,
+      "location": "Pond",
+      "shadowSize": "Large",
+      "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "hours": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    },
+    {
+      "id": "fish-06",
+      "name": "Koi",
+      "image": "Images/Fish/koi.png",
+      "price": 4000,
+      "location": "Pond",
+      "shadowSize": "Large",
+      "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "hours": [16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8]
+    },
+    {
+      "id": "fish-07",
+      "name": "Goldfish",
+      "image": "Images/Fish/goldfish.png",
+      "price": 1300,
+      "location": "Pond",
+      "shadowSize": "Tiny",
+      "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "hours": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     }
   ],
   "bugs": [
@@ -59,6 +89,33 @@
       "location": "On flowers",
       "months": [3, 4, 5, 6, 7, 8, 9, 10, 11],
       "hours": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    },
+    {
+      "id": "bug-03",
+      "name": "Monarch Butterfly",
+      "image": "Images/Bugs/monarchbutterfly.png",
+      "price": 140,
+      "location": "Flying near flowers",
+      "months": [3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "hours": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    },
+    {
+      "id": "bug-04",
+      "name": "Grasshopper",
+      "image": "Images/Bugs/grasshopper.png",
+      "price": 160,
+      "location": "On ground",
+      "months": [7, 8, 9, 10, 11],
+      "hours": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    },
+    {
+      "id": "bug-05",
+      "name": "Tarantula",
+      "image": "Images/Bugs/tarantula.png",
+      "price": 8000,
+      "location": "On ground",
+      "months": [11, 12, 1, 2, 3, 4],
+      "hours": [19, 20, 21, 22, 23, 0, 1, 2, 3]
     }
   ],
   "seaCreatures": [
@@ -80,6 +137,26 @@
       "location": "Sea",
       "shadowSize": "Medium",
       "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "hours": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    },
+    {
+      "id": "sea-03",
+      "name": "Sea Star",
+      "image": "Images/SeaCreatures/seastar.png",
+      "price": 500,
+      "location": "Sea",
+      "shadowSize": "Small",
+      "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "hours": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    },
+    {
+      "id": "sea-04",
+      "name": "Sea Grapes",
+      "image": "Images/SeaCreatures/seagrapes.png",
+      "price": 900,
+      "location": "Sea",
+      "shadowSize": "Medium",
+      "months": [6, 7, 8, 9],
       "hours": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     }
   ]
