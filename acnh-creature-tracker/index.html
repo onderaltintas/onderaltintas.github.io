@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Crossing Balık Rehberi</title>
+    <title>Animal Crossing Yakalama Takipçisi</title>
     <link rel="stylesheet" href="acnhStyles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="topHeading">
         <h1>Animal Crossing: New Horizons</h1>
-        <h2>Yarıküre Balık Rehberi</h2>
+        <h2>Animal Crossing Yakalama Takipçisi</h2>
         
         <!-- Yarıküre Seçimi -->
         <div id="hemisphere">
@@ -44,7 +44,86 @@
             <button class="tablinks" onclick="openList(event, 'seaCreatures')">Deniz Canlıları</button>
         </div>
 
-        <!-- Tablo içerikleri aynı kalacak -->
+        <div id="fish" class="tabcontent">
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Resim</th>
+                        <th>Fiyat</th>
+                        <th>Konum</th>
+                        <th>Zaman</th>
+                        <th>Ock</th>
+                        <th>Şub</th>
+                        <th>Mar</th>
+                        <th>Nis</th>
+                        <th>May</th>
+                        <th>Haz</th>
+                        <th>Tem</th>
+                        <th>Ağu</th>
+                        <th>Eyl</th>
+                        <th>Ekm</th>
+                        <th>Kas</th>
+                        <th>Ara</th>
+                    </tr>
+                </thead>
+                <tbody id="fish-body"></tbody>
+            </table>
+        </div>
+
+        <div id="bugs" class="tabcontent">
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Resim</th>
+                        <th>Fiyat</th>
+                        <th>Konum</th>
+                        <th>Zaman</th>
+                        <th>Ock</th>
+                        <th>Şub</th>
+                        <th>Mar</th>
+                        <th>Nis</th>
+                        <th>May</th>
+                        <th>Haz</th>
+                        <th>Tem</th>
+                        <th>Ağu</th>
+                        <th>Eyl</th>
+                        <th>Ekm</th>
+                        <th>Kas</th>
+                        <th>Ara</th>
+                    </tr>
+                </thead>
+                <tbody id="bugs-body"></tbody>
+            </table>
+        </div>
+
+        <div id="seaCreatures" class="tabcontent">
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Resim</th>
+                        <th>Fiyat</th>
+                        <th>Konum</th>
+                        <th>Zaman</th>
+                        <th>Ock</th>
+                        <th>Şub</th>
+                        <th>Mar</th>
+                        <th>Nis</th>
+                        <th>May</th>
+                        <th>Haz</th>
+                        <th>Tem</th>
+                        <th>Ağu</th>
+                        <th>Eyl</th>
+                        <th>Ekm</th>
+                        <th>Kas</th>
+                        <th>Ara</th>
+                    </tr>
+                </thead>
+                <tbody id="seaCreatures-body"></tbody>
+            </table>
+        </div>
     </div>
 
     <script src="acnhScript.js"></script>
