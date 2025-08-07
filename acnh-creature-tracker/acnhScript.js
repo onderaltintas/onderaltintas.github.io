@@ -3,34 +3,15 @@
  * @type {object}
  */
 const state = {
-    /**
-     * Stores the caught status of creatures.
-     * @type {Object.<string, boolean>}
-     */
     caught: {},
-    /**
-     * Stores user filter and language settings.
-     * @type {object}
-     */
     filters: {
         filterType: 'thisMonthRadio',
         showUncaught: true,
         language: 'tr'
     },
-    /**
-     * Stores the currently active creature tab.
-     * @type {string}
-     */
     currentTab: 'fish',
-    /**
-     * Stores the loaded creature data.
-     * @type {object}
-     */
+    currentMonth: new Date().getMonth() + 1,
     creaturesData: {},
-    /**
-     * Stores the loaded translations.
-     * @type {object}
-     */
     translations: {}
 };
 
@@ -48,9 +29,9 @@ const elements = {
     activeCreaturesRadio: document.getElementById('activeCreaturesRadio'),
     allCreaturesRadio: document.getElementById('allCreaturesRadio'),
     showUncaughtCheckbox: document.getElementById('showUncaughtCheckbox'),
-    fishTab: document.getElementById('fishTab'),
-    bugsTab: document.getElementById('bugsTab'),
-    seaCreaturesTab: document.getElementById('seaCreaturesTab'),
+    monthButtons: document.querySelectorAll('.availableMonth'),
+    tablinks: document.querySelectorAll('.tablinks'),
+    tabcontents: document.querySelectorAll('.tabcontent'),
     creatureLists: {
         fish: document.getElementById('fishList'),
         bugs: document.getElementById('bugsList'),
@@ -103,9 +84,12 @@ const applyLocalization = () => {
         }
     });
 
-    elements.fishTab.textContent = currentLangStrings.fish;
-    elements.bugsTab.textContent = currentLangStrings.bugs;
-    elements.seaCreaturesTab.textContent = currentLangStrings.seaCreatures;
+    elements.tablinks.forEach(link => {
+        const key = link.getAttribute('data-tab');
+        if (currentLangStrings[key]) {
+            link.textContent = currentLangStrings[key];
+        }
+    });
 };
 
 /**
@@ -171,47 +155,84 @@ const renderCreatures = () => {
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
 
+    // Clear any previous countdown timers
+    document.querySelectorAll('.creature-row').forEach(row => {
+        if (row.timerInterval) {
+            clearInterval(row.timerInterval);
+        }
+    });
+
     creatures.forEach(creature => {
         const isCaught = state.caught[creature.id];
         const isThisMonth = creature.months.includes(currentMonth);
         const isActiveNow = isCreatureActiveNow(creature);
 
-        let shouldRender = true;
-        if (state.filters.filterType === 'thisMonthRadio' && !isThisMonth) {
-            shouldRender = false;
-        } else if (state.filters.filterType === 'activeCreaturesRadio' && !isActiveNow) {
-            shouldRender = false;
+        let shouldRender = false;
+        
+        if (state.filters.filterType === 'thisMonthRadio' && isThisMonth) {
+            shouldRender = true;
+        } else if (state.filters.filterType === 'activeCreaturesRadio' && isActiveNow) {
+            shouldRender = true;
+        } else if (state.filters.filterType === 'allCreaturesRadio') {
+            shouldRender = true;
         }
+
         if (state.filters.showUncaught && isCaught) {
             shouldRender = false;
         }
 
         if (shouldRender) {
-            const card = document.createElement('div');
-            card.className = 'creature-card';
+            const tr = document.createElement('tr');
+            tr.className = 'creature-row';
 
+            const checkboxTd = document.createElement('td');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.className = 'caught-checkbox';
             checkbox.checked = isCaught;
             checkbox.addEventListener('change', (e) => {
                 state.caught[creature.id] = e.target.checked;
                 saveState();
                 renderCreatures();
             });
+            checkboxTd.appendChild(checkbox);
 
+            const nameTd = document.createElement('td');
+            nameTd.textContent = creature.name;
+
+            const imageTd = document.createElement('td');
             const img = document.createElement('img');
             img.src = creature.image;
             img.alt = creature.name;
             img.className = 'creature-image';
+            imageTd.appendChild(img);
 
-            const name = document.createElement('h3');
-            name.className = 'creature-name';
-            name.textContent = creature.name;
+            const priceTd = document.createElement('td');
+            priceTd.textContent = creature.price;
 
-            const countdown = document.createElement('div');
-            countdown.className = 'countdown-timer';
+            const locationTd = document.createElement('td');
+            locationTd.textContent = creature.location;
+            
+            const shadowSizeTd = document.createElement('td');
+            shadowSizeTd.textContent = creature.shadowSize;
+            
+            const timeTd = document.createElement('td');
+            timeTd.textContent = creature.hours.length === 24 ? "All day" : creature.hours.join(', ');
+            
+            tr.appendChild(checkboxTd);
+            tr.appendChild(nameTd);
+            tr.appendChild(imageTd);
+            tr.appendChild(priceTd);
+            tr.appendChild(locationTd);
+            
+            if (creatureCategory !== 'bugs') {
+                tr.appendChild(shadowSizeTd);
+            }
+
+            tr.appendChild(timeTd);
+
             if (isActiveNow) {
+                const countdown = document.createElement('div');
+                countdown.className = 'countdown-timer';
                 const updateTimer = () => {
                     const timeLeft = getTimeRemaining(creature);
                     if (timeLeft > 0) {
@@ -220,16 +241,92 @@ const renderCreatures = () => {
                         const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
                         countdown.textContent = `${state.translations[state.filters.language].countdown} ${hours}s ${minutes}d ${seconds}s`;
                     } else {
-                        clearInterval(card.timerInterval);
+                        clearInterval(tr.timerInterval);
                         renderCreatures();
                     }
                 };
-                card.timerInterval = setInterval(updateTimer, 1000);
+                tr.timerInterval = setInterval(updateTimer, 1000);
                 updateTimer();
+                timeTd.appendChild(countdown);
             }
 
-            card.append(checkbox, img, name, countdown);
-            container.appendChild(card);
+            container.appendChild(tr);
+        }
+    });
+};
+
+/**
+ * Handles the display of creatures when a month button is clicked.
+ * @param {number} month - The month number to display (1-12).
+ * @returns {void}
+ */
+const displayByMonth = (month) => {
+    state.currentMonth = month;
+    elements.thisMonthRadio.checked = false;
+    elements.activeCreaturesRadio.checked = false;
+    elements.allCreaturesRadio.checked = false;
+    
+    elements.monthButtons.forEach(button => button.classList.remove('active'));
+    elements.monthButtons[month - 1].classList.add('active');
+
+    const creatureCategory = state.currentTab;
+    const creatures = state.creaturesData[creatureCategory];
+    const container = elements.creatureLists[creatureCategory];
+    container.innerHTML = '';
+    
+    creatures.forEach(creature => {
+        const isCaught = state.caught[creature.id];
+        const isThisMonth = creature.months.includes(month);
+
+        let shouldRender = true;
+        if (!isThisMonth) {
+            shouldRender = false;
+        }
+        if (state.filters.showUncaught && isCaught) {
+            shouldRender = false;
+        }
+
+        if (shouldRender) {
+            const tr = document.createElement('tr');
+            tr.className = 'creature-row';
+
+            const checkboxTd = document.createElement('td');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = isCaught;
+            checkbox.addEventListener('change', (e) => {
+                state.caught[creature.id] = e.target.checked;
+                saveState();
+            });
+            checkboxTd.appendChild(checkbox);
+
+            const nameTd = document.createElement('td');
+            nameTd.textContent = creature.name;
+            const imageTd = document.createElement('td');
+            const img = document.createElement('img');
+            img.src = creature.image;
+            img.alt = creature.name;
+            img.className = 'creature-image';
+            imageTd.appendChild(img);
+            const priceTd = document.createElement('td');
+            priceTd.textContent = creature.price;
+            const locationTd = document.createElement('td');
+            locationTd.textContent = creature.location;
+            const shadowSizeTd = document.createElement('td');
+            shadowSizeTd.textContent = creature.shadowSize;
+            const timeTd = document.createElement('td');
+            timeTd.textContent = creature.hours.length === 24 ? "All day" : creature.hours.join(', ');
+            
+            tr.appendChild(checkboxTd);
+            tr.appendChild(nameTd);
+            tr.appendChild(imageTd);
+            tr.appendChild(priceTd);
+            tr.appendChild(locationTd);
+            if (creatureCategory !== 'bugs') {
+                tr.appendChild(shadowSizeTd);
+            }
+            tr.appendChild(timeTd);
+            container.appendChild(tr);
         }
     });
 };
@@ -239,6 +336,12 @@ const renderCreatures = () => {
  * @returns {void}
  */
 const setupEventListeners = () => {
+    elements.monthButtons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            displayByMonth(index + 1);
+        });
+    });
+
     document.querySelectorAll('input[name="filter-type"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             state.filters.filterType = e.target.id;
@@ -260,12 +363,12 @@ const setupEventListeners = () => {
         renderCreatures();
     });
 
-    document.querySelectorAll('.tablinks').forEach(tab => {
+    elements.tablinks.forEach(tab => {
         tab.addEventListener('click', (e) => {
-            document.querySelectorAll('.tabcontent').forEach(content => {
+            elements.tabcontents.forEach(content => {
                 content.style.display = 'none';
             });
-            document.querySelectorAll('.tablinks').forEach(link => {
+            elements.tablinks.forEach(link => {
                 link.classList.remove('active');
             });
             
@@ -294,6 +397,10 @@ const init = () => {
     
     document.getElementById(state.currentTab).style.display = 'block';
     document.getElementById(`${state.currentTab}Tab`).classList.add('active');
+    
+    // Default olarak "Bu Ay" filtresi aktif gelsin ve listeyi oluştursun
+    document.getElementById('thisMonthRadio').checked = true;
+    state.filters.filterType = 'thisMonthRadio';
     renderCreatures();
 };
 
