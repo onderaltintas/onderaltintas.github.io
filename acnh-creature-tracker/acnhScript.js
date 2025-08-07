@@ -58,8 +58,8 @@ function createTableRow(creature, type) {
     // Add image
     const imgCell = document.createElement('td');
     const img = document.createElement('img');
-    img.src = creature.image; // DÜZELTME: creature.Image -> creature.image
-    img.alt = creature.name; // DÜZELTME: creature.Name -> creature.name
+    img.src = creature.image;
+    img.alt = creature.name;
     img.width = 50;
     imgCell.appendChild(img);
     row.appendChild(imgCell);
@@ -102,19 +102,8 @@ function displayMonth(selectedMonth) {
     month = selectedMonth;
     highlightMonth(selectedMonth);
     
-    // Filter fish
-    northHemFish.forEach(row => {
-        const monthCells = row.getElementsByTagName('td');
-        // Months start from index 5 (after name, image, price, location, time)
-        if (monthCells[5 + selectedMonth].textContent === 'x') {
-            row.style.display = 'table-row';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-    
-    // Filter bugs
-    northHemBugs.forEach(row => {
+    // DÜZELTME: HTMLCollection'ı diziye çevir
+    Array.from(northHemFish).forEach(row => {
         const monthCells = row.getElementsByTagName('td');
         if (monthCells[5 + selectedMonth].textContent === 'x') {
             row.style.display = 'table-row';
@@ -123,8 +112,18 @@ function displayMonth(selectedMonth) {
         }
     });
     
-    // Filter sea creatures
-    northHemSeaCr.forEach(row => {
+    // DÜZELTME: HTMLCollection'ı diziye çevir
+    Array.from(northHemBugs).forEach(row => {
+        const monthCells = row.getElementsByTagName('td');
+        if (monthCells[5 + selectedMonth].textContent === 'x') {
+            row.style.display = 'table-row';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // DÜZELTME: HTMLCollection'ı diziye çevir
+    Array.from(northHemSeaCr).forEach(row => {
         const monthCells = row.getElementsByTagName('td');
         if (monthCells[5 + selectedMonth].textContent === 'x') {
             row.style.display = 'table-row';
