@@ -21,7 +21,17 @@ const state = {
      * Stores the currently active creature tab.
      * @type {string}
      */
-    currentTab: 'fish'
+    currentTab: 'fish',
+    /**
+     * Stores the loaded creature data.
+     * @type {object}
+     */
+    creaturesData: {},
+    /**
+     * Stores the loaded translations.
+     * @type {object}
+     */
+    translations: {}
 };
 
 /**
@@ -79,7 +89,7 @@ const saveState = () => {
  */
 const applyLocalization = () => {
     const lang = state.filters.language;
-    const currentLangStrings = translations[lang];
+    const currentLangStrings = state.translations[lang];
 
     elements.appTitle.textContent = currentLangStrings.appTitle;
     elements.mainHeader.textContent = currentLangStrings.mainHeader;
@@ -122,26 +132,26 @@ const isCreatureActiveNow = (creature) => {
 const getTimeRemaining = (creature) => {
     const now = new Date();
     const currentHour = now.getHours();
-    const sortedHours = creature.hours.sort((a, b) => a - b);
+    const sortedHours = [...creature.hours].sort((a, b) => a - b);
     
-    // Find the next hour boundary the creature will be active or inactive
     let nextChangeHour;
     if (isCreatureActiveNow(creature)) {
-        // Creature is active, find next inactive hour or wrap to the start of the active period
-        const nextInactiveHour = sortedHours.find(h => h > currentHour) || (sortedHours.length > 0 ? sortedHours[0] : null);
-        if (nextInactiveHour === null) return 0; // Not active in any hour
-        nextChangeHour = nextInactiveHour;
+        nextChangeHour = sortedHours.find(h => h > currentHour);
+        if (!nextChangeHour) {
+            nextChangeHour = sortedHours.length > 0 ? sortedHours[0] : null;
+        }
     } else {
-        // Creature is inactive, find next active hour or wrap to the start of the active period
-        const nextActiveHour = sortedHours.find(h => h > currentHour) || (sortedHours.length > 0 ? sortedHours[0] : null);
-        if (nextActiveHour === null) return 0; // Not active in any hour
-        nextChangeHour = nextActiveHour;
+        nextChangeHour = sortedHours.find(h => h > currentHour);
+        if (!nextChangeHour) {
+            nextChangeHour = sortedHours.length > 0 ? sortedHours[0] : null;
+        }
     }
     
+    if (nextChangeHour === null) return 0;
+
     const nextChange = new Date();
     nextChange.setHours(nextChangeHour, 0, 0, 0);
 
-    // If the next change is in the past, it's for the next day
     if (nextChange.getTime() < now.getTime()) {
         nextChange.setDate(nextChange.getDate() + 1);
     }
@@ -155,7 +165,7 @@ const getTimeRemaining = (creature) => {
  */
 const renderCreatures = () => {
     const creatureCategory = state.currentTab;
-    const creatures = creaturesData[creatureCategory];
+    const creatures = state.creaturesData[creatureCategory];
     const container = elements.creatureLists[creatureCategory];
     container.innerHTML = '';
     const now = new Date();
@@ -208,9 +218,8 @@ const renderCreatures = () => {
                         const seconds = Math.floor((timeLeft / 1000) % 60);
                         const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
                         const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
-                        countdown.textContent = `${translations[state.filters.language].countdown} ${hours}s ${minutes}d ${seconds}s`;
+                        countdown.textContent = `${state.translations[state.filters.language].countdown} ${hours}s ${minutes}d ${seconds}s`;
                     } else {
-                        // Timer expired, re-render to update status
                         clearInterval(card.timerInterval);
                         renderCreatures();
                     }
@@ -270,24 +279,31 @@ const setupEventListeners = () => {
 };
 
 /**
- * Initializes the application on page load.
+ * Initializes the application on page load after data is loaded.
  * @returns {void}
  */
 const init = () => {
     loadState();
     elements.languageSelect.value = state.filters.language;
     
-    // Set initial filter buttons based on loaded state
     document.getElementById(state.filters.filterType).checked = true;
     elements.showUncaughtCheckbox.checked = state.filters.showUncaught;
 
     applyLocalization();
     setupEventListeners();
     
-    // Set initial active tab and render
-    document.getElementById('fish').style.display = 'block';
-    elements.fishTab.classList.add('active');
+    document.getElementById(state.currentTab).style.display = 'block';
+    document.getElementById(`${state.currentTab}Tab`).classList.add('active');
     renderCreatures();
 };
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    Promise.all([
+        fetch('creatures.json').then(response => response.json()),
+        fetch('translations.json').then(response => response.json())
+    ]).then(([creatures, translations]) => {
+        state.creaturesData = creatures;
+        state.translations = translations;
+        init();
+    }).catch(error => console.error('Error loading data files:', error));
+});
