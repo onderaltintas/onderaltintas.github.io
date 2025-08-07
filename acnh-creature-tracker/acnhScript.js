@@ -45,7 +45,7 @@ async function loadCreatureData() {
     }
 }
 
-// Create table rows with new JSON structure
+// Create table rows with corrected field names
 function createTableRow(creature, type) {
     const row = document.createElement('tr');
     row.className = `${type}North`;
@@ -71,7 +71,14 @@ function createTableRow(creature, type) {
     
     // Add location
     const locationCell = document.createElement('td');
-    locationCell.textContent = creature.location;
+    
+    // Handle different location fields
+    if (type === 'sea') {
+        locationCell.textContent = creature.shadowSize || creature.swimmingPattern || '';
+    } else {
+        locationCell.textContent = creature.location || '';
+    }
+    
     row.appendChild(locationCell);
     
     // Add time
