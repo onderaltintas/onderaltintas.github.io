@@ -1,40 +1,33 @@
+// translations.json
 {
-  "tr": {
-    "appTitle": "ACNH Canlı Takipçisi",
-    "mainHeader": "Animal Crossing New Horizons",
-    "subHeader": "Balık, Böcek ve Deniz Canlısı Kontrol Listesi",
-    "langLabel": "Dil:",
-    "thisMonth": "Bu Ay",
-    "activeCreatures": "Aktif Canlılar",
-    "allCreatures": "Tüm Canlılar",
-    "showUncaught": "Sadece Yakalanmayanlar",
-    "fish": "Balıklar",
-    "bugs": "Böcekler",
-    "seaCreatures": "Deniz Canlıları",
-    "price": "Fiyat:",
-    "location": "Konum:",
-    "shadowSize": "Gölge Boyutu:",
-    "months": "Aylar:",
-    "hours": "Saatler:",
-    "countdown": "Yakalamak İçin Kalan Süre:"
-  },
-  "en": {
-    "appTitle": "ACNH Creature Tracker",
-    "mainHeader": "Animal Crossing New Horizons",
-    "subHeader": "Fish, Bug and Sea Creature Checklist",
-    "langLabel": "Language:",
-    "thisMonth": "This Month",
-    "activeCreatures": "Active Creatures",
-    "allCreatures": "All Creatures",
-    "showUncaught": "Show only un-caught",
-    "fish": "Fish",
-    "bugs": "Bugs",
-    "seaCreatures": "Sea Creatures",
-    "price": "Price:",
-    "location": "Location:",
-    "shadowSize": "Shadow Size:",
-    "months": "Months:",
-    "hours": "Hours:",
-    "countdown": "Time Remaining:"
-  }
+    "tr": {
+        "app_title": "Animal Crossing Yakalama Takipçisi",
+        "active_creatures": "Aktif Canlılar",
+        "show_uncaught": "Sadece Yakalanmayanlar",
+        "type_label": "Tür:",
+        "all_types": "Tümü",
+        "fish": "Balıklar",
+        "bugs": "Böcekler",
+        "sea_creatures": "Deniz Canlıları",
+        "language_label": "Dil:",
+        "type": "Tür",
+        "location": "Konum",
+        "price": "Fiyat",
+        "expired": "Süre Doldu"
+    },
+    "en": {
+        "app_title": "Animal Crossing Creature Tracker",
+        "active_creatures": "Active Creatures",
+        "show_uncaught": "Show Only Uncaught",
+        "type_label": "Type:",
+        "all_types": "All",
+        "fish": "Fish",
+        "bugs": "Bugs",
+        "sea_creatures": "Sea Creatures",
+        "language_label": "Language:",
+        "type": "Type",
+        "location": "Location",
+        "price": "Price",
+        "expired": "Expired"
+    }
 }
