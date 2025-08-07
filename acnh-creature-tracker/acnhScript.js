@@ -10,6 +10,7 @@ let isNorthernHemisphere = true; // Default to northern hemisphere
 const hemisphereToggle = document.getElementById('hemisphereToggle');
 const hemisphereText = document.getElementById('hemisphereText');
 const uncaughtToggle = document.getElementById('uncaughtToggle');
+const activeNowToggle = document.getElementById('activeNowToggle');
 
 hemisphereToggle.addEventListener('change', function() {
     isNorthernHemisphere = this.checked;
@@ -18,6 +19,10 @@ hemisphereToggle.addEventListener('change', function() {
 });
 
 uncaughtToggle.addEventListener('change', function() {
+    updateDisplay();
+});
+
+activeNowToggle.addEventListener('change', function() {
     updateDisplay();
 });
 
@@ -156,9 +161,100 @@ function createTableRow(creature, type) {
     return row;
 }
 
+// Convert time string to minutes
+function timeToMinutes(timeStr) {
+    const time = timeStr.trim().toUpperCase();
+    let hour, minute = 0;
+    let period = "";
+    
+    if (time.includes("AM") || time.includes("PM")) {
+        if (time.includes("AM")) {
+            period = "AM";
+        } else {
+            period = "PM";
+        }
+        
+        // Extract time part
+        const timePart = time.replace("AM", "").replace("PM", "").trim();
+        const parts = timePart.split(':');
+        
+        hour = parseInt(parts[0]);
+        minute = parts.length > 1 ? parseInt(parts[1]) : 0;
+        
+        // Handle 12AM and 12PM
+        if (period === "AM" && hour === 12) {
+            hour = 0;
+        } else if (period === "PM" && hour !== 12) {
+            hour += 12;
+        }
+    } else {
+        // Handle 24-hour format if needed
+        const parts = time.split(':');
+        hour = parseInt(parts[0]);
+        minute = parts.length > 1 ? parseInt(parts[1]) : 0;
+    }
+    
+    return hour * 60 + minute;
+}
+
+// Check if creature is active now
+function isActiveNow(timeRange) {
+    if (!timeRange) return false;
+    
+    // "Tüm gün" kontrolü
+    if (timeRange.includes("Tüm gün") || 
+        timeRange.includes("All day") || 
+        timeRange.includes("All Day")) {
+        return true;
+    }
+    
+    const now = new Date();
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+    const currentTotalMinutes = currentHours * 60 + currentMinutes;
+    
+    // Birden fazla zaman aralığı varsa (örneğin: "9AM-4PM & 9PM-4AM")
+    const timeRanges = timeRange.split('&').map(t => t.trim());
+    
+    for (const range of timeRanges) {
+        const [startStr, endStr] = range.split('-').map(s => s.trim());
+        
+        try {
+            const startMinutes = timeToMinutes(startStr);
+            let endMinutes = timeToMinutes(endStr);
+            
+            // Gece yarısını geçen zaman aralıkları
+            if (endMinutes < startMinutes) {
+                // Gece yarısını geçen aralıklar için endMinutes'i 24 saat ekleyerek ayarla
+                if (currentTotalMinutes >= startMinutes) {
+                    // Gece yarısından önceki kısım
+                    if (currentTotalMinutes >= startMinutes && currentTotalMinutes <= (24 * 60)) {
+                        return true;
+                    }
+                } else {
+                    // Gece yarısından sonraki kısım
+                    if (currentTotalMinutes <= endMinutes) {
+                        return true;
+                    }
+                }
+            } else {
+                // Normal zaman aralığı
+                if (currentTotalMinutes >= startMinutes && currentTotalMinutes <= endMinutes) {
+                    return true;
+                }
+            }
+        } catch (e) {
+            console.error("Zaman aralığı ayrıştırma hatası:", e);
+        }
+    }
+    
+    return false;
+}
+
 // Update display based on filters
 function updateDisplay() {
     const showOnlyUncaught = uncaughtToggle.checked;
+    const showActiveNow = activeNowToggle.checked;
     const hemisphere = isNorthernHemisphere ? 'north' : 'south';
     
     // Filter fish
@@ -172,8 +268,9 @@ function updateDisplay() {
             if (creature) {
                 const months = creature.months[hemisphere];
                 const isAvailable = months[month];
+                const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
-                if (isAvailable && (!showOnlyUncaught || !isCaptured)) {
+                if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
@@ -193,8 +290,9 @@ function updateDisplay() {
             if (creature) {
                 const months = creature.months[hemisphere];
                 const isAvailable = months[month];
+                const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
-                if (isAvailable && (!showOnlyUncaught || !isCaptured)) {
+                if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
@@ -214,8 +312,9 @@ function updateDisplay() {
             if (creature) {
                 const months = creature.months[hemisphere];
                 const isAvailable = months[month];
+                const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
-                if (isAvailable && (!showOnlyUncaught || !isCaptured)) {
+                if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
