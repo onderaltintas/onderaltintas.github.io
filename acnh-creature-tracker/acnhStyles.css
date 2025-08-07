@@ -4,6 +4,20 @@ Green: #93CEAE
 Teal: #7FCECB
 Off-White: #FAFCF6;
 */
+
+/* Yakalama checkbox'u için stil */
+.capture-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* Tablo hücrelerinde ortalamak için */
+td {
+    text-align: center;
+    vertical-align: middle;
+}
+
 #topHeading h1 {
   font-size: 2.2em;
   margin-bottom: 5px;
