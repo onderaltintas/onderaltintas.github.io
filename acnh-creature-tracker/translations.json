@@ -67,7 +67,10 @@
     "9AM-4AM": "09:00-04:00",
     "Narrow": "Dar",
     "6(fin)": "6(yüzgeç)",
+    "Small": "Küçük",
+    "Medium": "Orta",
     "Large": "Büyük",
+    "Huge": "Devasa",
     "Stationary": "Sabit",
     "Slow consistent movement": "Yavaş düzenli hareket",
     "Quick long lunges": "Hızlı uzun hamleler",
@@ -77,13 +80,13 @@
     "Slow short lunges": "Yavaş kısa hamleler",
     "Moderate short lunges": "Orta kısa hamleler",
     "Slow": "Yavaş",
-    "Huge": "Devasa",
     "Quick": "Hızlı",
     "Quick short lunges": "Hızlı kısa hamleler",
     "Fast": "Çok hızlı",
     "Tiny": "Minik",
     "Moderate": "Orta",
-    "Slow short movement": "Yavaş kısa hareket"
+    "Slow short movement": "Yavaş kısa hareket",
+    "On trees": "Ağaçlarda"
   },
   "en": {
     "app_title": "Animal Crossing Creature Tracker",
@@ -153,7 +156,10 @@
     "9AM-4AM": "9AM-4AM",
     "Narrow": "Narrow",
     "6(fin)": "6(fin)",
+    "Small": "Small",
+    "Medium": "Medium",
     "Large": "Large",
+    "Huge": "Huge",
     "Stationary": "Stationary",
     "Slow consistent movement": "Slow consistent movement",
     "Quick long lunges": "Quick long lunges",
@@ -163,12 +169,12 @@
     "Slow short lunges": "Slow short lunges",
     "Moderate short lunges": "Moderate short lunges",
     "Slow": "Slow",
-    "Huge": "Huge",
     "Quick": "Quick",
     "Quick short lunges": "Quick short lunges",
     "Fast": "Fast",
     "Tiny": "Tiny",
     "Moderate": "Moderate",
-    "Slow short movement": "Slow short movement"
+    "Slow short movement": "Slow short movement",
+    "On trees": "On trees"
   }
 }
