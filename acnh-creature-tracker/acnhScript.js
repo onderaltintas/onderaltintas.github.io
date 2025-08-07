@@ -224,7 +224,11 @@ function createTableRow(creature, type) {
     
     // Handle different location fields
     if (type === 'sea') {
-        locationCell.textContent = creature.shadowSize || creature.swimmingPattern || '';
+        // Translate sea creature attributes
+        let locationText = '';
+        if (creature.shadowSize) locationText += translate(creature.shadowSize) + ' ';
+        if (creature.swimmingPattern) locationText += translate(creature.swimmingPattern);
+        locationCell.textContent = locationText.trim();
     } else {
         // Translate location
         locationCell.textContent = translate(creature.location) || '';
