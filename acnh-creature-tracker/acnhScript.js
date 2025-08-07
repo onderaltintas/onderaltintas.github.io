@@ -3,7 +3,7 @@ let northHemFish = [];
 let northHemBugs = [];
 let northHemSeaCr = [];
 let monthButtons = document.getElementsByClassName("availableMonth");
-let month = new Date().getMonth();
+let month = new Date().getMonth(); // Current month (0-11)
 
 // Tab control functions
 function openList(evt, listName) {
@@ -45,47 +45,47 @@ async function loadCreatureData() {
     }
 }
 
-// Create table rows
+// Create table rows with new JSON structure
 function createTableRow(creature, type) {
     const row = document.createElement('tr');
     row.className = `${type}North`;
     
     // Add name
     const nameCell = document.createElement('td');
-    nameCell.textContent = creature.Name;
+    nameCell.textContent = creature.name;
     row.appendChild(nameCell);
     
     // Add image
     const imgCell = document.createElement('td');
     const img = document.createElement('img');
-    img.src = creature.Image;
-    img.alt = creature.Name;
+    img.src = creature.image;
+    img.alt = creature.name;
     img.width = 50;
     imgCell.appendChild(img);
     row.appendChild(imgCell);
     
     // Add price
     const priceCell = document.createElement('td');
-    priceCell.textContent = creature.Price;
+    priceCell.textContent = creature.price;
     row.appendChild(priceCell);
     
     // Add location
     const locationCell = document.createElement('td');
-    locationCell.textContent = creature.Location;
+    locationCell.textContent = creature.location;
     row.appendChild(locationCell);
     
     // Add time
     const timeCell = document.createElement('td');
-    timeCell.textContent = creature.Time;
+    timeCell.textContent = creature.time;
     row.appendChild(timeCell);
     
-    // Add months
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    months.forEach(month => {
+    // Add months (using north hemisphere data)
+    const months = creature.months.north;
+    for (let i = 0; i < 12; i++) {
         const monthCell = document.createElement('td');
-        monthCell.textContent = creature[month] ? 'x' : '';
+        monthCell.textContent = months[i] ? 'x' : '';
         row.appendChild(monthCell);
-    });
+    }
     
     return row;
 }
@@ -98,7 +98,7 @@ function displayMonth(selectedMonth) {
     // Filter fish
     northHemFish.forEach(row => {
         const monthCells = row.getElementsByTagName('td');
-        // +5 because first 5 columns are not months
+        // Months start from index 5 (after name, image, price, location, time)
         if (monthCells[5 + selectedMonth].textContent === 'x') {
             row.style.display = 'table-row';
         } else {
