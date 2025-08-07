@@ -348,10 +348,8 @@ function updateDisplay() {
     const showActiveNow = activeNowToggle.checked;
     const hemisphere = isNorthernHemisphere ? 'north' : 'south';
     
-    // Gerçek zamanlı ay ve zaman bilgileri
-    const now = new Date();
-    const currentRealMonth = now.getMonth();
-    const currentRealTime = now.getHours() * 60 + now.getMinutes();
+    // Use the selected month instead of current real month
+    const selectedMonth = month;
     
     // Filter fish
     if (northHemFish.length > 0) {
@@ -363,7 +361,7 @@ function updateDisplay() {
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                const isAvailable = months[currentRealMonth]; // Sadece mevcut ayda olanlar
+                const isAvailable = months[selectedMonth]; // Use selected month
                 const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
                 if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
@@ -385,7 +383,7 @@ function updateDisplay() {
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                const isAvailable = months[currentRealMonth]; // Sadece mevcut ayda olanlar
+                const isAvailable = months[selectedMonth]; // Use selected month
                 const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
                 if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
@@ -407,7 +405,7 @@ function updateDisplay() {
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                const isAvailable = months[currentRealMonth]; // Sadece mevcut ayda olanlar
+                const isAvailable = months[selectedMonth]; // Use selected month
                 const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
                 if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
