@@ -4,6 +4,17 @@ Green: #93CEAE
 Teal: #7FCECB
 Off-White: #FAFCF6;
 */
+#topHeading h1 {
+  font-size: 2.2em;
+  margin-bottom: 5px;
+}
+
+#topHeading h2 {
+  font-size: 1.5em;
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #318D9B;
+}
 
 body {
   text-align: center;
