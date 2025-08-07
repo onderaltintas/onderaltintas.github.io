@@ -3,48 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Crossing: Yakalama Takipçisi</title>
+    <title>Animal Crossing Balık Rehberi</title>
     <link rel="stylesheet" href="acnhStyles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1 data-i18n="app_title">Animal Crossing Yakalama Takipçisi</h1>
-    </header>
-
-    <div class="controls">
-        <div class="filter-group">
-            <label>
-                <input type="checkbox" id="active-only" checked>
-                <span data-i18n="active_creatures">Aktif Canlılar</span>
-            </label>
-            
-            <label>
-                <input type="checkbox" id="uncaught-only" checked>
-                <span data-i18n="show_uncaught">Sadece Yakalanmayanlar</span>
-            </label>
-        </div>
+    <div id="topHeading">
+        <h1>Animal Crossing: New Horizons</h1>
+        <h2>Kuzey Yarımküre Balık Rehberi</h2>
         
-        <div class="filter-group">
-            <label data-i18n="type_label">Tür:</label>
-            <select id="type-filter">
-                <option value="all" data-i18n="all_types">Tümü</option>
-                <option value="fish" data-i18n="fish">Balıklar</option>
-                <option value="bug" data-i18n="bugs">Böcekler</option>
-                <option value="sea" data-i18n="sea_creatures">Deniz Canlıları</option>
-            </select>
-        </div>
-        
-        <div class="filter-group">
-            <label data-i18n="language_label">Dil:</label>
-            <select id="language-selector">
-                <option value="tr">Türkçe</option>
-                <option value="en">English</option>
-            </select>
+        <!-- Ay Butonları -->
+        <div id="monthButtons">
+            <button class="availableMonth" onclick="displayMonth(0)">Ocak</button>
+            <button class="availableMonth" onclick="displayMonth(1)">Şubat</button>
+            <button class="availableMonth" onclick="displayMonth(2)">Mart</button>
+            <button class="availableMonth" onclick="displayMonth(3)">Nisan</button>
+            <button class="availableMonth" onclick="displayMonth(4)">Mayıs</button>
+            <button class="availableMonth" onclick="displayMonth(5)">Haziran</button>
+            <button class="availableMonth" onclick="displayMonth(6)">Temmuz</button>
+            <button class="availableMonth" onclick="displayMonth(7)">Ağustos</button>
+            <button class="availableMonth" onclick="displayMonth(8)">Eylül</button>
+            <button class="availableMonth" onclick="displayMonth(9)">Ekim</button>
+            <button class="availableMonth" onclick="displayMonth(10)">Kasım</button>
+            <button class="availableMonth" onclick="displayMonth(11)">Aralık</button>
         </div>
     </div>
 
-    <div id="creature-list">
-        <!-- Creatures will be loaded here -->
+    <div id="charts">
+        <!-- Tab Butonları -->
+        <div class="tab">
+            <button class="tablinks" onclick="openList(event, 'fish')">Balıklar</button>
+            <button class="tablinks" onclick="openList(event, 'bugs')">Böcekler</button>
+            <button class="tablinks" onclick="openList(event, 'seaCreatures')">Deniz Canlıları</button>
+        </div>
+
+        <!-- Balık Tablosu -->
+        <div id="fish" class="tabcontent">
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Resim</th>
+                        <th>Fiyat</th>
+                        <th>Konum</th>
+                        <th>Zaman</th>
+                        <th>Ock</th>
+                        <th>Şub</th>
+                        <th>Mar</th>
+                        <th>Nis</th>
+                        <th>May</th>
+                        <th>Haz</th>
+                        <th>Tem</th>
+                        <th>Ağu</th>
+                        <th>Eyl</th>
+                        <th>Ekm</th>
+                        <th>Kas</th>
+                        <th>Ara</th>
+                    </tr>
+                </thead>
+                <tbody id="fish-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Böcek Tablosu -->
+        <div id="bugs" class="tabcontent">
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Resim</th>
+                        <th>Fiyat</th>
+                        <th>Konum</th>
+                        <th>Zaman</th>
+                        <th>Ock</th>
+                        <th>Şub</th>
+                        <th>Mar</th>
+                        <th>Nis</th>
+                        <th>May</th>
+                        <th>Haz</th>
+                        <th>Tem</th>
+                        <th>Ağu</th>
+                        <th>Eyl</th>
+                        <th>Ekm</th>
+                        <th>Kas</th>
+                        <th>Ara</th>
+                    </tr>
+                </thead>
+                <tbody id="bugs-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Deniz Canlıları Tablosu -->
+        <div id="seaCreatures" class="tabcontent">
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Resim</th>
+                        <th>Fiyat</th>
+                        <th>Konum</th>
+                        <th>Zaman</th>
+                        <th>Ock</th>
+                        <th>Şub</th>
+                        <th>Mar</th>
+                        <th>Nis</th>
+                        <th>May</th>
+                        <th>Haz</th>
+                        <th>Tem</th>
+                        <th>Ağu</th>
+                        <th>Eyl</th>
+                        <th>Ekm</th>
+                        <th>Kas</th>
+                        <th>Ara</th>
+                    </tr>
+                </thead>
+                <tbody id="seaCreatures-body"></tbody>
+            </table>
+        </div>
     </div>
 
     <script src="acnhScript.js"></script>
