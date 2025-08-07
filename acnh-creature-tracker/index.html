@@ -13,9 +13,7 @@
 <div id="topHeading">
   <h1 id="mainHeader">Animal Crossing New Horizons</h1>
   <h2 id="subHeader">Fish, Bug and Sea Creature Checklist </h2>
-</div>
 
-<div id="charts">
   <div class="header-controls">
     <div class="language-selector">
       <label for="language-select" id="langLabel"></label>
@@ -25,19 +23,19 @@
       </select>
     </div>
   </div>
-
+  
   <div class="filter-controls">
-    <div class="radio-buttons">
+    <div class="filter-radios">
       <label for="thisMonthRadio">
-        <input type="radio" name="filter-type" id="thisMonthRadio">
+        <input type="radio" name="filter-type" id="thisMonthRadio" data-filter="this-month">
         <span class="label-text" data-key="thisMonth"></span>
       </label>
       <label for="activeCreaturesRadio">
-        <input type="radio" name="filter-type" id="activeCreaturesRadio">
+        <input type="radio" name="filter-type" id="activeCreaturesRadio" data-filter="active">
         <span class="label-text" data-key="activeCreatures"></span>
       </label>
       <label for="allCreaturesRadio">
-        <input type="radio" name="filter-type" id="allCreaturesRadio">
+        <input type="radio" name="filter-type" id="allCreaturesRadio" data-filter="all">
         <span class="label-text" data-key="allCreatures"></span>
       </label>
     </div>
@@ -49,6 +47,23 @@
     </div>
   </div>
 
+  <div class="month-buttons">
+    <button class="availableMonth" onclick="displayByMonth(1)">Jan</button>
+    <button class="availableMonth" onclick="displayByMonth(2)">Feb</button>
+    <button class="availableMonth" onclick="displayByMonth(3)">Mar</button>
+    <button class="availableMonth" onclick="displayByMonth(4)">Apr</button>
+    <button class="availableMonth" onclick="displayByMonth(5)">May</button>
+    <button class="availableMonth" onclick="displayByMonth(6)">Jun</button>
+    <button class="availableMonth" onclick="displayByMonth(7)">Jul</button>
+    <button class="availableMonth" onclick="displayByMonth(8)">Aug</button>
+    <button class="availableMonth" onclick="displayByMonth(9)">Sept</button>
+    <button class="availableMonth" onclick="displayByMonth(10)">Oct</button>
+    <button class="availableMonth" onclick="displayByMonth(11)">Nov</button>
+    <button class="availableMonth" onclick="displayByMonth(12)">Dec</button>
+  </div>
+</div>
+
+<div id="charts">
   <div class="tab">
     <button class="tablinks" id="fishTab" data-tab="fish"></button>
     <button class="tablinks" id="bugsTab" data-tab="bugs"></button>
@@ -56,13 +71,51 @@
   </div>
 
   <div id="fish" class="tabcontent active">
-    <div id="fishList" class="creature-grid"></div>
+    <table id="fishTable">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th><img src="Images/Icons/fish-icon.png"></th>
+          <th>Price</th>
+          <th>Location</th>
+          <th>Shadow Size</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="fishList"></tbody>
+    </table>
   </div>
   <div id="bugs" class="tabcontent">
-    <div id="bugsList" class="creature-grid"></div>
+    <table id="bugsTable">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th><img src="Images/Icons/bug-icon.png"></th>
+          <th>Price</th>
+          <th>Location</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="bugsList"></tbody>
+    </table>
   </div>
   <div id="seaCreatures" class="tabcontent">
-    <div id="seaCreaturesList" class="creature-grid"></div>
+    <table id="seaCreaturesTable">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th><img src="Images/Icons/sea-creature-icon.png"></th>
+          <th>Price</th>
+          <th>Location</th>
+          <th>Shadow Size</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="seaCreaturesList"></tbody>
+    </table>
   </div>
 </div>
 </body>
