@@ -1,99 +1,2317 @@
-[
+{
+  "fish": [
     {
-        "id": 1,
-        "type": "fish",
-        "name": {
-            "tr": "Kırmızı Balon Balığı",
-            "en": "Red Snapper"
-        },
-        "image": "https://acnhcdn.com/latest/FishIcon/Fish38.png",
-        "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        "hours": [9, 10, 11, 12, 13, 14, 15, 16],
-        "location": {
-            "tr": "Okyanus",
-            "en": "Ocean"
-        },
-        "price": 3000
+      "name": "Bitterling",
+      "image": "Images/Fish/bitterling.png",
+      "price": 900,
+      "location": "River",
+      "shadowSize": "1",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, false, false, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, false, false, true, true, true, true, false, false]
+      }
     },
     {
-        "id": 2,
-        "type": "fish",
-        "name": {
-            "tr": "Koi Balığı",
-            "en": "Koi"
-        },
-        "image": "https://acnhcdn.com/latest/FishIcon/Fish31.png",
-        "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        "hours": [16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8],
-        "location": {
-            "tr": "Gölet",
-            "en": "Pond"
-        },
-        "price": 4000
+      "name": "Pale Chub",
+      "image": "Images/Fish/palechub.png",
+      "price": 200,
+      "location": "River",
+      "shadowSize": "1",
+      "time": "9AM-4PM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
     },
     {
-        "id": 3,
-        "type": "bug",
-        "name": {
-            "tr": "Kelebek",
-            "en": "Common Butterfly"
-        },
-        "image": "https://acnhcdn.com/latest/FishIcon/Bug01.png",
-        "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        "hours": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-        "location": {
-            "tr": "Uçarak",
-            "en": "Flying"
-        },
-        "price": 160
+      "name": "Crucian Carp",
+      "image": "Images/Fish/crucianCarp.png",
+      "price": 160,
+      "location": "River",
+      "shadowSize": "2",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
     },
     {
-        "id": 4,
-        "type": "bug",
-        "name": {
-            "tr": "Ateş Böceği",
-            "en": "Firefly"
-        },
-        "image": "https://acnhcdn.com/latest/FishIcon/Bug42.png",
-        "months": [6, 7, 8],
-        "hours": [19, 20, 21, 22, 23, 0, 1, 2, 3],
-        "location": {
-            "tr": "Suda",
-            "en": "Near Water"
-        },
-        "price": 300
+      "name": "Dace",
+      "image": "Images/Fish/dace.png",
+      "price": 240,
+      "location": "River",
+      "shadowSize": "3",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
     },
     {
-        "id": 5,
-        "type": "sea",
-        "name": {
-            "tr": "Denizyıldızı",
-            "en": "Starfish"
-        },
-        "image": "https://acnhcdn.com/latest/FishIcon/Fish73.png",
-        "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        "hours": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-        "location": {
-            "tr": "Deniz",
-            "en": "Sea"
-        },
-        "price": 500
+      "name": "Carp",
+      "image": "Images/Fish/carp.png",
+      "price": 300,
+      "location": "Pond",
+      "shadowSize": "4",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
     },
     {
-        "id": 6,
-        "type": "sea",
-        "name": {
-            "tr": "Mürekkep Balığı",
-            "en": "Octopus"
-        },
-        "image": "https://acnhcdn.com/latest/FishIcon/Fish68.png",
-        "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        "hours": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-        "location": {
-            "tr": "Deniz",
-            "en": "Sea"
-        },
-        "price": 1200
+      "name": "Koi",
+      "image": "Images/Fish/koi.png",
+      "price": 4000,
+      "location": "Pond",
+      "shadowSize": "4",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Goldfish",
+      "image": "Images/Fish/goldfish.png",
+      "price": 1300,
+      "location": "Pond",
+      "shadowSize": "1",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Pop-eyed Goldfish",
+      "image": "Images/Fish/pop-eyed-goldfish.png",
+      "price": 1300,
+      "location": "Pond",
+      "shadowSize": "1",
+      "time": "9AM-4PM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Ranchu Goldfish",
+      "image": "Images/Fish/ranchu-goldfish.png",
+      "price": 4500,
+      "location": "Pond",
+      "shadowSize": "2",
+      "time": "9AM-4PM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Killifish",
+      "image": "Images/Fish/killifish.png",
+      "price": 300,
+      "location": "Pond",
+      "shadowSize": "1",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, true, true, true, true]
+      }
+    },
+    {
+      "name": "Crawfish",
+      "image": "Images/Fish/crawfish.png",
+      "price": 200,
+      "location": "Pond",
+      "shadowSize": "2",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Soft-shelled Turtle",
+      "image": "Images/Fish/softshelledturtle.png",
+      "price": 3750,
+      "location": "River",
+      "shadowSize": "4",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, false, false, false, true, true, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Snapping Turtle",
+      "image": "Images/Fish/snappingturtle.png",
+      "price": 5000,
+      "location": "River",
+      "shadowSize": "4",
+      "time": "9PM-4AM",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, true, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Tadpole",
+      "image": "Images/Fish/tadpole.png",
+      "price": 100,
+      "location": "Pond",
+      "shadowSize": "1",
+      "time": "All day",
+      "months": {
+        "north": [false, false, true, true, true, true, true, false, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Frog",
+      "image": "Images/Fish/frog.png",
+      "price": 120,
+      "location": "Pond",
+      "shadowSize": "2",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, false, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, true, true, false, false]
+      }
+    },
+    {
+      "name": "Freshwater Goby",
+      "image": "Images/Fish/freshwatergoby.png",
+      "price": 400,
+      "location": "River",
+      "shadowSize": "2",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Loach",
+      "image": "Images/Fish/loach.png",
+      "price": 400,
+      "location": "River",
+      "shadowSize": "2",
+      "time": "All day",
+      "months": {
+        "north": [false, false, true, true, true, false, false, false, false, false, false, false],
+        "south": [true, true, false, false, false, true, true, true, false, false, false, false]
+      }
+    },
+    {
+      "name": "Catfish",
+      "image": "Images/Fish/catfish.png",
+      "price": 800,
+      "location": "Pond",
+      "shadowSize": "4",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, true, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Giant Snakehead",
+      "image": "Images/Fish/giantsnakehead.png",
+      "price": 5500,
+      "location": "Pond",
+      "shadowSize": "4",
+      "time": "9AM-4PM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, false, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, true, true, false, false]
+      }
+    },
+    {
+      "name": "Bluegill",
+      "image": "Images/Fish/bluegill.png",
+      "price": 180,
+      "location": "River",
+      "shadowSize": "2",
+      "time": "9AM-4PM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Yellow Perch",
+      "image": "Images/Fish/yellowperch.png",
+      "price": 300,
+      "location": "River",
+      "shadowSize": "3",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, false, false, false, false, false, false, true, true, true],
+        "south": [false, false, false, true, true, true, true, true, true, false, false, false]
+      }
+    },
+    {
+      "name": "Black Bass",
+      "image": "Images/Fish/blackbass.png",
+      "price": 400,
+      "location": "River",
+      "shadowSize": "4",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Tilapia",
+      "image": "Images/Fish/tilapia.png",
+      "price": 800,
+      "location": "River",
+      "shadowSize": "3",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, true, false, false],
+        "south": [true, true, true, true, true, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Pike",
+      "image": "Images/Fish/pike.png",
+      "price": 1800,
+      "location": "River",
+      "shadowSize": "5",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, false, false, true, true, true, true],
+        "south": [true, true, true, true, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Pond Smelt",
+      "image": "Images/Fish/pondsmelt.png",
+      "price": 500,
+      "location": "River",
+      "shadowSize": "2",
+      "time": "All day",
+      "months": {
+        "north": [true, true, false, false, false, false, false, false, false, false, false, true],
+        "south": [false, false, true, true, true, false, false, false, false, false, true, false]
+      }
+    },
+    {
+      "name": "Sweetfish",
+      "image": "Images/Fish/sweetfish.png",
+      "price": 900,
+      "location": "River",
+      "shadowSize": "3",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Cherry Salmon",
+      "image": "Images/Fish/cherrysalmon.png",
+      "price": 1000,
+      "location": "River (Clifftop)",
+      "shadowSize": "3",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, true, true, true, true, false, false, true, true, false, false],
+        "south": [true, true, false, false, false, false, true, true, false, false, true, true]
+      }
+    },
+    {
+      "name": "Char",
+      "image": "Images/Fish/char.png",
+      "price": 3800,
+      "location": "River (Clifftop), Pond",
+      "shadowSize": "3",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, true, true, true, true, false, false, true, true, false, false],
+        "south": [true, true, false, false, false, false, true, true, false, false, true, true]
+      }
+    },
+    {
+      "name": "Golden Trout",
+      "image": "Images/Fish/goldentrout.png",
+      "price": 15000,
+      "location": "River (Clifftop)",
+      "shadowSize": "3",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, true, true, true, true, false, false, true, true, false, false],
+        "south": [true, true, false, false, false, false, true, true, false, false, true, true]
+      }
+    },
+    {
+      "name": "Stringfish",
+      "image": "Images/Fish/stringfish.png",
+      "price": 15000,
+      "location": "River (Clifftop)",
+      "shadowSize": "5",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [true, true, true, false, false, false, false, false, false, false, false, true],
+        "south": [false, false, false, false, false, true, true, true, true, true, true, false]
+      }
+    },
+    {
+      "name": "Salmon",
+      "image": "Images/Fish/salmon.png",
+      "price": 700,
+      "location": "River (Mouth)",
+      "shadowSize": "4",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, false, false, true, false, false, false],
+        "south": [false, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "King Salmon",
+      "image": "Images/Fish/kingsalmon.png",
+      "price": 1800,
+      "location": "River (Mouth)",
+      "shadowSize": "6",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, false, false, true, false, false, false],
+        "south": [false, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Mitten Crab",
+      "image": "Images/Fish/mittencrab.png",
+      "price": 2000,
+      "location": "River",
+      "shadowSize": "2",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, false, false, false, false, true, true, true, false],
+        "south": [true, true, true, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Guppy",
+      "image": "Images/Fish/guppy.png",
+      "price": 1300,
+      "location": "River",
+      "shadowSize": "1",
+      "time": "9AM-4PM",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, true, true, false],
+        "south": [true, true, true, false, false, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Nibble Fish",
+      "image": "Images/Fish/nibblefish.png",
+      "price": 1500,
+      "location": "River",
+      "shadowSize": "1",
+      "time": "9AM-4PM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Angelfish",
+      "image": "Images/Fish/angelfish.png",
+      "price": 3000,
+      "location": "River",
+      "shadowSize": "2",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, true, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Betta",
+      "image": "Images/Fish/betta.png",
+      "price": 2500,
+      "location": "River",
+      "shadowSize": "2",
+      "time": "9AM-4PM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, true, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Neon Tetra",
+      "image": "Images/Fish/neontetra.png",
+      "price": 500,
+      "location": "River",
+      "shadowSize": "1",
+      "time": "9AM-4PM",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, true, true, false],
+        "south": [true, true, true, false, false, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Rainbowfish",
+      "image": "Images/Fish/rainbowfish.png",
+      "price": 800,
+      "location": "River",
+      "shadowSize": "1",
+      "time": "9AM-4PM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, true, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Piranha",
+      "image": "Images/Fish/piranha.png",
+      "price": 2500,
+      "location": "River",
+      "shadowSize": "2",
+      "time": "9AM-4PM & 9PM-4AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, false, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, true, true, false, false]
+      }
+    },
+    {
+      "name": "Arowana",
+      "image": "Images/Fish/arowana.png",
+      "price": 10000,
+      "location": "River",
+      "shadowSize": "4",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Dorado",
+      "image": "Images/Fish/dorado.png",
+      "price": 15000,
+      "location": "River",
+      "shadowSize": "5",
+      "time": "4AM-9PM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Gar",
+      "image": "Images/Fish/gar.png",
+      "price": 6000,
+      "location": "Pond",
+      "shadowSize": "5",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Arapaima",
+      "image": "Images/Fish/arapaima.png",
+      "price": 10000,
+      "location": "River",
+      "shadowSize": "6",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Saddled Bichir",
+      "image": "Images/Fish/saddledbichir.png",
+      "price": 4000,
+      "location": "River",
+      "shadowSize": "4",
+      "time": "9PM-4AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Sturgeon",
+      "image": "Images/Fish/sturgeon.png",
+      "price": 10000,
+      "location": "River (Mouth)",
+      "shadowSize": "6",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, false, false, false, false, false, true, true, true, true],
+        "south": [false, false, false, true, true, true, true, true, false, false, false, false]
+      }
+    },
+    {
+      "name": "Sea Butterfly",
+      "image": "Images/Fish/seabutterfly.png",
+      "price": 1000,
+      "location": "Sea",
+      "shadowSize": "1",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, false, false, false, false, false, false, false, false, true],
+        "south": [false, false, false, false, false, true, true, true, true, true, true, false]
+      }
+    },
+    {
+      "name": "Sea Horse",
+      "image": "Images/Fish/seahorse.png",
+      "price": 1100,
+      "location": "Sea",
+      "shadowSize": "1",
+      "time": "All day",
+      "months": {
+        "north": [false, false, true, true, true, true, true, true, true, true, true, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Clown Fish",
+      "image": "Images/Fish/clownfish.png",
+      "price": 650,
+      "location": "Sea",
+      "shadowSize": "1",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Surgeonfish",
+      "image": "Images/Fish/surgeonfish.png",
+      "price": 1000,
+      "location": "Sea",
+      "shadowSize": "2",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Butterfly Fish",
+      "image": "Images/Fish/butterflyfish.png",
+      "price": 1000,
+      "location": "Sea",
+      "shadowSize": "2",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Napoleonfish",
+      "image": "Images/Fish/napoleonfish.png",
+      "price": 10000,
+      "location": "Sea",
+      "shadowSize": "6",
+      "time": "4AM-9PM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Zebra Turkeyfish",
+      "image": "Images/Fish/zebraturkeyfish.png",
+      "price": 500,
+      "location": "Sea",
+      "shadowSize": "3",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, true, true, false],
+        "south": [true, true, true, false, false, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Blowfish",
+      "image": "Images/Fish/blowfish.png",
+      "price": 5000,
+      "location": "Sea",
+      "shadowSize": "3",
+      "time": "9PM-4AM",
+      "months": {
+        "north": [true, true, false, false, false, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, true, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Puffer Fish",
+      "image": "Images/Fish/pufferfish.png",
+      "price": 250,
+      "location": "Sea",
+      "shadowSize": "3",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Anchovy",
+      "image": "Images/Fish/anchovy.png",
+      "price": 200,
+      "location": "Sea",
+      "shadowSize": "2",
+      "time": "4AM-9PM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Horse Mackerel",
+      "image": "Images/Fish/horsemackerel.png",
+      "price": 150,
+      "location": "Sea",
+      "shadowSize": "2",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Barred Knifejaw",
+      "image": "Images/Fish/barredknifejaw.png",
+      "price": 5000,
+      "location": "Sea",
+      "shadowSize": "3",
+      "time": "All day",
+      "months": {
+        "north": [false, false, true, true, true, true, true, true, true, true, true, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Sea Bass",
+      "image": "Images/Fish/seabass.png",
+      "price": 400,
+      "location": "Sea",
+      "shadowSize": "5",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Red Snapper",
+      "image": "Images/Fish/redsnapper.png",
+      "price": 3000,
+      "location": "Sea",
+      "shadowSize": "4",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Dab",
+      "image": "Images/Fish/dab.png",
+      "price": 300,
+      "location": "Sea",
+      "shadowSize": "3",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, false, false, false, false, false, true, true, true],
+        "south": [false, false, false, false, true, true, true, true, true, false, false, false]
+      }
+    },
+    {
+      "name": "Olive Flounder",
+      "image": "Images/Fish/oliveflounder.png",
+      "price": 800,
+      "location": "Sea",
+      "shadowSize": "5",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Squid",
+      "image": "Images/Fish/squid.png",
+      "price": 500,
+      "location": "Sea",
+      "shadowSize": "3",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, false, false, false, true],
+        "south": [false, false, false, false, false, false, false, false, true, true, true, false]
+      }
+    },
+    {
+      "name": "Moray Eel",
+      "image": "Images/Fish/morayeel.png",
+      "price": 2000,
+      "location": "Sea",
+      "shadowSize": "Narrow",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, false, true, true, true, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Ribbon Eel",
+      "image": "Images/Fish/ribboneel.png",
+      "price": 600,
+      "location": "Sea",
+      "shadowSize": "Narrow",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, true, false, false],
+        "south": [true, true, true, true, true, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Tuna",
+      "image": "Images/Fish/tuna.png",
+      "price": 7000,
+      "location": "Pier",
+      "shadowSize": "6",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, false, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, true, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Blue Marlin",
+      "image": "Images/Fish/bluemarlin.png",
+      "price": 10000,
+      "location": "Pier",
+      "shadowSize": "6",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, false, false, true, true, false, false, true, true],
+        "south": [false, false, false, false, true, true, false, false, true, true, false, false]
+      }
+    },
+    {
+      "name": "Giant Trevally",
+      "image": "Images/Fish/gianttrevally.png",
+      "price": 4500,
+      "location": "Pier",
+      "shadowSize": "5",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, true, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Mahi-Mahi",
+      "image": "Images/Fish/mahimahi.png",
+      "price": 6000,
+      "location": "Pier",
+      "shadowSize": "5",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, true, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Ocean Sunfish",
+      "image": "Images/Fish/oceansunfish.png",
+      "price": 4000,
+      "location": "Sea",
+      "shadowSize": "6(fin)",
+      "time": "4AM-9PM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Ray",
+      "image": "Images/Fish/ray.png",
+      "price": 3000,
+      "location": "Sea",
+      "shadowSize": "5",
+      "time": "4AM-9PM",
+      "months": {
+        "n极": [false, false, false, false, false, false, false, true, true, true, true, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Saw Shark",
+      "image": "Images/Fish/sawshark.png",
+      "price": 12000,
+      "location": "Sea",
+      "shadowSize": "6(fin)",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Hammerhead Shark",
+      "image": "Images/Fish/hammerheadshark.png",
+      "price": 8000,
+      "location": "Sea",
+      "shadowSize": "6(fin)",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true极, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Great White Shark",
+      "image": "Images/Fish/greatwhiteshark.png",
+      "price": 15000,
+      "location": "Sea",
+      "shadowSize": "6(fin)",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Whale Shark",
+      "image": "Images/Fish/whaleshark.png",
+      "price": 13000,
+      "location": "Sea",
+      "shadowSize": "6(fin)",
+      "time": "All Day",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Suckerfish",
+      "image": "Images/Fish/suckerfish.png",
+      "price": 1500,
+      "location": "Sea",
+      "shadowSize": "6(fin)",
+      "time": "All Day",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Football Fish",
+      "image": "Images/Fish/footballfish.png",
+      "price": 2500,
+      "location": "Sea",
+      "shadowSize": "4",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [true, true, true, false, false, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, true, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Oarfish",
+      "image": "Images/Fish/oarfish.png",
+      "price": 9000,
+      "location": "Sea",
+      "shadowSize": "6",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, false, false, false, false, false, false, true],
+        "south": [false, false, false, false, false, true, true, true, true, true, true, false]
+      }
+    },
+    {
+      "name": "Barreleye",
+      "image": "Images/F极sh/barreleye.png",
+      "price": 15000,
+      "location": "Sea",
+      "shadowSize": "2",
+      "time": "9PM-4AM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Coelacanth",
+      "image": "Images/Fish/coelacanth.png",
+      "price": 15000,
+      "location": "Sea",
+      "shadowSize": "6",
+      "time": "All day*",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
     }
-]
-
+  ],
+  "bugs": [
+    {
+      "name": "Common Butterfly",
+      "image": "Images/Bugs/commonbutterfly.png",
+      "price": 160,
+      "location": "Flying",
+      "time": "4AM-7PM",
+      "months": {
+        "north": [true, true, true, true, true, true, false, false, true, true, true, true],
+        "south": [false, false, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Yellow Butterfly",
+      "image": "Images/Bugs/yellowbutterfly.png",
+      "price": 160,
+      "location": "Flying",
+      "time": "4AM-7PM",
+      "months": {
+        "north": [false, false, true, true, true, true, false, false, true, true, false, false],
+        "south": [true, true, false, false, false, false, true, true, false, false, true, true]
+      }
+    },
+    {
+      "name": "Tiger Butterfly",
+      "image": "Images/Bugs/tigerbutterfly.png",
+      "price": 240,
+      "location": "Flying",
+      "time": "4AM-7PM",
+      "months": {
+        "north": [false, false, true, true, true, true, true, true, true, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Peacock Butterfly",
+      "image": "Images/Bugs/peacockbutterfly.png",
+      "price": 2500,
+      "location": "Flying",
+      "time": "4AM-7PM",
+      "months": {
+        "north": [false, false, true, true, true, true, false, false, false, false, false, false],
+        "south": [true, true, false, false, false, false, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Common Bluebottle",
+      "image": "Images/Bugs/commonbluebottle.png",
+      "price": 300,
+      "location": "Flying",
+      "time": "4AM-7PM",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, false, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, true, true, true, true]
+      }
+    },
+    {
+      "name": "Paper Kite Butterfly",
+      "image": "Images/Bugs/paperkitebutterfly.png",
+      "price": 1000,
+      "location": "Flying",
+      "time": "8AM-7PM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Great Purple Emperor",
+      "image": "Images/Bugs/greatpurpleemperor.png",
+      "price": 3000,
+      "location": "Flying",
+      "time": "4AM-7PM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, false, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, true, true, true, true]
+      }
+    },
+    {
+      "name": "Monarch Butterfly",
+      "image": "Images/Bugs/monarchbutterfly.png",
+      "price": 140,
+      "location": "Flying",
+      "time": "4AM-5PM",
+      "months": {
+        "north": [false, false, false, false, false, false, false, false, true, true, true, false],
+        "south": [true, true, true, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Emperor Butterfly",
+      "image": "Images/Bugs/emperorbutterfly.png",
+      "price": 4000,
+      "location": "Flying",
+      "time": "5PM-8AM",
+      "months": {
+        "north": [true, true, true, false, false, true, true, true, true, false, false, false],
+        "south": [false, false, false, true, true, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Agrias Butterfly",
+      "image": "Images/Bugs/agriasbutterfly.png",
+      "price": 3000,
+      "location": "Flying",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Rajah Brooke's Birdwing",
+      "image": "Images/Bugs/rajahbrookesbirdwing.png",
+      "price": 2500,
+      "location": "Flying",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [true, true, false, true, true, true, true, true, true, false, false, true],
+        "south": [false, false, true, false, false, false, false, false, false, true, true, false]
+      }
+    },
+    {
+      "name": "Queen Alexandra's Birdwing",
+      "image": "Images/Bugs/queenalexandrasbirdwing.png",
+      "price": 4000,
+      "location": "Flying",
+      "time": "8AM-4PM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Moth",
+      "image": "Images/Bugs/moth.png",
+      "price": 130,
+      "location": "Flying by light",
+      "time": "7PM-4AM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Atlas Moth",
+      "image": "Images/Bugs/atlasmoth.png",
+      "price": 3000,
+      "location": "On Trees",
+      "time": "7PM-4AM",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Madagascan Sunset Moth",
+      "image": "Images/Bugs/madagascansunsetmoth.png",
+      "price": 2500,
+      "location": "Flying",
+      "time": "8AM-4PM",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Long Locust",
+      "image": "Images/Bugs/longlocust.png",
+      "price": 200,
+      "location": "Ground",
+      "time": "8AM-7PM",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, true, true, false],
+        "south": [true, true, true, false, false, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Migratory Locust",
+      "image": "Images/Bugs/migratorylocust.png",
+      "price": 600,
+      "location": "Ground",
+      "time": "8AM-7PM",
+      "months": {
+        "north": [false, false, false, false, false, false, false, true, true, true, true, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Rice Grasshopper",
+      "image": "Images/Bugs/ricegrasshopper.png",
+      "price": 160,
+      "location": "Ground",
+      "time": "8AM-7PM",
+      "months": {
+        "north": [false, false, false, false, false, false, false, true, true, true, true, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Grasshopper",
+      "image": "Images/Bugs/grasshopper.png",
+      "price": 160,
+      "location": "Ground",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Cricket",
+      "image": "Images/Bugs/cricket.png",
+      "price": 130,
+      "location": "Ground",
+      "time": "5PM-8AM",
+      "极months": {
+        "north": [false, false, false, false, false, false, false, false, true, true, true, false],
+        "south": [true, true, true, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Bell Cricket",
+      "image": "Images/Bugs/bellcricket.png",
+      "price": 430,
+      "location": "Ground",
+      "time": "5PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, false, false, false, true, true, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Mantis",
+      "image": "Images/Bugs/mantis.png",
+      "price": 430,
+      "location": "Flowers",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, true, true, true, true, true, true, true, true, true, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Orchid Mantis",
+      "image": "Images/Bugs/orchidmantis.png",
+      "price": 2400,
+      "location": "White flowers",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, true, true, true, true, true, true, true, true, true, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Honeybee",
+      "image": "Images/Bugs/honeybee.png",
+      "price": 200,
+      "location": "Flying",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, true, true, true, true, false, false, false, false, false, false],
+        "south": [true, true, false, false, false, false, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Wasp",
+      "image": "Images/Bugs/wasp.png",
+      "price": 2500,
+      "location": "Shaking trees",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Brown Cicada",
+      "image": "Images/Bugs/browncicada.png",
+      "price": 250,
+      "location": "On trees",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Robust Cicada",
+      "image": "Images/Bugs/robustcicada.png",
+      "price": 300,
+      "location": "On trees",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Giant Cicada",
+      "image": "Images/Bugs/giantcicada.png",
+      "price": 500,
+      "location": "On trees",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Walker Cicada",
+      "image": "Images/Bugs/walkercicada.png",
+      "price": 400,
+      "location": "On trees",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, false, false, false, false, false, true, true, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Evening Cicada",
+      "image": "Images/Bugs/eveningcicada.png",
+      "price": 550,
+      "location": "On trees",
+      "time": "4AM-8AM & 4PM-7PM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Cicada Shell",
+      "image": "Images/Bugs/cicadashell.png",
+      "price": 10,
+      "location": "On trees",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Red Dragonfly",
+      "image": "Images/Bugs/reddragonfly.png",
+      "price": 180,
+      "location": "Flying",
+      "time": "8AM-7PM",
+      "months": {
+        "north": [false, false, false, false, false, false, false, false, true, true, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Darner Dragonfly",
+      "image": "Images/Bugs/darnerdragonfly.png",
+      "price": 230,
+      "location": "Flying",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Banded Dragonfly",
+      "image": "Images/Bugs/bandeddragonfly.png",
+      "price": 4500,
+      "location": "Flying",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, true, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Damselfly",
+      "image": "Images/Bugs/damselfly.png",
+      "price": 500,
+      "location": "Flying",
+      "time": "All day",
+      "months": {
+        "north": [true, true, false, false, false, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, true, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Firefly",
+      "image": "Images/Bugs/firefly.png",
+      "price": 300,
+      "location": "Flying",
+      "time": "7PM-4AM",
+      "months": {
+        "north": [false, false, false, false, false, true, false, false, false, false, false, false],
+        "south": [true, false, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Mole Cricket",
+      "image": "Images/Bugs/molecricket.png",
+      "price": 500,
+      "location": "Underground",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, false, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Pondskater",
+      "image": "Images/Bugs/pondskater.png",
+      "price": 130,
+      "location": "On ponds and rivers",
+      "time": "8AM-7PM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Diving Beetle",
+      "image": "Images/Bugs/divingbeetle.png",
+      "price": 800,
+      "location": "On ponds and rivers",
+      "time": "8AM-7PM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Giant Water Bug",
+      "image": "Images/Bugs/giantwaterbug.png",
+      "price": 2000,
+      "location": "On ponds and rivers",
+      "time": "7PM-8AM",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Stinkbug",
+      "image": "Images/Bugs/stinkbug.png",
+      "price": 120,
+      "location": "Flowers",
+      "time": "All day",
+      "months": {
+        "north": [false, false, true, true, true, true, true, true, true, true, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Man-faced Stinkbug",
+      "image": "Images/Bugs/manfacedstinkbug.png",
+      "price": 1000,
+      "location": "Flowers",
+      "time": "7PM-8AM",
+      "months": {
+        "north": [false, false, true, true, true, true, true, true, true, true, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Ladybug",
+      "image": "Images/Bugs/ladybug.png",
+      "price": 200,
+      "location": "Flowers",
+      "time": "8AM-5PM",
+      "months": {
+        "north": [false, false, true, true, true, true, false, false, false, true, false, false],
+        "south": [true, true, false, false, false, false, true, true, true, false, true, true]
+      }
+    },
+    {
+      "name": "Tiger Beetle",
+      "image": "Images/Bugs/tigerbeetle.png",
+      "price": 1500,
+      "location": "Ground",
+      "time": "All day",
+      "months": {
+        "north": [false, true, true, true, true, true, true, true, true, true, false, false],
+        "south": [true, false, false, false, false, false, false, false, false, false, true, true]
+      }
+    },
+    {
+      "name": "Jewel Beetle",
+      "image": "Images/Bugs/jewelbeetle.png",
+      "price": 2400,
+      "location": "Tree stumps",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, true, true, true,极 true, true, false, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, true, true, true, true]
+      }
+    },
+    {
+      "name": "Violin Beetle",
+      "image": "Images/Bugs/violinbeetle.png",
+      "price": 450,
+      "location": "Tree stumps",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, true, true, false, false, true, true, true, false],
+        "south": [true, true, true, true, false, false, true, true, false, false, false, true]
+      }
+    },
+    {
+      "name": "Citrus Long-horned Beetle",
+      "image": "Images/Bugs/citruslonghornedbeetle.png",
+      "price": 350,
+      "location": "Tree Stumps",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Rosalia Batesi Beetle",
+      "image": "Images/Bugs/rosaliabatesibeetle.png",
+      "price": 3000,
+      "location": "Tree stumps",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Blue Weevil Beetle",
+      "image": "Images/Bugs/blueweevilbeetle.png",
+      "price": 800,
+      "location": "Coconut trees",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Dung Beetle",
+      "image": "Images/Bugs/dungbeetle.png",
+      "price": 3000,
+      "location": "Ground (rolling snowballs)",
+      "time": "All day",
+      "months": {
+        "north": [true, true, false, false, false, false, false, false, false, false, false, true],
+        "south": [false, false, false, true, true, true, true, true, true, true, true, false]
+      }
+    },
+    {
+      "name": "Earth-boring Dung Beetle",
+      "image": "Images/Bugs/earthboringdungbeetle.png",
+      "price": 300,
+      "location": "Ground",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Scarab Beetle",
+      "image": "Images/Bugs/scarabbeetle.png",
+      "price": 10000,
+      "location": "Trees",
+      "time": "11PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Drone Beetle",
+      "image": "Images/Bugs/dronebeetle.png",
+      "price": 200,
+      "location": "Trees",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Goliath Beetle",
+      "image": "Images/Bugs/goliathbeetle.png",
+      "price": 8000,
+      "location": "Coconut trees",
+      "time": "5PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Saw Stag",
+      "image": "Images/Bugs/sawstag.png",
+      "price": 2000,
+      "location": "Trees",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Miyama Stag",
+      "image": "Images/Bugs/miyamastag.png",
+      "price": 1000,
+      "location": "Trees",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Giant Stag",
+      "image": "Images/Bugs/giantstag.png",
+      "price": 10000,
+      "location": "Trees",
+      "time": "11PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Rainbow Stag",
+      "image": "Images/Bugs/rainbowstag.png",
+      "price": 6000,
+      "location": "Trees",
+      "time": "7PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Cyclommatus Stag",
+      "image": "Images/Bugs/cyclommatusstag.png",
+      "price": 8000,
+      "location": "Coconut trees",
+      "time": "5PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Golden Stag",
+      "image": "Images/Bugs/goldenstag.png",
+      "price": 12000,
+      "location": "Coconut trees",
+      "time": "5PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Giraffe Stag",
+      "image": "Images/Bugs/giraffestag.png",
+      "price": 12000,
+      "location": "Coconut trees",
+      "time": "5PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Horned Dynastid",
+      "image": "Images/Bugs/horneddynastid.png",
+      "price": 1350,
+      "location": "Trees",
+      "time": "5PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Horned Elephant",
+      "image": "Images/Bugs/hornedelephant.png",
+      "price": 8000,
+      "location": "Coconut trees",
+      "time": "5PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Horned Hercules",
+      "image": "Images/Bugs/hornedhercules.png",
+      "price": 12000,
+      "location": "Coconut trees",
+      "time": "5PM-8AM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, false, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Walking Stick",
+      "image": "Images/Bugs/walkingstick.png",
+      "price": 600,
+      "location": "Trees",
+      "time": "4AM-8AM & 5PM-7PM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, true, true, true, false],
+        "south": [true, true, true, true, true, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Walking Leaf",
+      "image": "Images/Bugs/walkingleaf.png",
+      "price": 600,
+      "location": "Under trees disguised as leaves",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Bagworm",
+      "image": "Images/Bugs/bagworm.png",
+      "price": 600,
+      "location": "Shaking trees",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Ant",
+      "image": "Images/Bugs/ant.png",
+      "price": 80,
+      "location": "Rotten food",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Hermit Crab",
+      "image": "Images/Bugs/hermitcrab.png",
+      "price": 1000,
+      "location": "Beach disguised as shells",
+      "time": "7PM-8AM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Wharf Roach",
+      "image": "Images/Bugs/wharfroach.png",
+      "price": 200,
+      "location": "Beach rocks",
+      "time": "All day",
+极      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Fly",
+      "image": "Images/Bugs/fly.png",
+      "price": 60,
+      "location": "Trash items",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Mosquito",
+      "image": "Images/Bugs/mosquito.png",
+      "price": 130,
+      "location": "Flying",
+      "time": "5PM-4AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Flea",
+      "image": "Images/Bugs/flea.png",
+      "price": 70,
+      "location": "Villagers",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, true, true, true, false],
+        "south": [true, true, true, false, false, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Snail",
+      "image": "Images/Bugs/snail.png",
+      "price": 250,
+      "location": "Rocks and bushes during rain",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Pill Bug",
+      "image": "Images/Bugs/pillbug.png",
+      "price": 250,
+      "location": "Hitting rocks",
+      "time": "11PM-4PM",
+      "months": {
+        "north": [true, true, true, true, true, true, false, false, true, true, true, true],
+        "south": [false, false, false, false, false, false, true, true, false, false, false, false]
+      }
+    },
+    {
+      "name": "Centipede",
+      "image": "Images/Bugs/centipede.png",
+      "price": 300,
+      "location": "Hitting rocks",
+      "time": "4PM-11PM",
+      "months": {
+        "north": [true, true, true, true, true, true, false, false, true, true, true, true],
+        "south": [false, false, false, false, false, false, true, true, false, false, false, false]
+      }
+    },
+    {
+      "name": "Spider",
+      "image": "Images/Bugs/spider.png",
+      "price": 600,
+      "location": "Shaking trees",
+      "time": "7PM-8AM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Tarantula",
+      "image": "Images/Bugs/tarantula.png",
+      "price": 8000,
+      "location": "Ground",
+      "time": "7PM-4AM",
+      "months": {
+        "north": [true, true, true, true, false, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, true, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Scorpion",
+      "image": "Images/Bugs/scorpion.png",
+      "price": 8000,
+      "location": "Ground",
+      "time": "7PM-4AM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, true, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, true, true]
+      }
+    }
+  ],
+  "seaCreatures": [
+    {
+      "name": "Seaweed",
+      "image": "Images/SeaCreatures/seaweed.png",
+      "price": 600,
+      "shadowSize": "Large",
+      "swimmingPattern": "Stationary",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, false, false, true, true, true],
+        "south": [false, false, false, false, false, false, false, true, true, false, false, false]
+      }
+    },
+    {
+      "name": "Sea Grapes",
+      "image": "Images/SeaCreatures/seagrapes.png",
+      "price": 900,
+      "shadowSize": "Small",
+      "swimmingPattern": "Stationary",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Sea Cucumber",
+      "image": "Images/SeaCreatures/seacucumber.png",
+      "price": 500,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Slow consistent movement",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, false, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, true, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Sea Pig",
+      "image": "Images/SeaCreatures/seapig.png",
+      "price": 10000,
+      "shadowSize": "Small",
+      "swimmingPattern": "Quick long lunges",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [true, true, false, false, false, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, true, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Sea Star",
+      "image": "Images/SeaCreatures/seastar.png",
+      "price": 500,
+      "shadowSize": "Small",
+      "swimmingPattern": "Slow short lunges",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Sea Urchin",
+      "image": "Images/SeaCreatures/seaurchin.png",
+      "price": 1700,
+      "shadowSize": "Small",
+      "swimmingPattern": "Slow consistent movement",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Slate Pencil Urchin",
+      "image": "Images/SeaCreatures/slatepencilurchin.png",
+      "price": 2000,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Moderate consistent movement",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Sea Anemone",
+      "image": "Images/SeaCreatures/seaanemone.png",
+      "price": 500,
+      "shadowSize": "Large",
+      "swimmingPattern": "Stationary",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Moon Jellyfish",
+      "image": "Images/SeaCreatures/moonjellyfish.png",
+      "price": 600,
+      "shadowSize": "Small",
+      "swimmingPattern": "Slow consistent movement",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Sea Slug",
+      "image": "Images/SeaCreatures/seaslug.png",
+      "price": 600,
+      "shadowSize": "Tiny",
+      "swimmingPattern": "Slow consistent movement",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Pearl Oyster",
+      "image": "Images/SeaCreatures/pearloyster.png",
+      "price": 2800,
+      "shadowSize": "Small",
+      "swimmingPattern": "Moderate long lunges",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Mussel",
+      "image": "Images/SeaCreatures/mussel.png",
+      "price": 1500,
+      "shadowSize": "Small",
+      "swimmingPattern": "Slow consistent movement",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Oyster",
+      "image": "Images/SeaCreatures/oyster.png",
+      "price": 1100,
+      "shadowSize": "Small",
+      "swimmingPattern": "Moderate short lunges",
+      "time": "All day",
+      "months": {
+        "north": [true, true, false, false, false, false, false, false, true, true, true, true],
+        "south": [false, false, false, true, true, true, true, true, false, false, false, false]
+      }
+    },
+    {
+      "name": "Scallop",
+      "image": "Images/SeaCreatures/scallop.png",
+      "price": 1200,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Slow long lunges",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Whelk",
+      "image": "Images/SeaCreatures/whelk.png",
+      "price": 1000,
+      "shadowSize": "Small",
+      "swimmingPattern": "Slow consistent movement",
+      "time极": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Turban Shell",
+      "image": "Images/SeaCreatures/turbanshell.png",
+      "price": 1000,
+      "shadowSize": "Small",
+      "swimmingPattern": "Slow",
+      "time": "All day",
+      "months": {
+        "north": [false, false, true, true, true, false, false, false, true, true, true, true],
+        "south": [true, true, false, false, false, true, true, true, false, false, false, false]
+      }
+    },
+    {
+      "name": "Abalone",
+      "image": "Images/SeaCreatures/abalone.png",
+      "price": 2000,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Moderate consistent movement",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [true, false, false, false, false, true, true, true, true, true, true, true],
+        "south": [false, true, true, true, true, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Gigas Giant Clam",
+      "image": "Images/SeaCreatures/gigasgiantclam.png",
+      "price": 15000,
+      "shadowSize": "Huge",
+      "swimmingPattern": "Quick long lunges",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false,极 false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Chambered Nautilus",
+      "image": "Images/SeaCreatures/chamberednautilus.png",
+      "price": 1800,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Slow",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, true, true, true, true, false, false, true, true, true, false],
+        "south": [true, true, false, false, false, false, true, true, false, false, false, true]
+      }
+    },
+    {
+      "name": "Octopus",
+      "image": "Images/SeaCreatures/octopus.png",
+      "price": 1200,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Moderate long lunges",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Umbrella Octopus",
+      "image": "Images/SeaCreatures/umbrellaoctopus.png",
+      "price": 6000,
+      "shadowSize": "Small",
+      "swimmingPattern": "Quick long lunges",
+      "time": "All day",
+      "months": {
+        "north": [false, false, true, true, true, false, false, false, true, true, true, false],
+        "south": [true, true, false, false, false, true, true, true, false, false, false, true]
+      }
+    },
+    {
+      "name": "Vampire Squid",
+      "image": "Images/SeaCreatures/vampiresquid.png",
+      "price": 10000,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Quick long lunges",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, false, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, true, true, true, true]
+      }
+    },
+    {
+      "name": "Firefly Squid",
+      "image": "Images/SeaCreatures/fireflysquid.png",
+      "price": 1400,
+      "shadowSize": "Tiny",
+      "swimmingPattern": "Slow",
+      "time": "9AM-4AM",
+      "months": {
+        "north": [false, false, true, true, true, true, false, false, false, false, false, false],
+        "south": [true, true, false, false, false, false, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Gazami Crab",
+      "image": "Images/SeaCreatures/gazamicrab.png",
+      "price": 2200,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Moderate long lunges",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, true, true, false],
+        "south": [true, true, true, true, true, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Dungeness Crab",
+      "image": "Images/SeaCreatures/dungenesscrab.png",
+      "price": 1900,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Moderate consistent movement",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, false, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Snow Crab",
+      "image": "Images/SeaCreatures/snowcrab.png",
+      "price": 6000,
+      "shadowSize": "Large",
+      "swimmingPattern": "Quick short lunges",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, false, false, false, false, false, false, true, true],
+        "south": [false, false, false, false, true, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Red King Crab",
+      "image": "Images/SeaCreatures/redkingcrab.png",
+      "price": 8000,
+      "shadowSize": "Large",
+      "swimmingPattern": "Quick",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, false, false, false, false, false, false, false, true, true],
+        "south": [false, false, false, true, true, true, true, true, true, true, false, false]
+      }
+    },
+    {
+      "name": "Acorn Barnacle",
+      "image": "Images/SeaCreatures/acornbarnacle.png",
+      "price": 600,
+      "shadowSize": "Tiny",
+      "swimmingPattern": "Stationary",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Spider Crab",
+      "image": "Images/SeaCreatures/spidercrab.png",
+      "price": 12000,
+      "shadowSize": "Huge",
+      "swimmingPattern": "Quick",
+      "time": "All day",
+      "months": {
+        "north": [false, false, true, true, false, false, false, false, false, false, false, false],
+        "south": [true, true, false, false, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Tiger Prawn",
+      "image": "Images/SeaCreatures/tigerprawn.png",
+      "price": 3000,
+      "shadowSize": "Small",
+      "swimmingPattern": "Moderate consistent movement",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, false, true, true, true, true, false, false, false],
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Sweet Shrimp",
+      "image": "Images/SeaCreatures/sweetshrimp.png",
+      "price": 1400,
+      "shadowSize": "Small",
+      "swimmingPattern": "Slow",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [true, true, false, false, false, false, false, false, true, true, true, true],
+        "south": [false, false, false, true, true, true, true, true, false, false, false, false]
+      }
+    },
+    {
+      "name": "Mantis Shrimp",
+      "image": "Images/SeaCreatures/mantisshrimp.png",
+      "price": 2500,
+      "shadowSize": "Small",
+      "swimmingPattern": "Quick short lunges",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [true, true, true, true, true, true, true, true, true, true, true, true],
+        "south": [true, true, true, true, true, true, true, true, true, true, true, true]
+      }
+    },
+    {
+      "name": "Spiny Lobster",
+      "image": "Images/SeaCreatures/spinylobster.png",
+      "price": 5000,
+      "shadowSize": "Large",
+      "swimmingPattern": "Fast",
+      "time": "9PM-4AM",
+      "months": {
+        "north": [false, false, false, false, false, false, false, false, false, true, true, true],
+        "south": [true, true, true, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Lobster",
+      "image": "Images/SeaCreatures/lobster.png",
+      "price": 4500,
+      "shadowSize": "Large",
+      "swimmingPattern": "Quick",
+      "time": "All day",
+      "months": {
+        "north": [true, false, false, true, true, true, false, false, false, false, false, true],
+        "south": [false, true, true, false, false, false, true, true, true, true, true, false]
+      }
+    },
+    {
+      "name": "Giant Isopod",
+      "image": "Images/SeaCreatures/giantisopod.png",
+      "price": 12000,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Quick long lunges",
+      "time": "9AM-4PM & 9PM-4AM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, true, true, true, false],
+        "south": [true, true, true, true, true, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Horseshoe Crab",
+      "image": "Images/SeaCreatures/horseshoecrab.png",
+      "price": 2500,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Quick short lunges",
+      "time": "9PM-4AM",
+      "months": {
+        "north": [false, false, false, false, false, false, true, true, true, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, false, true, true, true]
+      }
+    },
+    {
+      "name": "Sea Pineapple",
+      "image": "Images/SeaCreatures/seapineapple.png",
+      "price": 1500,
+      "shadowSize": "Small",
+      "swimmingPattern": "Slow long lunges",
+      "time": "All day",
+      "months": {
+        "north": [false, false, false, true, true, true, true, true, false, false, false, false],
+        "south": [true, true, true, false, false, false, false, false, true, true, true, true]
+      }
+    },
+    {
+      "name": "Spotted Garden Eel",
+      "image": "Images/SeaCreatures/spottedgardeneel.png",
+      "price": 1100,
+      "shadowSize": "Small",
+      "swimmingPattern": "Slow consistent movement",
+      "time": "4AM-9PM",
+      "months": {
+        "north": [false, false, false, false, true, true, true, true, true, true, true, false],
+        "south": [true, true, true, true, false, false, false, false, false, false, false, true]
+      }
+    },
+    {
+      "name": "Flatworm",
+      "image": "Images/SeaCreatures/flatworm.png",
+      "price": 700,
+      "shadowSize": "Tiny",
+      "swimmingPattern": "Slow short movement",
+      "time": "4PM-9AM",
+      "months": {
+        "north": [false, false, false, false, false, false, false, true, true, false, false, false],
+        "south": [true, true, false, false, false, false, false, false, false, false, false, false]
+      }
+    },
+    {
+      "name": "Venus' Flower Basket",
+      "image": "Images/SeaCreatures/venusflowerbasket.png",
+      "price": 5000,
+      "shadowSize": "Medium",
+      "swimmingPattern": "Quick long lunges",
+      "time": "All day",
+      "months": {
+        "north": [true, true, true, false, false, false, false, false, false, true, true, true],
+        "south": [false, false, false, true, true, true, true, true, true, false, false, false]
+      }
+    }
+  ]
+}
