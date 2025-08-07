@@ -4,6 +4,18 @@ let northHemBugs = [];
 let northHemSeaCr = [];
 let monthButtons = document.getElementsByClassName("availableMonth");
 let month = new Date().getMonth(); // Current month (0-11)
+let isNorthernHemisphere = true; // Default to northern hemisphere
+
+// Hemisphere toggle
+const hemisphereToggle = document.getElementById('hemisphereToggle');
+hemisphereToggle.addEventListener('change', function() {
+    isNorthernHemisphere = this.checked;
+    document.querySelector('#hemisphere label').textContent = 
+        isNorthernHemisphere ? 'Kuzey Yarıküre' : 'Güney Yarıküre';
+    
+    // Refresh the display
+    displayMonth(month);
+});
 
 // Tab control functions
 function openList(evt, listName) {
@@ -50,7 +62,7 @@ async function loadCreatureData() {
     }
 }
 
-// Create table rows with corrected field names
+// Create table rows with hemisphere support
 function createTableRow(creature, type) {
     const row = document.createElement('tr');
     row.className = `${type}North`;
@@ -91,8 +103,8 @@ function createTableRow(creature, type) {
     timeCell.textContent = creature.time;
     row.appendChild(timeCell);
     
-    // Add months (using north hemisphere data)
-    const months = creature.months.north;
+    // Add months based on hemisphere
+    const months = isNorthernHemisphere ? creature.months.north : creature.months.south;
     for (let i = 0; i < 12; i++) {
         const monthCell = document.createElement('td');
         monthCell.textContent = months[i] ? 'x' : '';
@@ -102,19 +114,28 @@ function createTableRow(creature, type) {
     return row;
 }
 
-// Display creatures for selected month
+// Display creatures for selected month with hemisphere support
 function displayMonth(selectedMonth) {
     month = selectedMonth;
     highlightMonth(selectedMonth);
     
+    // Get current hemisphere months
+    const hemisphere = isNorthernHemisphere ? 'north' : 'south';
+    
     // Filter fish
     if (northHemFish.length > 0) {
         Array.from(northHemFish).forEach(row => {
-            const monthCells = row.getElementsByTagName('td');
-            if (monthCells[5 + selectedMonth].textContent === 'x') {
-                row.style.display = 'table-row';
-            } else {
-                row.style.display = 'none';
+            // Get creature name to find in JSON
+            const name = row.cells[0].textContent;
+            const creature = creatureData.fish.find(f => f.name === name);
+            
+            if (creature) {
+                const months = creature.months[hemisphere];
+                if (months[selectedMonth]) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
             }
         });
     }
@@ -122,11 +143,16 @@ function displayMonth(selectedMonth) {
     // Filter bugs
     if (northHemBugs.length > 0) {
         Array.from(northHemBugs).forEach(row => {
-            const monthCells = row.getElementsByTagName('td');
-            if (monthCells[5 + selectedMonth].textContent === 'x') {
-                row.style.display = 'table-row';
-            } else {
-                row.style.display = 'none';
+            const name = row.cells[0].textContent;
+            const creature = creatureData.bugs.find(b => b.name === name);
+            
+            if (creature) {
+                const months = creature.months[hemisphere];
+                if (months[selectedMonth]) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
             }
         });
     }
@@ -134,20 +160,31 @@ function displayMonth(selectedMonth) {
     // Filter sea creatures
     if (northHemSeaCr.length > 0) {
         Array.from(northHemSeaCr).forEach(row => {
-            const monthCells = row.getElementsByTagName('td');
-            if (monthCells[5 + selectedMonth].textContent === 'x') {
-                row.style.display = 'table-row';
-            } else {
-                row.style.display = 'none';
+            const name = row.cells[0].textContent;
+            const creature = creatureData.seaCreatures.find(s => s.name === name);
+            
+            if (creature) {
+                const months = creature.months[hemisphere];
+                if (months[selectedMonth]) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
             }
         });
     }
 }
 
+// Global creature data
+let creatureData;
+
 // Initialize page
 async function initPage() {
-    const creatureData = await loadCreatureData();
-    if (!creatureData) return;
+    const data = await loadCreatureData();
+    if (!data) return;
+    
+    // Save creature data globally
+    creatureData = data;
     
     // Populate fish table
     const fishBody = document.getElementById('fish-body');
@@ -180,12 +217,12 @@ async function initPage() {
     highlightMonth(currentMonth);
     displayMonth(currentMonth);
     
-    // Set default tab - Balıklar sekmesi aktif olsun
+    // Set default tab
     document.getElementById('bugs').style.display = 'none';
     document.getElementById('seaCreatures').style.display = 'none';
     document.getElementById('fish').style.display = 'block';
     
-    // Balıklar sekme butonunu aktif yap
+    // Set active tab
     const tablinks = document.getElementsByClassName('tablinks');
     for (let i = 0; i < tablinks.length; i++) {
         tablinks[i].classList.remove('active');
