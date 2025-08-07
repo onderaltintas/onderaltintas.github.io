@@ -257,6 +257,11 @@ function updateDisplay() {
     const showActiveNow = activeNowToggle.checked;
     const hemisphere = isNorthernHemisphere ? 'north' : 'south';
     
+    // Gerçek zamanlı ay ve zaman bilgileri
+    const now = new Date();
+    const currentRealMonth = now.getMonth();
+    const currentRealTime = now.getHours() * 60 + now.getMinutes();
+    
     // Filter fish
     if (northHemFish.length > 0) {
         Array.from(northHemFish).forEach(row => {
@@ -267,7 +272,7 @@ function updateDisplay() {
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                const isAvailable = months[month];
+                const isAvailable = months[currentRealMonth]; // Sadece mevcut ayda olanlar
                 const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
                 if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
@@ -289,7 +294,7 @@ function updateDisplay() {
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                const isAvailable = months[month];
+                const isAvailable = months[currentRealMonth]; // Sadece mevcut ayda olanlar
                 const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
                 if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
@@ -311,7 +316,7 @@ function updateDisplay() {
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                const isAvailable = months[month];
+                const isAvailable = months[currentRealMonth]; // Sadece mevcut ayda olanlar
                 const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
                 if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
