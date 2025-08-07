@@ -10,15 +10,20 @@ function openList(evt, listName) {
     const tabcontent = document.getElementsByClassName("tabcontent");
     const tablinks = document.getElementsByClassName("tablinks");
     
+    // Hide all tab content
     for (let i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
     }
     
+    // Remove active class from all tab links
     for (let i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
     
+    // Show the specific tab content
     document.getElementById(listName).style.display = "block";
+    
+    // Add active class to the button that opened the tab
     evt.currentTarget.className += " active";
 }
 
@@ -102,35 +107,41 @@ function displayMonth(selectedMonth) {
     month = selectedMonth;
     highlightMonth(selectedMonth);
     
-    // DÜZELTME: HTMLCollection'ı diziye çevir
-    Array.from(northHemFish).forEach(row => {
-        const monthCells = row.getElementsByTagName('td');
-        if (monthCells[5 + selectedMonth].textContent === 'x') {
-            row.style.display = 'table-row';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+    // Filter fish
+    if (northHemFish.length > 0) {
+        Array.from(northHemFish).forEach(row => {
+            const monthCells = row.getElementsByTagName('td');
+            if (monthCells[5 + selectedMonth].textContent === 'x') {
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
     
-    // DÜZELTME: HTMLCollection'ı diziye çevir
-    Array.from(northHemBugs).forEach(row => {
-        const monthCells = row.getElementsByTagName('td');
-        if (monthCells[5 + selectedMonth].textContent === 'x') {
-            row.style.display = 'table-row';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+    // Filter bugs
+    if (northHemBugs.length > 0) {
+        Array.from(northHemBugs).forEach(row => {
+            const monthCells = row.getElementsByTagName('td');
+            if (monthCells[5 + selectedMonth].textContent === 'x') {
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
     
-    // DÜZELTME: HTMLCollection'ı diziye çevir
-    Array.from(northHemSeaCr).forEach(row => {
-        const monthCells = row.getElementsByTagName('td');
-        if (monthCells[5 + selectedMonth].textContent === 'x') {
-            row.style.display = 'table-row';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+    // Filter sea creatures
+    if (northHemSeaCr.length > 0) {
+        Array.from(northHemSeaCr).forEach(row => {
+            const monthCells = row.getElementsByTagName('td');
+            if (monthCells[5 + selectedMonth].textContent === 'x') {
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
 }
 
 // Initialize page
@@ -169,9 +180,17 @@ async function initPage() {
     highlightMonth(currentMonth);
     displayMonth(currentMonth);
     
-    // Set default tab
+    // Set default tab - Balıklar sekmesi aktif olsun
+    document.getElementById('bugs').style.display = 'none';
+    document.getElementById('seaCreatures').style.display = 'none';
     document.getElementById('fish').style.display = 'block';
-    document.getElementsByClassName('tablinks')[0].classList.add('active');
+    
+    // Balıklar sekme butonunu aktif yap
+    const tablinks = document.getElementsByClassName('tablinks');
+    for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove('active');
+    }
+    tablinks[0].classList.add('active');
 }
 
 // Start the application
