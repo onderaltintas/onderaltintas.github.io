@@ -6,16 +6,19 @@ let monthButtons = document.getElementsByClassName("availableMonth");
 let month = new Date().getMonth(); // Current month (0-11)
 let isNorthernHemisphere = true; // Default to northern hemisphere
 
-// Hemisphere toggle
+// Hemisphere and uncaught toggle
 const hemisphereToggle = document.getElementById('hemisphereToggle');
 const hemisphereText = document.getElementById('hemisphereText');
+const uncaughtToggle = document.getElementById('uncaughtToggle');
 
 hemisphereToggle.addEventListener('change', function() {
     isNorthernHemisphere = this.checked;
     hemisphereText.textContent = isNorthernHemisphere ? 'Kuzey Yarıküre' : 'Güney Yarıküre';
-    
-    // Refresh the display
-    displayMonth(month);
+    updateDisplay();
+});
+
+uncaughtToggle.addEventListener('change', function() {
+    updateDisplay();
 });
 
 // Tab control functions
@@ -49,6 +52,13 @@ function highlightMonth(selectedIndex) {
             monthButtons[i].classList.remove("monthSelected");
         }
     }
+}
+
+// Set month and update display
+function setMonthAndUpdate(selectedMonth) {
+    month = selectedMonth;
+    highlightMonth(selectedMonth);
+    updateDisplay();
 }
 
 // Load creature data from JSON
@@ -93,6 +103,7 @@ function createTableRow(creature, type) {
     // Save status when checkbox changes
     captureCheckbox.addEventListener('change', function() {
         saveCaptureStatus(type, creature.name, this.checked);
+        updateDisplay(); // Update display after status change
     });
     
     captureCell.appendChild(captureCheckbox);
@@ -145,24 +156,24 @@ function createTableRow(creature, type) {
     return row;
 }
 
-// Display creatures for selected month with hemisphere support
-function displayMonth(selectedMonth) {
-    month = selectedMonth;
-    highlightMonth(selectedMonth);
-    
-    // Get current hemisphere months
+// Update display based on filters
+function updateDisplay() {
+    const showOnlyUncaught = uncaughtToggle.checked;
     const hemisphere = isNorthernHemisphere ? 'north' : 'south';
     
     // Filter fish
     if (northHemFish.length > 0) {
         Array.from(northHemFish).forEach(row => {
-            // Get creature name to find in JSON
-            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
+            const name = row.cells[1].textContent;
             const creature = creatureData.fish.find(f => f.name === name);
+            const captureCheckbox = row.querySelector('.capture-checkbox');
+            const isCaptured = captureCheckbox.checked;
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                if (months[selectedMonth]) {
+                const isAvailable = months[month];
+                
+                if (isAvailable && (!showOnlyUncaught || !isCaptured)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
@@ -174,12 +185,16 @@ function displayMonth(selectedMonth) {
     // Filter bugs
     if (northHemBugs.length > 0) {
         Array.from(northHemBugs).forEach(row => {
-            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
+            const name = row.cells[1].textContent;
             const creature = creatureData.bugs.find(b => b.name === name);
+            const captureCheckbox = row.querySelector('.capture-checkbox');
+            const isCaptured = captureCheckbox.checked;
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                if (months[selectedMonth]) {
+                const isAvailable = months[month];
+                
+                if (isAvailable && (!showOnlyUncaught || !isCaptured)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
@@ -191,12 +206,16 @@ function displayMonth(selectedMonth) {
     // Filter sea creatures
     if (northHemSeaCr.length > 0) {
         Array.from(northHemSeaCr).forEach(row => {
-            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
+            const name = row.cells[1].textContent;
             const creature = creatureData.seaCreatures.find(s => s.name === name);
+            const captureCheckbox = row.querySelector('.capture-checkbox');
+            const isCaptured = captureCheckbox.checked;
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                if (months[selectedMonth]) {
+                const isAvailable = months[month];
+                
+                if (isAvailable && (!showOnlyUncaught || !isCaptured)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
@@ -246,7 +265,7 @@ async function initPage() {
     // Set current month as default
     const currentMonth = new Date().getMonth();
     highlightMonth(currentMonth);
-    displayMonth(currentMonth);
+    updateDisplay();
     
     // Set default tab
     document.getElementById('bugs').style.display = 'none';
