@@ -8,10 +8,11 @@ let isNorthernHemisphere = true; // Default to northern hemisphere
 
 // Hemisphere toggle
 const hemisphereToggle = document.getElementById('hemisphereToggle');
+const hemisphereText = document.getElementById('hemisphereText');
+
 hemisphereToggle.addEventListener('change', function() {
     isNorthernHemisphere = this.checked;
-    document.querySelector('#hemisphere label').textContent = 
-        isNorthernHemisphere ? 'Kuzey Yarıküre' : 'Güney Yarıküre';
+    hemisphereText.textContent = isNorthernHemisphere ? 'Kuzey Yarıküre' : 'Güney Yarıküre';
     
     // Refresh the display
     displayMonth(month);
