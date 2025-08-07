@@ -58,8 +58,8 @@ function createTableRow(creature, type) {
     // Add image
     const imgCell = document.createElement('td');
     const img = document.createElement('img');
-    img.src = creature.image;
-    img.alt = creature.name;
+    img.src = creature.image; // DÜZELTME: creature.Image -> creature.image
+    img.alt = creature.name; // DÜZELTME: creature.Name -> creature.name
     img.width = 50;
     imgCell.appendChild(img);
     row.appendChild(imgCell);
