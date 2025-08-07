@@ -103,4 +103,60 @@ function displayMonth(selectedMonth) {
     }
 }
 
-// Initialize page fonksiyonu aynı kalıyor...
+// Global creature data
+let creatureData;
+
+// Initialize page
+async function initPage() {
+    const data = await loadCreatureData();
+    if (!data) return;
+    
+    // Save creature data globally
+    creatureData = data;
+    
+    // Populate fish table
+    const fishBody = document.getElementById('fish-body');
+    creatureData.fish.forEach(fish => {
+        const row = createTableRow(fish, 'fish');
+        fishBody.appendChild(row);
+    });
+    
+    // Populate bugs table
+    const bugsBody = document.getElementById('bugs-body');
+    creatureData.bugs.forEach(bug => {
+        const row = createTableRow(bug, 'bugs');
+        bugsBody.appendChild(row);
+    });
+    
+    // Populate sea creatures table
+    const seaBody = document.getElementById('seaCreatures-body');
+    creatureData.seaCreatures.forEach(seaCreature => {
+        const row = createTableRow(seaCreature, 'sea');
+        seaBody.appendChild(row);
+    });
+    
+    // Initialize global variables
+    northHemFish = document.getElementsByClassName('fishNorth');
+    northHemBugs = document.getElementsByClassName('bugsNorth');
+    northHemSeaCr = document.getElementsByClassName('seaNorth');
+    
+    // Set current month as default
+    const currentMonth = new Date().getMonth();
+    highlightMonth(currentMonth);
+    displayMonth(currentMonth);
+    
+    // Set default tab
+    document.getElementById('bugs').style.display = 'none';
+    document.getElementById('seaCreatures').style.display = 'none';
+    document.getElementById('fish').style.display = 'block';
+    
+    // Set active tab
+    const tablinks = document.getElementsByClassName('tablinks');
+    for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove('active');
+    }
+    tablinks[0].classList.add('active');
+}
+
+// Start the application
+window.onload = initPage;
