@@ -848,7 +848,7 @@
       "shadowSize": "5",
       "time": "4AM-9PM",
       "months": {
-        "n极": [false, false, false, false, false, false, false, true, true, true, true, false],
+        "north": [false, false, false, false, false, false, false, true, true, true, true, false],
         "south": [true, true, true, true, false, false, false, false, false, false, false, false]
       }
     },
@@ -873,7 +873,7 @@
       "time": "4PM-9AM",
       "months": {
         "north": [false, false, false, false, false, true, true, true, true, false, false, false],
-        "south": [true极, true, true, true, false, false, false, false, false, true, true, true]
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
       }
     },
     {
@@ -938,7 +938,7 @@
     },
     {
       "name": "Barreleye",
-      "image": "Images/F极sh/barreleye.png",
+      "image": "Images/Fish/barreleye.png",
       "price": 15000,
       "location": "Sea",
       "shadowSize": "2",
@@ -1177,7 +1177,7 @@
       "price": 130,
       "location": "Ground",
       "time": "5PM-8AM",
-      "极months": {
+      "months": {
         "north": [false, false, false, false, false, false, false, false, true, true, true, false],
         "south": [true, true, true, false, false, false, false, false, false, false, false, false]
       }
@@ -1453,7 +1453,7 @@
       "location": "Tree stumps",
       "time": "All day",
       "months": {
-        "north": [false, false, false, true, true, true,极 true, true, false, false, false, false],
+        "north": [false, false, false, true, true, true, true, true, false, false, false, false],
         "south": [true, true, true, false, false, false, false, false, true, true, true, true]
       }
     },
@@ -1727,7 +1727,7 @@
       "price": 200,
       "location": "Beach rocks",
       "time": "All day",
-极      "months": {
+      "months": {
         "north": [true, true, true, true, true, true, true, true, true, true, true, true],
         "south": [true, true, true, true, true, true, true, true, true, true, true, true]
       }
@@ -2007,7 +2007,7 @@
       "price": 1000,
       "shadowSize": "Small",
       "swimmingPattern": "Slow consistent movement",
-      "time极": "All day",
+      "time": "All day",
       "months": {
         "north": [true, true, true, true, true, true, true, true, true, true, true, true],
         "south": [true, true, true, true, true, true, true, true, true, true, true, true]
@@ -2046,7 +2046,7 @@
       "time": "All day",
       "months": {
         "north": [false, false, false, false, true, true, true, true, true, false, false, false],
-        "south": [true, true, true, true, false, false, false,极 false, false, true, true, true]
+        "south": [true, true, true, true, false, false, false, false, false, true, true, true]
       }
     },
     {
