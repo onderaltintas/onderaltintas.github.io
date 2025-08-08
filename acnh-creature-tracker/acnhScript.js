@@ -54,24 +54,6 @@ function applyTranslations(lang) {
     document.getElementById('locationHeader').textContent = t.location || 'Konum';
     document.getElementById('timeHeader').textContent = t.time || 'Zaman';
     
-    // Update month headers
-    const monthAbbr = lang === 'tr' ? 
-        ["Ock", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Ekm", "Kas", "Ara"] :
-        ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    
-    document.getElementById('janHeader').textContent = monthAbbr[0];
-    document.getElementById('febHeader').textContent = monthAbbr[1];
-    document.getElementById('marHeader').textContent = monthAbbr[2];
-    document.getElementById('aprHeader').textContent = monthAbbr[3];
-    document.getElementById('mayHeader').textContent = monthAbbr[4];
-    document.getElementById('junHeader').textContent = monthAbbr[5];
-    document.getElementById('julHeader').textContent = monthAbbr[6];
-    document.getElementById('augHeader').textContent = monthAbbr[7];
-    document.getElementById('sepHeader').textContent = monthAbbr[8];
-    document.getElementById('octHeader').textContent = monthAbbr[9];
-    document.getElementById('novHeader').textContent = monthAbbr[10];
-    document.getElementById('decHeader').textContent = monthAbbr[11];
-    
     // Update month buttons
     const monthNames = lang === 'tr' ? 
         ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"] :
