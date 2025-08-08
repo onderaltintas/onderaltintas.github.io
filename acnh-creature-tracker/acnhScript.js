@@ -289,12 +289,15 @@ function createTableRow(creature, type) {
     row.appendChild(timeCell);
     
     // Add months based on hemisphere
+    // Mobile: Months were removed to reduce row length
+    /*
     const months = isNorthernHemisphere ? creature.months.north : creature.months.south;
     for (let i = 0; i < 12; i++) {
         const monthCell = document.createElement('td');
         monthCell.textContent = months[i] ? 'x' : '';
         row.appendChild(monthCell);
     }
+    */
     
     return row;
 }
