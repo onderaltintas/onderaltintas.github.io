@@ -257,4 +257,5 @@ td {
 /* Pembe arkaplan (ayrılacak olanlar için) */
 .leaving-soon {
     background-color: #ffcccc !important; /* Açık pembe */
+    color: red;
 }
