@@ -86,7 +86,8 @@
     "Tiny": "Minik",
     "Moderate": "Orta",
     "Slow short movement": "Yavaş kısa hareket",
-    "On trees": "Ağaçlarda"
+    "On trees": "Ağaçlarda",
+    "Trees": "Ağaçlar"  
   },
   "en": {
     "app_title": "Animal Crossing Creature Tracker",
@@ -175,6 +176,7 @@
     "Tiny": "Tiny",
     "Moderate": "Moderate",
     "Slow short movement": "Slow short movement",
-    "On trees": "On trees"
+    "On trees": "On trees",
+    "Trees": "Trees"  
   }
 }
