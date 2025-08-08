@@ -8,13 +8,14 @@ let isNorthernHemisphere = true; // Default to northern hemisphere
 let currentLanguage = 'tr'; // Default language
 let translationData = {}; // Will store translations
 let creatureData = {}; // Global creature data
+let isActiveNowMode = false; // Aktif şimdi modu için
 
 // Hemisphere and uncaught toggle
 const hemisphereToggle = document.getElementById('hemisphereToggle');
 const hemisphereText = document.getElementById('hemisphereText');
 const uncaughtToggle = document.getElementById('uncaughtToggle');
-const activeNowToggle = document.getElementById('activeNowToggle');
 const languageSelect = document.getElementById('languageSelect');
+const activeNowButton = document.getElementById('activeNowButton'); // Yeşil buton
 
 // Load translations
 async function loadTranslations() {
@@ -38,7 +39,9 @@ function applyTranslations(lang) {
         (t.southern_hemisphere || 'Güney Yarıküre');
     
     document.getElementById('uncaughtText').textContent = t.show_uncaught || 'Yakalanmayanlar';
-    document.getElementById('activeNowText').textContent = t.active_now || 'Şu Anda Aktif';
+    
+    // Aktif şimdi buton metni
+    activeNowButton.textContent = t.active_now_button || 'Şu An';
     
     document.getElementById('fishTab').textContent = t.fish || 'Balıklar';
     document.getElementById('bugsTab').textContent = t.bugs || 'Böcekler';
@@ -134,9 +137,25 @@ hemisphereToggle.addEventListener('change', function() {
 });
 
 uncaughtToggle.addEventListener('change', updateDisplay);
-activeNowToggle.addEventListener('change', updateDisplay);
 languageSelect.addEventListener('change', function() {
     changeLanguage(this.value);
+});
+
+// Aktif şimdi buton event listener
+activeNowButton.addEventListener('click', function() {
+    // Aktif modu aç/kapat
+    isActiveNowMode = !isActiveNowMode;
+    
+    if (isActiveNowMode) {
+        // Aktif modda şu anki ayı seç
+        month = new Date().getMonth();
+        highlightMonth(month);
+        activeNowButton.classList.add('active');
+    } else {
+        activeNowButton.classList.remove('active');
+    }
+    
+    updateDisplay();
 });
 
 // Tab control functions
@@ -175,6 +194,8 @@ function highlightMonth(selectedIndex) {
 // Set month and update display
 function setMonthAndUpdate(selectedMonth) {
     month = selectedMonth;
+    isActiveNowMode = false; // Aktif modu kapat
+    activeNowButton.classList.remove('active');
     highlightMonth(selectedMonth);
     updateDisplay();
 }
@@ -371,7 +392,6 @@ function isActiveNow(timeRange) {
 // Update display based on filters
 function updateDisplay() {
     const showOnlyUncaught = uncaughtToggle.checked;
-    const showActiveNow = activeNowToggle.checked;
     const hemisphere = isNorthernHemisphere ? 'north' : 'south';
     
     // Use the selected month instead of current real month
@@ -388,12 +408,35 @@ function updateDisplay() {
             if (creature) {
                 const months = creature.months[hemisphere];
                 const isAvailable = months[selectedMonth]; // Use selected month
-                const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
-                if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
-                    row.style.display = 'table-row';
+                // Check if leaving this month (next month not available)
+                const nextMonth = (selectedMonth + 1) % 12;
+                const isLeaving = isAvailable && !months[nextMonth];
+                
+                if (isActiveNowMode) {
+                    // Aktif mod: sadece şu anda aktif olanlar
+                    const isActive = isActiveNow(creature.time);
+                    
+                    if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
+                        row.style.display = 'table-row';
+                        if (isLeaving) {
+                            row.classList.add('leaving-soon');
+                        } else {
+                            row.classList.remove('leaving-soon');
+                        }
+                    } else {
+                        row.style.display = 'none';
+                        row.classList.remove('leaving-soon');
+                    }
                 } else {
-                    row.style.display = 'none';
+                    // Normal mod
+                    if (isAvailable && (!showOnlyUncaught || !isCaptured)) {
+                        row.style.display = 'table-row';
+                        row.classList.remove('leaving-soon');
+                    } else {
+                        row.style.display = 'none';
+                        row.classList.remove('leaving-soon');
+                    }
                 }
             }
         });
@@ -410,12 +453,35 @@ function updateDisplay() {
             if (creature) {
                 const months = creature.months[hemisphere];
                 const isAvailable = months[selectedMonth]; // Use selected month
-                const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
-                if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
-                    row.style.display = 'table-row';
+                // Check if leaving this month (next month not available)
+                const nextMonth = (selectedMonth + 1) % 12;
+                const isLeaving = isAvailable && !months[nextMonth];
+                
+                if (isActiveNowMode) {
+                    // Aktif mod: sadece şu anda aktif olanlar
+                    const isActive = isActiveNow(creature.time);
+                    
+                    if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
+                        row.style.display = 'table-row';
+                        if (isLeaving) {
+                            row.classList.add('leaving-soon');
+                        } else {
+                            row.classList.remove('leaving-soon');
+                        }
+                    } else {
+                        row.style.display = 'none';
+                        row.classList.remove('leaving-soon');
+                    }
                 } else {
-                    row.style.display = 'none';
+                    // Normal mod
+                    if (isAvailable && (!showOnlyUncaught || !isCaptured)) {
+                        row.style.display = 'table-row';
+                        row.classList.remove('leaving-soon');
+                    } else {
+                        row.style.display = 'none';
+                        row.classList.remove('leaving-soon');
+                    }
                 }
             }
         });
@@ -432,12 +498,35 @@ function updateDisplay() {
             if (creature) {
                 const months = creature.months[hemisphere];
                 const isAvailable = months[selectedMonth]; // Use selected month
-                const isActive = showActiveNow ? isActiveNow(creature.time) : true;
                 
-                if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
-                    row.style.display = 'table-row';
+                // Check if leaving this month (next month not available)
+                const nextMonth = (selectedMonth + 1) % 12;
+                const isLeaving = isAvailable && !months[nextMonth];
+                
+                if (isActiveNowMode) {
+                    // Aktif mod: sadece şu anda aktif olanlar
+                    const isActive = isActiveNow(creature.time);
+                    
+                    if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
+                        row.style.display = 'table-row';
+                        if (isLeaving) {
+                            row.classList.add('leaving-soon');
+                        } else {
+                            row.classList.remove('leaving-soon');
+                        }
+                    } else {
+                        row.style.display = 'none';
+                        row.classList.remove('leaving-soon');
+                    }
                 } else {
-                    row.style.display = 'none';
+                    // Normal mod
+                    if (isAvailable && (!showOnlyUncaught || !isCaptured)) {
+                        row.style.display = 'table-row';
+                        row.classList.remove('leaving-soon');
+                    } else {
+                        row.style.display = 'none';
+                        row.classList.remove('leaving-soon');
+                    }
                 }
             }
         });
