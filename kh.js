@@ -726,7 +726,7 @@ function whenAllLoaded(gameDiv, popup, stickyNodes) {
                 bgmusic = document.createElement('audio');
                 bgmusic.id = 'khbgmusic';
                 bgmusic.loop = 'loop';
-                bgmusic.src = 'http://kathack.com/js/katamari.mp3';
+                bgmusic.src = './katamari.mp3';
                 gameDiv.appendChild(bgmusic);
             }
             bgmusic.play();
