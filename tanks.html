@@ -137,7 +137,9 @@ function darken(hsl, change){
 for(let i=0;i<NUM;i++) tanks.push(new Tank());
 
 // main loop
+var time = performance.now();
 function step(){
+  var now = performance.now();
   // update
   for(let t of tanks) t.update();
   for(let i = shots.length-1; i>=0; i--){
@@ -176,7 +178,12 @@ function step(){
   ctx.font = '13px monospace';
   const alive = tanks.filter(t=>t.alive).length;
   ctx.fillText(`Tanks: ${alive}/${NUM}`, 12, 24);
-
+  var totalExecutionTime = performance.now() - now;
+  if(performance.now() - time > 1){
+    console.log("Frame execution time: "+ totalExecutionTime + "ms")
+    time = performance.now();
+  }
+  console.log("frame calculation execution time:" + now + "ms");
   requestAnimationFrame(step);
 }
 
@@ -246,4 +253,5 @@ window.addEventListener('keydown', (e)=>{
 </script>
 </body>
 </html>
+
 
