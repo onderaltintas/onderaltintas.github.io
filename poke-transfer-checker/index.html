@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PokéTransfer Checker</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 min-h-screen p-6">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      function App() {
+        const [games, setGames] = useState([]);
+        const [allPokemon, setAllPokemon] = useState([]);
+        const [fromGame, setFromGame] = useState("");
+        const [toGame, setToGame] = useState("");
+        const [filtered, setFiltered] = useState([]);
+
+        useEffect(() => {
+          // Burada kendi JSON dosyanı path ile koy
+          fetch("all_pokemon.json")
+            .then((res) => res.json())
+            .then((data) => {
+              setAllPokemon(data);
+              // bütün oyun isimlerini çıkar
+              const gameSet = new Set();
+              data.forEach((p) => p.games.forEach((g) => gameSet.add(g)));
+              setGames([...gameSet].sort());
+            });
+        }, []);
+
+        useEffect(() => {
+          if (fromGame && toGame) {
+            setFiltered(
+              allPokemon.filter(
+                (p) => p.games.includes(fromGame) && p.games.includes(toGame)
+              )
+            );
+          } else {
+            setFiltered([]);
+          }
+        }, [fromGame, toGame, allPokemon]);
+
+        return (
+          <div className="max-w-5xl mx-auto">
+            <header className="flex items-center gap-2 mb-6">
+              <span className="text-2xl">🔴 PokéTransfer Checker</span>
+            </header>
+
+            <div className="flex gap-4 mb-6">
+              <select
+                value={fromGame}
+                onChange={(e) => setFromGame(e.target.value)}
+                className="p-2 border rounded w-1/2"
+              >
+                <option value="">Starting game</option>
+                {games.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={toGame}
+                onChange={(e) => setToGame(e.target.value)}
+                className="p-2 border rounded w-1/2"
+              >
+                <option value="">Target game</option>
+                {games.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {fromGame && toGame && (
+              <p className="mb-4 text-gray-700">
+                Found {filtered.length} transferable Pokémon
+              </p>
+            )}
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {filtered.map((p) => (
+                <div
+                  key={p.id}
+                  className="border rounded-xl p-3 shadow bg-white flex flex-col items-center"
+                >
+                  <img
+                    src={p.image_url}
+                    alt={p.name}
+                    className="w-24 h-24 object-contain"
+                  />
+                  <p className="capitalize font-semibold mt-2">{p.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
