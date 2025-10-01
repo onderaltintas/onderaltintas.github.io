@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Sprite Tanks</title>
+<style>
+  body {margin:0; background:#111;}
+  canvas {display:block; margin:auto; background:#222;}
+</style>
+</head>
+<body>
+<canvas id="c" width="1024" height="1024"></canvas>
+<script>
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const W=canvas.width,H=canvas.height;
+
+// Sprite sheet ayarları
+const SPRITE_SIZE=128;
+const SPRITE_COLS=6144/128; // 48
+const WALK_START=12; // 12. kare (0 index değil, 1 index -> 13. kare ise x=12)
+const WALK_FRAMES=8;
+
+const spriteImg=new Image();
+spriteImg.src="sprites.png"; // kendi png yolunu koy
+
+const NUM=200; // test için biraz azaldı istersen artır
+const tanks=[];
+const shots=[];
+
+function rand(min,max){return Math.random()*(max-min)+min;}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+function angleBetween(a,b){return Math.atan2(b.y-a.y,b.x-a.x);}
+
+class Tank{
+  constructor(){
+    this.x=rand(0,W);
+    this.y=rand(0,H);
+    this.angle=rand(0,Math.PI*2);
+    this.speed=rand(0.5,1.5);
+    this.target=this.newTarget();
+    this.alive=true;
+    this.frame=0;
+    this.frameTick=0;
+  }
+  newTarget(){return {x:rand(0,W),y:rand(0,H)};}
+  update(){
+    if(!this.alive)return;
+    const desired=angleBetween(this,this.target);
+    let da=desired-this.angle;
+    da=Math.atan2(Math.sin(da),Math.cos(da));
+    this.angle+=Math.sign(da)*Math.min(Math.abs(da),0.05);
+
+    this.x+=Math.cos(this.angle)*this.speed;
+    this.y+=Math.sin(this.angle)*this.speed;
+    if(this.x<0)this.x=W;if(this.x>W)this.x=0;
+    if(this.y<0)this.y=H;if(this.y>H)this.y=0;
+    if(dist(this,this.target)<8)this.target=this.newTarget();
+
+    // animasyon frame
+    this.frameTick++;
+    if(this.frameTick%8===0){ // hız
+      this.frame=(this.frame+1)%WALK_FRAMES;
+    }
+  }
+  draw(){
+    if(!this.alive)return;
+    // angle -> yön index
+    const dirs=["E","NE","N","NW","W","SW","S","SE"];
+    let dirIndex=Math.round(this.angle/(Math.PI/4))%8;
+    if(dirIndex<0)dirIndex+=8;
+
+    // satır: yön
+    const sy=dirIndex*SPRITE_SIZE;
+    // sütun: yürüyüş animasyonu
+    const sx=(WALK_START+this.frame)*SPRITE_SIZE;
+
+    ctx.drawImage(spriteImg,sx,sy,SPRITE_SIZE,SPRITE_SIZE,
+                  this.x-16,this.y-16,128,128); // ölçek küçült
+  }
+}
+
+for(let i=0;i<NUM;i++)tanks.push(new Tank());
+
+function step(){
+  ctx.clearRect(0,0,W,H);
+  for(let t of tanks){t.update();t.draw();}
+  requestAnimationFrame(step);
+}
+
+spriteImg.onload=()=>step();
+</script>
+</body>
+</html>
