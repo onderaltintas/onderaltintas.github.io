@@ -20,6 +20,7 @@
         const [fromGame, setFromGame] = useState("");
         const [toGame, setToGame] = useState("");
         const [filtered, setFiltered] = useState([]);
+        const [searchTerm, setSearchTerm] = useState("");
 
         useEffect(() => {
           // Burada kendi JSON dosyanı path ile koy
@@ -27,24 +28,58 @@
             .then((res) => res.json())
             .then((data) => {
               setAllPokemon(data);
-              // bütün oyun isimlerini çıkar
+              // modern_games'den oyun isimlerini çıkar
               const gameSet = new Set();
-              data.forEach((p) => p.games.forEach((g) => gameSet.add(g)));
+              data.forEach((p) => {
+                if (p.modern_games) {
+                  p.modern_games.forEach((g) => gameSet.add(g));
+                }
+              });
               setGames([...gameSet].sort());
             });
         }, []);
 
         useEffect(() => {
           if (fromGame && toGame) {
-            setFiltered(
-              allPokemon.filter(
-                (p) => p.games.includes(fromGame) && p.games.includes(toGame)
-              )
+            let result = allPokemon.filter(
+              (p) => 
+                p.modern_games && 
+                p.modern_games.includes(fromGame) && 
+                p.modern_games.includes(toGame)
             );
+
+            // Arama terimi varsa filtrele
+            if (searchTerm.trim() !== "") {
+              const term = searchTerm.toLowerCase().trim();
+              result = result.filter(p => 
+                p.name.toLowerCase().includes(term)
+              );
+            }
+
+            setFiltered(result);
           } else {
             setFiltered([]);
           }
-        }, [fromGame, toGame, allPokemon]);
+        }, [fromGame, toGame, allPokemon, searchTerm]);
+
+        const handleSearchChange = (e) => {
+          setSearchTerm(e.target.value);
+        };
+
+        // Oyun kodlarını güzel isimlere çeviren fonksiyon
+        const getGameDisplayName = (gameCode) => {
+          const gameNames = {
+            "pokemon-go": "Pokémon GO",
+            "lets-go-pikachu": "Pokémon Let's Go Pikachu",
+            "lets-go-eevee": "Pokémon Let's Go Eevee",
+            "arceus": "Pokémon Legends: Arceus",
+            "sword": "Pokémon Sword",
+            "shield": "Pokémon Shield",
+            "scarlet": "Pokémon Scarlet",
+            "violet": "Pokémon Violet"
+          };
+          return gameNames[gameCode] || gameCode;
+        };
 
         return (
           <div className="max-w-5xl mx-auto">
@@ -61,7 +96,7 @@
                 <option value="">Starting game</option>
                 {games.map((g) => (
                   <option key={g} value={g}>
-                    {g}
+                    {getGameDisplayName(g)}
                   </option>
                 ))}
               </select>
@@ -73,15 +108,35 @@
                 <option value="">Target game</option>
                 {games.map((g) => (
                   <option key={g} value={g}>
-                    {g}
+                    {getGameDisplayName(g)}
                   </option>
                 ))}
               </select>
             </div>
 
+            {/* Arama çubuğu */}
+            {fromGame && toGame && (
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="Search Pokémon by name..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="p-2 border rounded w-full"
+                />
+              </div>
+            )}
+
             {fromGame && toGame && (
               <p className="mb-4 text-gray-700">
                 Found {filtered.length} transferable Pokémon
+                {searchTerm && ` matching "${searchTerm}"`}
+              </p>
+            )}
+
+            {fromGame && toGame && filtered.length === 0 && searchTerm && (
+              <p className="mb-4 text-red-500">
+                No Pokémon found matching "{searchTerm}"
               </p>
             )}
 
