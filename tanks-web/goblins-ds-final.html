@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Goblin Savaşı</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
   body { 
     margin:0; 
@@ -393,7 +394,7 @@ spriteSheet.onload = () => {
   }
 
   // Goblin'leri oluştur
-  for (let i = 0; i < 250; i++) {
+  for (let i = 0; i < 100; i++) {
     goblins.push(new Goblin(Math.random() * canvas.width, Math.random() * canvas.height));
   }
 
@@ -401,4 +402,5 @@ spriteSheet.onload = () => {
 };
 </script>
 </body>
+
 </html>
