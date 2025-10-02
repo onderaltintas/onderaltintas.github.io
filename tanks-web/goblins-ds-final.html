@@ -7,11 +7,11 @@
 <style>
   body { 
     margin:0; 
-    background:#ccc; 
+    background:#fff; 
     overflow: hidden;
   }
   canvas { 
-    background:#ddd; 
+    background:#fff; 
     display:block; 
     width: 100vw; 
     height: 100vh; 
@@ -23,7 +23,7 @@
 <script>
 // Ayarlar - bu değerleri değiştirerek özelleştirebilirsiniz
 const SHOW_HEALTH_BARS = false; // Health bar'ları gösterilsin mi? (true/false)
-const NUMBER_OF_GOBLINS = 400; // Ekrandaki goblin sayısı
+const NUMBER_OF_GOBLINS = 200; // Ekrandaki goblin sayısı
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -372,7 +372,7 @@ class Bullet {
 }
 
 function loop() {
-  ctx.fillStyle = "#ddd";
+  ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   for (let g of goblins) g.update();
@@ -407,3 +407,4 @@ spriteSheet.onload = () => {
 </script>
 </body>
 </html>
+
