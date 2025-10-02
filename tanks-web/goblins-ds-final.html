@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Goblin Savaşı</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Goblin Savaşı</title>
 <style>
   body { 
     margin:0; 
-    background:#fff; 
+    background:#ccc; 
     overflow: hidden;
   }
   canvas { 
-    background:#fff; 
+    background:#ddd; 
     display:block; 
     width: 100vw; 
     height: 100vh; 
@@ -21,6 +21,10 @@
 <body>
 <canvas id="gameCanvas"></canvas>
 <script>
+// Ayarlar - bu değerleri değiştirerek özelleştirebilirsiniz
+const SHOW_HEALTH_BARS = false; // Health bar'ları gösterilsin mi? (true/false)
+const NUMBER_OF_GOBLINS = 400; // Ekrandaki goblin sayısı
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -310,8 +314,8 @@ class Goblin {
       this.x - 64, this.y - 64, 128, 128  // Sprite'ı merkeze göre çiz
     );
     
-    // Sağlık çubuğu (isteğe bağlı)
-    if (this.state !== "dying") {
+    // Sağlık çubuğu - SHOW_HEALTH_BARS ayarına bağlı
+    if (SHOW_HEALTH_BARS && this.state !== "dying") {
       ctx.fillStyle = "red";
       ctx.fillRect(this.x - 32, this.y - 80, 64, 5);
       ctx.fillStyle = "green";
@@ -368,7 +372,7 @@ class Bullet {
 }
 
 function loop() {
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = "#ddd";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   for (let g of goblins) g.update();
@@ -393,8 +397,8 @@ spriteSheet.onload = () => {
     spriteVariants.push(off);
   }
 
-  // Goblin'leri oluştur
-  for (let i = 0; i < 100; i++) {
+  // Goblin'leri oluştur - NUMBER_OF_GOBLINS ayarına bağlı
+  for (let i = 0; i < NUMBER_OF_GOBLINS; i++) {
     goblins.push(new Goblin(Math.random() * canvas.width, Math.random() * canvas.height));
   }
 
@@ -402,5 +406,4 @@ spriteSheet.onload = () => {
 };
 </script>
 </body>
-
 </html>
