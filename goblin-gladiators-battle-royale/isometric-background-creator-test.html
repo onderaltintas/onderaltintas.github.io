@@ -95,6 +95,34 @@
             font-weight: bold;
             color: #e94560;
         }
+        
+        .seed-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .seed-input {
+            flex: 1;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #222;
+            color: white;
+        }
+        
+        .seed-button {
+            padding: 8px 12px;
+            background: #0f3460;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .seed-button:hover {
+            background: #16213e;
+        }
     </style>
 </head>
 <body>
@@ -102,18 +130,15 @@
         <canvas id="bgCanvas"></canvas>
         <div class="controls">
             <h1>İzometrik Savaş Alanı</h1>
-            <div class="button-grid">
-                <button class="bg-button" data-type="grass">Çim</button>
-                <button class="bg-button" data-type="desert">Çöl</button>
-                <button class="bg-button" data-type="wood">Ahşap</button>
-                <button class="bg-button" data-type="stone">Taş</button>
-                <button class="bg-button" data-type="cloud">Bulut</button>
-                <button class="bg-button" data-type="marble">Mermer</button>
-                <button class="bg-button" data-type="cobblestone">Arnavut Kaldırımı</button>
-                <button class="bg-button" data-type="street">Sokak</button>
+            <div class="button-grid" id="buttonContainer">
+                <!-- Butonlar JavaScript ile dinamik olarak oluşturulacak -->
+            </div>
+            <div class="seed-controls">
+                <input type="number" class="seed-input" id="seedInput" placeholder="Seed değeri">
+                <button class="seed-button" id="seedButton">Seed Uygula</button>
             </div>
             <div class="info">
-                Mevcut tip: <span class="current-type">Çim</span>
+                Mevcut tip: <span class="current-type" id="currentType">Çim</span>
             </div>
         </div>
     </div>
@@ -123,8 +148,10 @@
         // Sayfa yüklendiğinde çalışacak kod
         document.addEventListener('DOMContentLoaded', function() {
             const canvas = document.getElementById('bgCanvas');
-            const currentTypeSpan = document.querySelector('.current-type');
-            const bgButtons = document.querySelectorAll('.bg-button');
+            const currentTypeSpan = document.getElementById('currentType');
+            const buttonContainer = document.getElementById('buttonContainer');
+            const seedInput = document.getElementById('seedInput');
+            const seedButton = document.getElementById('seedButton');
             
             // Canvas boyutunu ayarla
             function resizeCanvas() {
@@ -145,27 +172,57 @@
             
             // Arkaplan oluşturucuyu başlat
             window.bgCreator = new IsometricBackgroundCreator();
-            window.bgCreator.create(canvas, 'grass');
             
-            // Butonlara tıklama olaylarını ekle
-            bgButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const type = this.getAttribute('data-type');
+            // Dinamik butonları oluştur
+            function createButtons() {
+                buttonContainer.innerHTML = '';
+                const types = window.bgCreator.getAllTypes();
+                
+                types.forEach(type => {
+                    const button = document.createElement('button');
+                    button.className = 'bg-button';
+                    button.setAttribute('data-type', type);
+                    button.textContent = window.bgCreator.getTypeName(type, 'Tr');
                     
-                    // Aktif butonu güncelle
-                    bgButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
+                    button.addEventListener('click', function() {
+                        // Aktif butonu güncelle
+                        document.querySelectorAll('.bg-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                        
+                        // Arkaplanı değiştir
+                        window.bgCreator.create(canvas, type);
+                        
+                        // Mevcut tipi güncelle
+                        currentTypeSpan.textContent = window.bgCreator.getTypeName(type, 'Tr');
+                    });
                     
-                    // Arkaplanı değiştir
-                    window.bgCreator.create(canvas, type);
-                    
-                    // Mevcut tipi güncelle
-                    currentTypeSpan.textContent = type;
+                    buttonContainer.appendChild(button);
                 });
+                
+                // İlk butonu aktif yap ve arkaplanı oluştur
+                if (types.length > 0) {
+                    const firstButton = buttonContainer.querySelector('.bg-button');
+                    firstButton.classList.add('active');
+                    window.bgCreator.create(canvas, types[0]);
+                    currentTypeSpan.textContent = window.bgCreator.getTypeName(types[0], 'Tr');
+                }
+            }
+            
+            // Seed butonuna tıklama olayını ekle
+            seedButton.addEventListener('click', function() {
+                const seedValue = parseFloat(seedInput.value);
+                if (!isNaN(seedValue)) {
+                    window.bgCreator.setSeed(seedValue);
+                    if (window.bgCreator.currentType) {
+                        window.bgCreator.create(canvas, window.bgCreator.currentType);
+                    }
+                }
             });
             
-            // İlk butonu aktif yap
-            document.querySelector('.bg-button[data-type="grass"]').classList.add('active');
+            // Butonları oluştur
+            createButtons();
         });
     </script>
 </body>
