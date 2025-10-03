@@ -10,8 +10,12 @@ class IsometricBackgroundCreator {
         this.colors = {
             desert: ['#f4d742', '#e5c135', '#d6ac29', '#c7991e'],
             grass: ['#7cfc00', '#70e000', '#64c400', '#58a800'],
-            wood: ['#daa520', '#c19c1e', '#a8841b', '#8f6d18'],
-            stone: ['#a9a9a9', '#989898', '#878787', '#767676']
+            wood: ['#e8c46e', '#d4b15f', '#c09e51', '#ac8b43'], // Açık tonlara ayarlandı
+            stone: ['#c4c4c4', '#b0b0b0', '#9c9c9c', '#888888'], // Açık tonlara ayarlandı
+            cloud: ['#ffffff', '#f8f8f8', '#f0f0f0', '#e8e8e8'],
+            marble: ['#f5f5f5', '#e8e8e8', '#dbdbdb', '#cecece'],
+            cobblestone: ['#a8a8a8', '#989898', '#888888', '#787878'],
+            street: ['#4a4a4a', '#555555', '#606060', '#6b6b6b']
         };
 
         // İzometrik dönüşüm parametreleri
@@ -59,6 +63,18 @@ class IsometricBackgroundCreator {
     generateBackground(type) {
         this.backgroundCtx.clearRect(0, 0, this.backgroundCanvas.width, this.backgroundCanvas.height);
         
+        // Cloud tipi için gökyüzü arkaplanı
+        if (type === 'cloud') {
+            const gradient = this.backgroundCtx.createLinearGradient(0, 0, 0, this.backgroundCanvas.height);
+            gradient.addColorStop(0, '#87CEEB'); // Açık mavi
+            gradient.addColorStop(1, '#E0F7FF'); // Daha açık mavi
+            this.backgroundCtx.fillStyle = gradient;
+            this.backgroundCtx.fillRect(0, 0, this.backgroundCanvas.width, this.backgroundCanvas.height);
+            
+            // Gökkuşağı efekti
+            this.drawRainbow();
+        }
+        
         const cols = Math.ceil(this.backgroundCanvas.width / this.tileWidth) * 2 + 10;
         const rows = Math.ceil(this.backgroundCanvas.height / this.tileHeight) * 2 + 10;
         
@@ -77,6 +93,30 @@ class IsometricBackgroundCreator {
                     this.drawIsometricTile(screenX, screenY, type, x, y);
                 }
             }
+        }
+    }
+
+    drawRainbow() {
+        const rainbowColors = [
+            'rgba(255, 0, 0, 0.3)',     // Kırmızı
+            'rgba(255, 165, 0, 0.3)',   // Turuncu
+            'rgba(255, 255, 0, 0.3)',   // Sarı
+            'rgba(0, 255, 0, 0.3)',     // Yeşil
+            'rgba(0, 0, 255, 0.3)',     // Mavi
+            'rgba(75, 0, 130, 0.3)',    // Çivit
+            'rgba(238, 130, 238, 0.3)'  // Mor
+        ];
+        
+        const centerX = this.backgroundCanvas.width / 2;
+        const startY = this.backgroundCanvas.height * 0.1;
+        const radius = this.backgroundCanvas.width * 0.3;
+        
+        for (let i = 0; i < rainbowColors.length; i++) {
+            this.backgroundCtx.beginPath();
+            this.backgroundCtx.arc(centerX, this.backgroundCanvas.height + 50, radius - i * 15, Math.PI, 2 * Math.PI);
+            this.backgroundCtx.strokeStyle = rainbowColors[i];
+            this.backgroundCtx.lineWidth = 10;
+            this.backgroundCtx.stroke();
         }
     }
 
@@ -152,47 +192,47 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'wood':
-                this.backgroundCtx.strokeStyle = this.darkenColor(baseColor, 25);
-                this.backgroundCtx.lineWidth = 1.5;
+                this.backgroundCtx.strokeStyle = this.darkenColor(baseColor, 15); // Daha açık kontur
+                this.backgroundCtx.lineWidth = 1;
                 for (let i = 0; i < 5; i++) {
                     const startY = random(i) * this.tileHeight;
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.moveTo(-this.tileWidth/3, startY);
                     this.backgroundCtx.bezierCurveTo(
-                        -this.tileWidth/6, startY + (random(i + 10) - 0.5) * 10,
-                        this.tileWidth/6, startY + (random(i + 20) - 0.5) * 10,
+                        -this.tileWidth/6, startY + (random(i + 10) - 0.5) * 8,
+                        this.tileWidth/6, startY + (random(i + 20) - 0.5) * 8,
                         this.tileWidth/3, startY
                     );
                     this.backgroundCtx.stroke();
                 }
                 
-                this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 35);
+                this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 20); // Daha açık düğümler
                 for (let i = 0; i < 2; i++) {
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.arc(
                         (random(i + 30) - 0.5) * this.tileWidth / 3,
                         random(i + 40) * this.tileHeight,
-                        3 + random(i + 50) * 4, 0, Math.PI * 2
+                        2 + random(i + 50) * 2, 0, Math.PI * 2
                     );
                     this.backgroundCtx.fill();
                 }
                 break;
                 
             case 'stone':
-                this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 20);
+                this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 15); // Daha az koyu
                 for (let i = 0; i < 8; i++) {
                     const stoneX = (random(i) - 0.5) * this.tileWidth / 1.5;
                     const stoneY = random(i + 10) * this.tileHeight;
-                    const width = 3 + random(i + 20) * 8;
-                    const height = 3 + random(i + 30) * 6;
+                    const width = 3 + random(i + 20) * 6;
+                    const height = 3 + random(i + 30) * 4;
                     
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.ellipse(stoneX, stoneY, width, height, random(i + 40) * Math.PI, 0, Math.PI * 2);
                     this.backgroundCtx.fill();
                 }
                 
-                this.backgroundCtx.strokeStyle = this.darkenColor(baseColor, 40);
-                this.backgroundCtx.lineWidth = 1;
+                this.backgroundCtx.strokeStyle = this.darkenColor(baseColor, 25); // Daha açık çizgiler
+                this.backgroundCtx.lineWidth = 0.7;
                 for (let i = 0; i < 3; i++) {
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.moveTo((random(i + 50) - 0.5) * this.tileWidth / 2, 0);
@@ -203,6 +243,104 @@ class IsometricBackgroundCreator {
                     this.backgroundCtx.moveTo(-this.tileWidth/2, random(i + 70) * this.tileHeight);
                     this.backgroundCtx.lineTo(this.tileWidth/2, random(i + 80) * this.tileHeight);
                     this.backgroundCtx.stroke();
+                }
+                break;
+                
+            case 'cloud':
+                this.backgroundCtx.fillStyle = this.lightenColor(baseColor, 10);
+                for (let i = 0; i < 5; i++) {
+                    const cloudX = (random(i) - 0.5) * this.tileWidth / 1.5;
+                    const cloudY = random(i + 10) * this.tileHeight;
+                    const size = 5 + random(i + 20) * 10;
+                    
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.arc(cloudX, cloudY, size, 0, Math.PI * 2);
+                    this.backgroundCtx.fill();
+                }
+                break;
+                
+            case 'marble':
+                this.backgroundCtx.strokeStyle = this.darkenColor(baseColor, 10);
+                this.backgroundCtx.lineWidth = 1;
+                for (let i = 0; i < 8; i++) {
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.moveTo(-this.tileWidth/2, random(i) * this.tileHeight);
+                    this.backgroundCtx.bezierCurveTo(
+                        -this.tileWidth/4, random(i + 10) * this.tileHeight,
+                        this.tileWidth/4, random(i + 20) * this.tileHeight,
+                        this.tileWidth/2, random(i + 30) * this.tileHeight
+                    );
+                    this.backgroundCtx.stroke();
+                }
+                
+                this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 5);
+                for (let i = 0; i < 4; i++) {
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.ellipse(
+                        (random(i + 40) - 0.5) * this.tileWidth / 2,
+                        random(i + 50) * this.tileHeight,
+                        3 + random(i + 60) * 4,
+                        1 + random(i + 70) * 2,
+                        random(i + 80) * Math.PI,
+                        0, Math.PI * 2
+                    );
+                    this.backgroundCtx.fill();
+                }
+                break;
+                
+            case 'cobblestone':
+                this.backgroundCtx.strokeStyle = this.darkenColor(baseColor, 20);
+                this.backgroundCtx.lineWidth = 1.5;
+                
+                // Taş sınırları
+                for (let i = 0; i < 6; i++) {
+                    const offsetX = (random(i) - 0.5) * this.tileWidth / 4;
+                    const offsetY = (random(i + 10) - 0.5) * this.tileHeight / 2;
+                    
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.arc(offsetX, offsetY, 8 + random(i + 20) * 10, 0, Math.PI * 2);
+                    this.backgroundCtx.stroke();
+                }
+                
+                // Taş dokusu
+                this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 10);
+                for (let i = 0; i < 12; i++) {
+                    const stoneX = (random(i + 30) - 0.5) * this.tileWidth / 1.5;
+                    const stoneY = random(i + 40) * this.tileHeight;
+                    const size = 2 + random(i + 50) * 3;
+                    
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.arc(stoneX, stoneY, size, 0, Math.PI * 2);
+                    this.backgroundCtx.fill();
+                }
+                break;
+                
+            case 'street':
+                this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 5);
+                this.backgroundCtx.fillRect(-this.tileWidth/2, 0, this.tileWidth, this.tileHeight);
+                
+                // Yol çizgileri
+                this.backgroundCtx.strokeStyle = this.lightenColor(baseColor, 40);
+                this.backgroundCtx.lineWidth = 2;
+                this.backgroundCtx.setLineDash([10, 5]);
+                
+                this.backgroundCtx.beginPath();
+                this.backgroundCtx.moveTo(-this.tileWidth/3, this.tileHeight/2);
+                this.backgroundCtx.lineTo(this.tileWidth/3, this.tileHeight/2);
+                this.backgroundCtx.stroke();
+                
+                this.backgroundCtx.setLineDash([]);
+                
+                // Yol işaretleri
+                this.backgroundCtx.fillStyle = this.lightenColor(baseColor, 50);
+                for (let i = 0; i < 2; i++) {
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.arc(
+                        (random(i + 60) - 0.5) * this.tileWidth / 4,
+                        this.tileHeight * 0.7,
+                        3, 0, Math.PI * 2
+                    );
+                    this.backgroundCtx.fill();
                 }
                 break;
         }
