@@ -34,8 +34,12 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const backgroundCreator = new IsometricBackgroundCreator();
-const BackgroundTypes = ['grass','desert','wood','stone']
-backgroundCreator.create(canvas, BackgroundTypes[Math.floor(Math.random()*4+1)]);
+var BackgroundTypes = [];
+for (var key in backgroundCreator.colors) {
+  BackgroundTypes.push(key);
+}
+  
+backgroundCreator.create(canvas, BackgroundTypes[Math.floor(Math.random()*BackgroundTypes.length+1)]);
 
 // Pencere boyutu değiştiğinde kanvas boyutunu güncelle
 window.addEventListener('resize', function() {
