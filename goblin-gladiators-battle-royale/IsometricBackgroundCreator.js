@@ -244,13 +244,13 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'cloud':
-                // Daha sık ve büyük bulutlar
+                // Daha az ve daha ufak bulutlar
                 this.backgroundCtx.fillStyle = baseColor;
                 
-                for (let i = 0; i < 25; i++) { // Daha fazla bulut
+                for (let i = 0; i < 15; i++) { // Daha az bulut
                     const cloudX = (random(i) - 0.5) * this.tileWidth / 1.2;
                     const cloudY = random(i + 10) * this.tileHeight;
-                    const size = 10 + random(i + 20) * 15; // Daha büyük boyut
+                    const size = 5 + random(i + 20) * 8; // Daha ufak boyut
                     
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.arc(cloudX, cloudY, size, 0, Math.PI * 2);
@@ -295,24 +295,26 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'cobblestone':
-                // Tile'ın merkezinde, tile'ı neredeyse kaplayan bir sekizgen
                 this.backgroundCtx.fillStyle = baseColor;
                 
+                // Sekizgeni 45 derece döndür
+                this.backgroundCtx.rotate(Math.PI / 4);
+                
                 // Sekizgenin boyutları
-                const size = Math.min(this.tileWidth, this.tileHeight) * 0.8; // Tile'ın %80'ini kapla
+                const size = Math.min(this.tileWidth, this.tileHeight) * 0.6; // Boyutu küçült
                 
                 this.backgroundCtx.beginPath();
                 
-                // Sekizgenin köşe noktaları (izometrik perspektifte)
+                // Sekizgenin köşe noktaları (kenarlar tile bitimlerine gelecek şekilde)
                 for (let i = 0; i < 8; i++) {
                     const angle = (i * 2 * Math.PI) / 8;
-                    const x = size * Math.cos(angle);
-                    const y = size * Math.sin(angle) * 0.5; // Yükseklik faktörü
+                    const xPos = size * Math.cos(angle);
+                    const yPos = size * Math.sin(angle);
                     
                     if (i === 0) {
-                        this.backgroundCtx.moveTo(x, y);
+                        this.backgroundCtx.moveTo(xPos, yPos);
                     } else {
-                        this.backgroundCtx.lineTo(x, y);
+                        this.backgroundCtx.lineTo(xPos, yPos);
                     }
                 }
                 
