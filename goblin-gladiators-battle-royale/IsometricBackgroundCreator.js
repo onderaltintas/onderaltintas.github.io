@@ -265,28 +265,38 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'marble':
-                this.backgroundCtx.strokeStyle = this.darkenColor(baseColor, 10);
-                this.backgroundCtx.lineWidth = 1;
-                for (let i = 0; i < 8; i++) {
+                // İzometrik mermer damarları: çok katmanlı, ince ve yarı saydam damarlar.
+                for (let v = 0; v < 10; v++) {
+                    const alpha = 0.12 + random(v + 10) * 0.35;
+                    const lineW = 0.6 + random(v + 20) * 1.6;
+                    const strokeColor = this.darkenColor(baseColor, 8 + Math.floor(random(v) * 20));
+                    this.backgroundCtx.strokeStyle = this.hexToRgba(strokeColor, alpha);
+                    this.backgroundCtx.lineWidth = lineW;
+                    
                     this.backgroundCtx.beginPath();
-                    this.backgroundCtx.moveTo(-this.tileWidth/2, random(i) * this.tileHeight);
+                    const startY = random(v + 30) * this.tileHeight - this.tileHeight * 0.1;
+                    const cp1Y = startY + (random(v + 40) - 0.5) * this.tileHeight * 0.6;
+                    const cp2Y = startY + (random(v + 50) - 0.5) * this.tileHeight * 0.6;
+                    const endY = startY + (random(v + 60) - 0.5) * this.tileHeight * 0.2;
+                    this.backgroundCtx.moveTo(-this.tileWidth / 2, startY);
                     this.backgroundCtx.bezierCurveTo(
-                        -this.tileWidth/4, random(i + 10) * this.tileHeight,
-                        this.tileWidth/4, random(i + 20) * this.tileHeight,
-                        this.tileWidth/2, random(i + 30) * this.tileHeight
+                        -this.tileWidth / 4, cp1Y,
+                        this.tileWidth / 4, cp2Y,
+                        this.tileWidth / 2, endY
                     );
                     this.backgroundCtx.stroke();
                 }
-                
-                this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 5);
+
+                // Hafif lekeler ile doğal görünüm
+                this.backgroundCtx.fillStyle = this.hexToRgba(this.darkenColor(baseColor, 6), 0.6);
                 for (let i = 0; i < 4; i++) {
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.ellipse(
-                        (random(i + 40) - 0.5) * this.tileWidth / 2,
-                        random(i + 50) * this.tileHeight,
-                        3 + random(i + 60) * 4,
-                        1 + random(i + 70) * 2,
-                        random(i + 80) * Math.PI,
+                        (random(i + 70) - 0.5) * this.tileWidth / 2,
+                        random(i + 80) * this.tileHeight,
+                        2 + random(i + 90) * 4,
+                        1 + random(i + 100) * 2,
+                        random(i + 110) * Math.PI,
                         0, Math.PI * 2
                     );
                     this.backgroundCtx.fill();
@@ -294,7 +304,8 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'cobblestone':
-                // Tile'ın merkezinde, tile'ı neredeyse kaplayan bir sekizgen (izometrik perspektifte)
+                // Tile'ın merkezinde, tile'ı neredeyse kaplayan bir sekizgen.
+                // Sekizgenin kenarları tile kenarlarına hizalanacak şekilde açıyı kaydırıyoruz.
                 this.backgroundCtx.fillStyle = baseColor;
                 
                 // Sekizgenin boyutları
@@ -302,12 +313,12 @@ class IsometricBackgroundCreator {
                 
                 this.backgroundCtx.beginPath();
                 
-                // Sekizgenin köşe noktaları (izometrik perspektifte)
+                // Sekizgenin köşe noktaları (izometrik perspektifte) - başlangıç açısı kaydırıldı
                 for (let i = 0; i < 8; i++) {
-                    const angle = (i * 2 * Math.PI) / 8;
+                    const angle = (i * 2 * Math.PI) / 8 + Math.PI / 8;
                     const xPos = size * Math.cos(angle);
                     const yPos = size * Math.sin(angle) * 0.5; // Yükseklik faktörü
-                    
+                                        
                     if (i === 0) {
                         this.backgroundCtx.moveTo(xPos, yPos);
                     } else {
