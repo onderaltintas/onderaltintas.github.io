@@ -304,8 +304,7 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'cobblestone':
-                // Tile'ın merkezinde, tile'ı neredeyse kaplayan bir sekizgen.
-                // Sekizgenin kenarları tile kenarlarına hizalanacak şekilde açıyı kaydırıyoruz.
+                // Mevcut sekizgen çizimi
                 this.backgroundCtx.fillStyle = baseColor;
                 
                 // Sekizgenin boyutları
@@ -316,8 +315,10 @@ class IsometricBackgroundCreator {
                 // Sekizgenin köşe noktaları (izometrik perspektifte) - başlangıç açısı kaydırıldı
                 for (let i = 0; i < 8; i++) {
                     const angle = (i * 2 * Math.PI) / 8 + Math.PI / 8;
-                    const xPos = size * Math.cos(angle);
-                    const yPos = size * Math.sin(angle) * 0.5; // Yükseklik faktörü
+                    // Rastgelelik ekleyerek pürüzsüzlüğü azalt
+                    const randomFactor = 0.95 + random(i + 150) * 0.1; 
+                    const xPos = size * randomFactor * Math.cos(angle);
+                    const yPos = size * randomFactor * Math.sin(angle) * 0.5; // Yükseklik faktörü
                                         
                     if (i === 0) {
                         this.backgroundCtx.moveTo(xPos, yPos);
@@ -329,10 +330,53 @@ class IsometricBackgroundCreator {
                 this.backgroundCtx.closePath();
                 this.backgroundCtx.fill();
                 
-                // Sekizgen kenarları
-                this.backgroundCtx.strokeStyle = this.darkenColor(baseColor, 20);
-                this.backgroundCtx.lineWidth = 1;
+                // Sekizgen kenarları: Derzleri daha koyu yap
+                this.backgroundCtx.strokeStyle = this.darkenColor(baseColor, 30); // Daha koyu derz rengi
+                this.backgroundCtx.lineWidth = 1.5; // Daha belirgin derz
                 this.backgroundCtx.stroke();
+
+                // --- Eskitme ve çatlaklar ---
+                
+                // 1. Rastgele, koyu lekeler (kir/yosun)
+                this.backgroundCtx.fillStyle = this.hexToRgba(this.darkenColor(baseColor, 40), 0.5);
+                for (let i = 0; i < 4; i++) {
+                    const spotX = (random(i + 200) - 0.5) * this.tileWidth / 3;
+                    const spotY = random(i + 210) * this.tileHeight;
+                    const spotSize = 1.5 + random(i + 220) * 3;
+                    
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.ellipse(spotX, spotY, spotSize, spotSize * 0.5, 
+                                             random(i + 230) * Math.PI, 0, Math.PI * 2);
+                    this.backgroundCtx.fill();
+                }
+
+                // 2. İnce çatlaklar/çizikler (pürüzsüzlüğü gidermek için)
+                this.backgroundCtx.strokeStyle = this.hexToRgba(this.darkenColor(baseColor, 50), 0.6);
+                this.backgroundCtx.lineWidth = 0.5;
+                
+                for (let i = 0; i < 3; i++) {
+                    const startX = (random(i + 240) - 0.5) * this.tileWidth / 2;
+                    const startY = random(i + 250) * this.tileHeight;
+                    const endX = (random(i + 260) - 0.5) * this.tileWidth / 2;
+                    const endY = random(i + 270) * this.tileHeight;
+                    
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.moveTo(startX, startY);
+                    this.backgroundCtx.lineTo(endX, endY);
+                    this.backgroundCtx.stroke();
+                }
+                
+                // 3. Yüzey pürüzsüzlüğü için hafif vurgular (ışık yansıması)
+                this.backgroundCtx.fillStyle = this.hexToRgba(this.lightenColor(baseColor, 20), 0.4);
+                for (let i = 0; i < 3; i++) {
+                    const highlightX = (random(i + 280) - 0.5) * this.tileWidth / 2;
+                    const highlightY = random(i + 290) * this.tileHeight / 2;
+                    const hSize = 1 + random(i + 300) * 2;
+                    
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.arc(highlightX, highlightY, hSize, 0, Math.PI * 2);
+                    this.backgroundCtx.fill();
+                }
                 break;
                 
             case 'street':
