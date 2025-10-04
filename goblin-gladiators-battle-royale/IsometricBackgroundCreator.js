@@ -244,13 +244,13 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'cloud':
-                // Daha az ve daha ufak bulutlar
+                // Daha sık ve büyük bulutlar
                 this.backgroundCtx.fillStyle = baseColor;
                 
-                for (let i = 0; i < 15; i++) { // Daha az bulut
+                for (let i = 0; i < 15; i++) { // Daha fazla bulut
                     const cloudX = (random(i) - 0.5) * this.tileWidth / 1.2;
                     const cloudY = random(i + 10) * this.tileHeight;
-                    const size = 5 + random(i + 20) * 8; // Daha ufak boyut
+                    const size = 10 + random(i + 20) * 15; // Daha büyük boyut
                     
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.arc(cloudX, cloudY, size, 0, Math.PI * 2);
@@ -295,26 +295,24 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'cobblestone':
+                // Tile'ın merkezinde, tile'ı neredeyse kaplayan bir sekizgen
                 this.backgroundCtx.fillStyle = baseColor;
                 
-                // Sekizgeni 45 derece döndür
-                this.backgroundCtx.rotate(Math.PI / 4);
-                
                 // Sekizgenin boyutları
-                const size = Math.min(this.tileWidth, this.tileHeight) * 0.6; // Boyutu küçült
+                const size = Math.min(this.tileWidth, this.tileHeight) * 0.8; // Tile'ın %80'ini kapla
                 
                 this.backgroundCtx.beginPath();
                 
-                // Sekizgenin köşe noktaları (kenarlar tile bitimlerine gelecek şekilde)
+                // Sekizgenin köşe noktaları (izometrik perspektifte)
                 for (let i = 0; i < 8; i++) {
                     const angle = (i * 2 * Math.PI) / 8;
-                    const xPos = size * Math.cos(angle);
-                    const yPos = size * Math.sin(angle);
+                    const x = size * Math.cos(angle);
+                    const y = size * Math.sin(angle) * 0.5; // Yükseklik faktörü
                     
                     if (i === 0) {
-                        this.backgroundCtx.moveTo(xPos, yPos);
+                        this.backgroundCtx.moveTo(x, y);
                     } else {
-                        this.backgroundCtx.lineTo(xPos, yPos);
+                        this.backgroundCtx.lineTo(x, y);
                     }
                 }
                 
@@ -527,3 +525,4 @@ class IsometricBackgroundCreator {
         return Object.keys(this.Types);
     }
 }
+
