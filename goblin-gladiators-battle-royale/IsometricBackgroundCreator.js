@@ -26,12 +26,12 @@ class IsometricBackgroundCreator {
             grass: ['#7cfc00', '#70e000', '#64c400', '#58a800'],
             wood: ['#e8c46e', '#d4b15f', '#c09e51', '#ac8b43'],
             stone: ['#e0e0e0', '#d0d0d0', '#c0c0c0', '#b0b0b0'],
-            cloud: ['#ffffff', '#fefefe', '#fdfdfd', '#fcfcfc'], // Neredeyse tamamen beyaz
+            cloud: ['#ffffff', '#fefefe', '#fdfdfd', '#fcfcfc'],
             marble: ['#f5f5f5', '#e8e8e8', '#dbdbdb', '#cecece'],
             cobblestone: ['#d0d0d0', '#c0c0c0', '#b0b0b0', '#a0a0a0'],
-            street: ['#a0a0a0', '#b0b0b0', '#c0c0c0', '#d0d0d0'], // Daha açık gri tonlar
+            street: ['#a0a0a0', '#b0b0b0', '#c0c0c0', '#d0d0d0'],
             snow: ['#ffffff', '#f8f8f8', '#f0f0f0', '#e8e8e8'],
-            mosaic: ['#ffb6c1', '#98fb98', '#87ceeb', '#dda0dd'] // Pastel tonlar
+            mosaic: ['#ffb6c1', '#98fb98', '#87ceeb', '#dda0dd', '#f0e68c', '#d2b48c'] // Pastel tonlara birkaç renk daha
         };
 
         // İzometrik dönüşüm parametreleri
@@ -82,9 +82,9 @@ class IsometricBackgroundCreator {
         // Cloud tipi için gökyüzü arkaplanı
         if (type === 'cloud') {
             const gradient = this.backgroundCtx.createLinearGradient(0, 0, 0, this.backgroundCanvas.height);
-            gradient.addColorStop(0, '#87CEEB'); // Açık mavi
-            gradient.addColorStop(0.7, '#B0E2FF'); // Orta mavi
-            gradient.addColorStop(1, '#E0F7FF'); // Daha açık mavi
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(0.7, '#B0E2FF');
+            gradient.addColorStop(1, '#E0F7FF');
             this.backgroundCtx.fillStyle = gradient;
             this.backgroundCtx.fillRect(0, 0, this.backgroundCanvas.width, this.backgroundCanvas.height);
         }
@@ -212,7 +212,6 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'stone':
-                // Daha gerçekçi taş dokusu
                 this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 10);
                 for (let i = 0; i < 6; i++) {
                     const stoneX = (random(i) - 0.5) * this.tileWidth / 1.5;
@@ -225,7 +224,6 @@ class IsometricBackgroundCreator {
                                              random(i + 40) * Math.PI, 0, Math.PI * 2);
                     this.backgroundCtx.fill();
                     
-                    // Taş üzerine hafif vurgular
                     this.backgroundCtx.fillStyle = this.lightenColor(baseColor, 15);
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.ellipse(stoneX - width/4, stoneY - height/4, 
@@ -235,7 +233,6 @@ class IsometricBackgroundCreator {
                     this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 10);
                 }
                 
-                // Taş aralarındaki çizgiler
                 this.backgroundCtx.strokeStyle = this.darkenColor(baseColor, 25);
                 this.backgroundCtx.lineWidth = 0.7;
                 for (let i = 0; i < 2; i++) {
@@ -247,21 +244,19 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'cloud':
-                // Daha sık ve beyaz bulutlar
+                // Daha sık ve büyük bulutlar
                 this.backgroundCtx.fillStyle = baseColor;
                 
-                for (let i = 0; i < 15; i++) { // Daha fazla bulut
+                for (let i = 0; i < 25; i++) { // Daha fazla bulut
                     const cloudX = (random(i) - 0.5) * this.tileWidth / 1.2;
                     const cloudY = random(i + 10) * this.tileHeight;
-                    const size = 3 + random(i + 20) * 6; // Daha küçük boyut
+                    const size = 10 + random(i + 20) * 15; // Daha büyük boyut
                     
-                    // Tam dairesel bulut
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.arc(cloudX, cloudY, size, 0, Math.PI * 2);
                     this.backgroundCtx.fill();
                     
-                    // Bulut gölgeleri (çok hafif)
-                    this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 2); // Çok hafif gölge
+                    this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 2);
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.arc(cloudX + 1, cloudY + 1, size * 0.9, 0, Math.PI * 2);
                     this.backgroundCtx.fill();
@@ -300,24 +295,28 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'cobblestone':
-                // Her tile'a bir izometrik sekizgen
+                // Tile'ın merkezinde, tile'ı neredeyse kaplayan bir sekizgen
                 this.backgroundCtx.fillStyle = baseColor;
                 
-                // İzometrik sekizgen çizimi
+                // Sekizgenin boyutları
+                const size = Math.min(this.tileWidth, this.tileHeight) * 0.8; // Tile'ın %80'ini kapla
+                
                 this.backgroundCtx.beginPath();
                 
                 // Sekizgenin köşe noktaları (izometrik perspektifte)
-                const size = 15; // Sekizgen boyutu
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i * 2 * Math.PI) / 8;
+                    const x = size * Math.cos(angle);
+                    const y = size * Math.sin(angle) * 0.5; // Yükseklik faktörü
+                    
+                    if (i === 0) {
+                        this.backgroundCtx.moveTo(x, y);
+                    } else {
+                        this.backgroundCtx.lineTo(x, y);
+                    }
+                }
                 
-                // Üst noktalar
-                this.backgroundCtx.moveTo(0, -size/2);
-                this.backgroundCtx.lineTo(size/2, -size/4);
-                this.backgroundCtx.lineTo(size/2, size/4);
-                this.backgroundCtx.lineTo(0, size/2);
-                this.backgroundCtx.lineTo(-size/2, size/4);
-                this.backgroundCtx.lineTo(-size/2, -size/4);
                 this.backgroundCtx.closePath();
-                
                 this.backgroundCtx.fill();
                 
                 // Sekizgen kenarları
@@ -327,10 +326,8 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'street':
-                // İzometrik sokak görünümü
                 this.backgroundCtx.fillStyle = baseColor;
                 
-                // İzometrik dörtgen çizimi
                 this.backgroundCtx.beginPath();
                 this.backgroundCtx.moveTo(-this.tileWidth/2, 0);
                 this.backgroundCtx.lineTo(0, this.tileHeight/2);
@@ -339,17 +336,14 @@ class IsometricBackgroundCreator {
                 this.backgroundCtx.closePath();
                 this.backgroundCtx.fill();
                 
-                // Yol çizgileri (izometrik)
                 this.backgroundCtx.strokeStyle = this.lightenColor(baseColor, 40);
                 this.backgroundCtx.lineWidth = 2;
                 
-                // Merkez çizgisi
                 this.backgroundCtx.beginPath();
                 this.backgroundCtx.moveTo(-this.tileWidth/4, this.tileHeight/4);
                 this.backgroundCtx.lineTo(this.tileWidth/4, -this.tileHeight/4);
                 this.backgroundCtx.stroke();
                 
-                // Yan çizgiler
                 this.backgroundCtx.beginPath();
                 this.backgroundCtx.moveTo(-this.tileWidth/3, this.tileHeight/6);
                 this.backgroundCtx.lineTo(this.tileWidth/6, -this.tileHeight/3);
@@ -360,7 +354,6 @@ class IsometricBackgroundCreator {
                 this.backgroundCtx.lineTo(this.tileWidth/3, -this.tileHeight/6);
                 this.backgroundCtx.stroke();
                 
-                // Yol işaretleri
                 this.backgroundCtx.fillStyle = this.lightenColor(baseColor, 60);
                 for (let i = 0; i < 3; i++) {
                     const markerX = (random(i) - 0.5) * this.tileWidth / 3;
@@ -373,10 +366,8 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'snow':
-                // Kar efekti
                 this.backgroundCtx.fillStyle = baseColor;
                 
-                // Kar taneleri
                 for (let i = 0; i < 20; i++) {
                     const flakeX = (random(i) - 0.5) * this.tileWidth / 1.2;
                     const flakeY = random(i + 10) * this.tileHeight;
@@ -387,7 +378,6 @@ class IsometricBackgroundCreator {
                     this.backgroundCtx.fill();
                 }
                 
-                // Buz kristalleri
                 this.backgroundCtx.strokeStyle = this.lightenColor(baseColor, 10);
                 this.backgroundCtx.lineWidth = 1;
                 for (let i = 0; i < 8; i++) {
@@ -411,44 +401,48 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'mosaic':
-                // Pastel renkli mozaik
-                const shapes = 12; // Mozaik parçası sayısı
+                // Mozaik parçalarını izometrik perspektife uygun çiz
+                const shapes = 15;
                 
                 for (let i = 0; i < shapes; i++) {
-                    // Pastel renk seçimi
                     const colorIndex = Math.floor(random(i) * this.colors.mosaic.length);
                     const shapeColor = this.colors.mosaic[colorIndex];
                     
                     this.backgroundCtx.fillStyle = shapeColor;
                     
-                    const shapeX = (random(i) - 0.5) * this.tileWidth / 1.2;
-                    const shapeY = random(i + 10) * this.tileHeight;
-                    const size = 5 + random(i + 20) * 8;
+                    // Mozaik parçasının konumu (izometrik koordinatlarda)
+                    const isoX = (random(i) - 0.5) * this.tileWidth / 1.2;
+                    const isoY = (random(i + 10) - 0.5) * this.tileHeight / 1.2;
                     
-                    // Rastgele şekil seçimi
+                    // İzometrik dönüşüm: (isoX, isoY) -> (x, y)
+                    const x = isoX;
+                    const y = isoY;
+                    
+                    const size = 3 + random(i + 20) * 6;
+                    
                     const shapeType = Math.floor(random(i + 30) * 4);
                     
                     this.backgroundCtx.beginPath();
                     
                     switch(shapeType) {
-                        case 0: // Üçgen
-                            this.backgroundCtx.moveTo(shapeX, shapeY - size/2);
-                            this.backgroundCtx.lineTo(shapeX + size/2, shapeY + size/2);
-                            this.backgroundCtx.lineTo(shapeX - size/2, shapeY + size/2);
+                        case 0: // Üçgen (izometrik)
+                            this.backgroundCtx.moveTo(x, y - size/2);
+                            this.backgroundCtx.lineTo(x + size/2, y + size/2);
+                            this.backgroundCtx.lineTo(x - size/2, y + size/2);
                             break;
                             
                         case 1: // Dörtgen (izometrik)
-                            this.backgroundCtx.moveTo(shapeX - size/2, shapeY);
-                            this.backgroundCtx.lineTo(shapeX, shapeY - size/2);
-                            this.backgroundCtx.lineTo(shapeX + size/2, shapeY);
-                            this.backgroundCtx.lineTo(shapeX, shapeY + size/2);
+                            this.backgroundCtx.moveTo(x - size/2, y);
+                            this.backgroundCtx.lineTo(x, y - size/2);
+                            this.backgroundCtx.lineTo(x + size/2, y);
+                            this.backgroundCtx.lineTo(x, y + size/2);
                             break;
                             
                         case 2: // Beşgen
                             for (let j = 0; j < 5; j++) {
                                 const angle = (j * 2 * Math.PI) / 5;
-                                const pentX = shapeX + size * Math.cos(angle);
-                                const pentY = shapeY + size * Math.sin(angle);
+                                const pentX = x + size * Math.cos(angle);
+                                const pentY = y + size * Math.sin(angle) * 0.5; // Yükseklik faktörü
                                 
                                 if (j === 0) {
                                     this.backgroundCtx.moveTo(pentX, pentY);
@@ -461,8 +455,8 @@ class IsometricBackgroundCreator {
                         case 3: // Altıgen
                             for (let j = 0; j < 6; j++) {
                                 const angle = (j * 2 * Math.PI) / 6;
-                                const hexX = shapeX + size * Math.cos(angle);
-                                const hexY = shapeY + size * Math.sin(angle);
+                                const hexX = x + size * Math.cos(angle);
+                                const hexY = y + size * Math.sin(angle) * 0.5;
                                 
                                 if (j === 0) {
                                     this.backgroundCtx.moveTo(hexX, hexY);
@@ -476,7 +470,6 @@ class IsometricBackgroundCreator {
                     this.backgroundCtx.closePath();
                     this.backgroundCtx.fill();
                     
-                    // Mozaik parçası kenarları
                     this.backgroundCtx.strokeStyle = this.darkenColor(shapeColor, 10);
                     this.backgroundCtx.lineWidth = 0.5;
                     this.backgroundCtx.stroke();
@@ -505,7 +498,6 @@ class IsometricBackgroundCreator {
         return "#" + (0x1000000 + (R > 255 ? 255 : R) * 0x10000 + (G > 255 ? 255 : G) * 0x100 + (B > 255 ? 255 : B)).toString(16).slice(1);
     }
 
-    // Mevcut arkaplan tipini değiştirmek için
     changeType(canvas, newType) {
         if (!this.isCreated) {
             console.warn('Arkaplan henüz oluşturulmadı. Önce create() metodunu çağırın.');
@@ -515,7 +507,6 @@ class IsometricBackgroundCreator {
         this.create(canvas, newType);
     }
 
-    // Seed değerini değiştirmek için (isteğe bağlı)
     setSeed(newSeed) {
         this.backgroundSeed = newSeed;
         if (this.isCreated && this.currentType) {
@@ -523,7 +514,6 @@ class IsometricBackgroundCreator {
         }
     }
 
-    // Tip isimlerini almak için
     getTypeName(type, language = 'Tr') {
         if (this.Types[type] && this.Types[type][language]) {
             return this.Types[type][language];
@@ -531,7 +521,6 @@ class IsometricBackgroundCreator {
         return type;
     }
 
-    // Tüm tipleri listelemek için
     getAllTypes() {
         return Object.keys(this.Types);
     }
