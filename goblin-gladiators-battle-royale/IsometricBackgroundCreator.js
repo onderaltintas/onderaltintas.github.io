@@ -244,24 +244,23 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'cloud':
-                // Daha sık ve büyük bulutlar
-                this.backgroundCtx.fillStyle = baseColor;
-                
-                for (let i = 0; i < 15; i++) { // Daha fazla bulut
+                // Bulutlar için transparanlık ekleyerek arka planın görünmesini sağla
+                for (let i = 0; i < 12; i++) {
                     const cloudX = (random(i) - 0.5) * this.tileWidth / 1.2;
                     const cloudY = random(i + 10) * this.tileHeight;
-                    const size = 10 + random(i + 20) * 15; // Daha büyük boyut
+                    const size = 8 + random(i + 20) * 10;
                     
+                    // Bulutları yarı saydam yap
+                    this.backgroundCtx.fillStyle = this.hexToRgba(baseColor, 0.7);
                     this.backgroundCtx.beginPath();
                     this.backgroundCtx.arc(cloudX, cloudY, size, 0, Math.PI * 2);
                     this.backgroundCtx.fill();
                     
-                    this.backgroundCtx.fillStyle = this.darkenColor(baseColor, 2);
+                    // İkinci bir katman daha opak
+                    this.backgroundCtx.fillStyle = this.hexToRgba(baseColor, 0.5);
                     this.backgroundCtx.beginPath();
-                    this.backgroundCtx.arc(cloudX + 1, cloudY + 1, size * 0.9, 0, Math.PI * 2);
+                    this.backgroundCtx.arc(cloudX + size * 0.3, cloudY - size * 0.2, size * 0.8, 0, Math.PI * 2);
                     this.backgroundCtx.fill();
-                    
-                    this.backgroundCtx.fillStyle = baseColor;
                 }
                 break;
                 
@@ -295,24 +294,24 @@ class IsometricBackgroundCreator {
                 break;
                 
             case 'cobblestone':
-                // Tile'ın merkezinde, tile'ı neredeyse kaplayan bir sekizgen
+                // Tile'ın merkezinde, tile'ı neredeyse kaplayan bir sekizgen (izometrik perspektifte)
                 this.backgroundCtx.fillStyle = baseColor;
                 
                 // Sekizgenin boyutları
-                const size = Math.min(this.tileWidth, this.tileHeight) * 0.8; // Tile'ın %80'ini kapla
+                const size = Math.min(this.tileWidth, this.tileHeight) * 0.8;
                 
                 this.backgroundCtx.beginPath();
                 
                 // Sekizgenin köşe noktaları (izometrik perspektifte)
                 for (let i = 0; i < 8; i++) {
                     const angle = (i * 2 * Math.PI) / 8;
-                    const x = size * Math.cos(angle);
-                    const y = size * Math.sin(angle) * 0.5; // Yükseklik faktörü
+                    const xPos = size * Math.cos(angle);
+                    const yPos = size * Math.sin(angle) * 0.5; // Yükseklik faktörü
                     
                     if (i === 0) {
-                        this.backgroundCtx.moveTo(x, y);
+                        this.backgroundCtx.moveTo(xPos, yPos);
                     } else {
-                        this.backgroundCtx.lineTo(x, y);
+                        this.backgroundCtx.lineTo(xPos, yPos);
                     }
                 }
                 
@@ -480,6 +479,26 @@ class IsometricBackgroundCreator {
         this.backgroundCtx.restore();
     }
 
+    hexToRgba(hex, opacity) {
+        // Hex renk kodunu RGB'ye çevir
+        let r = 0, g = 0, b = 0;
+        
+        // 3 karakterli hex kodu
+        if (hex.length === 4) {
+            r = parseInt(hex[1] + hex[1], 16);
+            g = parseInt(hex[2] + hex[2], 16);
+            b = parseInt(hex[3] + hex[3], 16);
+        }
+        // 6 karakterli hex kodu
+        else if (hex.length === 7) {
+            r = parseInt(hex[1] + hex[2], 16);
+            g = parseInt(hex[3] + hex[4], 16);
+            b = parseInt(hex[5] + hex[6], 16);
+        }
+        
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+
     darkenColor(color, percent) {
         const num = parseInt(color.slice(1), 16);
         const amt = Math.round(2.55 * percent);
@@ -525,4 +544,3 @@ class IsometricBackgroundCreator {
         return Object.keys(this.Types);
     }
 }
-
