@@ -28,18 +28,20 @@ class Game {
         this.init();
     }
 
+    stringToHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // 32-bit integer'a dönüştür
+        }
+        return Math.abs(hash);
+    }
+
     async init() {
         // Canvas boyutunu ayarla ve mobil uyumlu yap
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
-
-        // Arkaplanı oluştur
-        const backgroundTypes = [];
-        for (const key in this.backgroundCreator.colors) {
-            backgroundTypes.push(key);
-        }
-        const randomBackground = backgroundTypes[Math.floor(Math.random() * backgroundTypes.length)];
-        this.backgroundCreator.create(this.canvas, randomBackground);
 
         // Dosyaları yükle
         try {
@@ -124,6 +126,13 @@ class Game {
 
         // Arena ismini güncelle
         this.arenaName = this.places[Math.floor(Math.random() * this.places.length)];
+        
+        // Arka plan tipi ve seed'i arena ismine göre ayarla
+        const backgroundTypes = this.backgroundCreator.getAllTypes();
+        const hash = this.stringToHash(this.arenaName);
+        const backgroundType = backgroundTypes[hash % backgroundTypes.length];
+        this.backgroundCreator.setSeed(hash);
+        this.backgroundCreator.create(this.canvas, backgroundType);
         
         this.gameLoop();
     }
