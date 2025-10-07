@@ -59,6 +59,9 @@ class Game {
             this.names = await namesResponse.json();
         } catch (error) {
             console.error('Dosyalar yüklenirken hata oluştu:', error);
+            // Varsayılan değerler
+            this.places = ["Default Arena"];
+            this.names = ["Goblin"];
         }
 
         // Arena ismini seç
@@ -157,8 +160,7 @@ class Game {
         }
 
         // Çizimler
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.backgroundCreator.draw(this.ctx);
+        //this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         for (let g of this.goblins) g.draw(this.ctx);
         for (let b of this.bullets) b.draw(this.ctx);
