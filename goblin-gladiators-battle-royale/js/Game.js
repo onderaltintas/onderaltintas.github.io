@@ -146,6 +146,7 @@ class Game {
 
     gameLoop() {
         // Arkaplanı güncelle
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.backgroundCreator.update(this.canvas);
 
         // State'e göre güncelleme
@@ -160,7 +161,7 @@ class Game {
         }
 
         // Çizimler
-        //this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
 
         for (let g of this.goblins) g.draw(this.ctx);
         for (let b of this.bullets) b.draw(this.ctx);
@@ -345,3 +346,4 @@ class Game {
         }
     }
 }
+
