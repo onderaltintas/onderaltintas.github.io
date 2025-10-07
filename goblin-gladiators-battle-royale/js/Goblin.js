@@ -251,8 +251,13 @@ class Goblin {
             128
         );
         
-        // Eğer bet modundaysa veya game over durumundaysa health bar ve isim göster
-        if (this.game.state === "betting" || this.game.state === "gameOver") {
+        // Düzeltme 1: Health bar ve isim gösterimi için koşulu güncelle
+        // Betting, game over durumunda veya bu goblin seçilmişse göster
+        const showInfo = this.game.state === "betting" || 
+                         this.game.state === "gameOver" || 
+                         (this.game.selectedGoblin === this);
+
+        if (showInfo) {
             // Health bar
             const barWidth = 64;
             const barHeight = 5;
@@ -263,10 +268,19 @@ class Goblin {
             ctx.fillRect(this.x - barWidth/2, this.y - 80, barWidth * healthPercent, barHeight);
 
             // İsim
-            ctx.font = "12px Arial";
+            let nameText = `${this.firstName} ${this.lastName}`;
+            
+            // Düzeltme 1: Bet edilen goblinin isminin yanına gold coin işareti (💰) ekle
+            if (this.game.selectedGoblin === this) {
+                nameText += ` 💰`; 
+                ctx.font = "bold 14px Arial"; // Bet edilen için daha belirgin font
+            } else {
+                 ctx.font = "12px Arial";
+            }
+            
             ctx.fillStyle = "white";
             ctx.textAlign = "center";
-            ctx.fillText(`${this.firstName} ${this.lastName}`, this.x, this.y - 85);
+            ctx.fillText(nameText, this.x, this.y - 85);
         }
     }
 }

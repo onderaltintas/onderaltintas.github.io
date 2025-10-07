@@ -28,6 +28,10 @@ class Game {
         this.lastFiveGoblins = [];
         this.betAmount = 20;
         this.showArenaName = true;
+        
+        // Düzeltme 2 ve 3 için sayaçlar
+        this.gameOverTick = 0;
+        this.titleDisplayTick = 0; 
 
         this.init();
     }
@@ -97,6 +101,8 @@ class Game {
         this.titleFadeIn = true;
         this.selectedGoblin = null;
         this.showArenaName = true;
+        this.gameOverTick = 0; // Sayaçları sıfırla
+        this.titleDisplayTick = 0; // Sayaçları sıfırla
 
         // Eğer bir önceki kazanan varsa, onu ekle
         if (this.winnerGoblin) {
@@ -178,15 +184,24 @@ class Game {
     }
 
     updateTitle() {
-        this.titleAlpha += this.titleFadeIn ? 0.02 : -0.02;
-        if (this.titleAlpha >= 1) {
-            this.titleAlpha = 1;
-            setTimeout(() => {
+        // Düzeltme 2: Title ekranındaki setTimeout'u titleDisplayTick ile değiştirerek arena isminin daha uzun süre ve düzgün görünmesini sağla
+        if (this.titleFadeIn) {
+            this.titleAlpha += 0.02;
+            if (this.titleAlpha >= 1) {
+                this.titleAlpha = 1;
                 this.titleFadeIn = false;
-            }, 2000);
-        } else if (this.titleAlpha <= 0) {
-            this.state = "fighting";
-            this.showArenaName = false;
+                this.titleDisplayTick = 0; // Ekranın tam görünür olduğu anı başlat
+            }
+        } else {
+            this.titleDisplayTick++;
+            // 2 saniye (120 kare) bekle
+            if (this.titleDisplayTick >= 120) { 
+                this.titleAlpha -= 0.02;
+                if (this.titleAlpha <= 0) {
+                    this.state = "fighting";
+                    this.showArenaName = false;
+                }
+            }
         }
     }
 
@@ -211,6 +226,7 @@ class Game {
         if (this.goblins.length === 1 && this.state !== "gameOver") {
             this.winnerGoblin = this.goblins[0];
             this.state = "gameOver";
+            this.gameOverTick = 0; // Game over sayacını başlat
             
             // Eğer seçilen goblin kazandıysa ödül ver
             if (this.selectedGoblin === this.winnerGoblin) {
@@ -233,19 +249,32 @@ class Game {
         if (this.goblins.length === 1 && this.state !== "gameOver") {
             this.winnerGoblin = this.goblins[0];
             this.state = "gameOver";
+            this.gameOverTick = 0; // Game over sayacını başlat
             
             // Eğer seçilen goblin kazandıysa ödül ver
             if (this.selectedGoblin === this.winnerGoblin) {
                 this.playerGold += this.betAmount * 2;
             }
         }
+        
+        // Düzeltme 1'i desteklemek için: Eğer bahis yapılmadıysa ve 5 saniye geçtiyse, bahis listesini kaldırmak için otomatik olarak fighting'e dön.
+        if (!this.selectedGoblin) {
+            this.titleDisplayTick++; // titleDisplayTick'i bahis bekleme süresi olarak kullan
+            // 5 saniye (300 kare) sonra otomatik olarak fighting'e dön
+            if (this.titleDisplayTick > 300) {
+                 this.state = "fighting";
+                 this.titleDisplayTick = 0;
+            }
+        }
     }
 
     updateGameOver() {
-        // 3 saniye sonra yeni round başlat
-        setTimeout(() => {
+        // Düzeltme 2 ve 3: setTimeout yerine frame sayacı kullanarak oyun sonu ekranını tut ve sonra yeniden başlat
+        this.gameOverTick++;
+        // 5 saniye (300 kare) sonra yeni round başlat
+        if (this.gameOverTick > 300) { 
             this.startNewRound();
-        }, 3000);
+        }
     }
 
     drawTitle() {
@@ -317,7 +346,9 @@ class Game {
         }
         
         this.ctx.font = "18px Arial";
-        this.ctx.fillText("Next round starting soon...", this.canvas.width / 2, this.canvas.height / 2 + 50);
+        // Düzeltme 3: Oyun sonu bekleme süresini göster
+        const secondsLeft = Math.ceil((300 - this.gameOverTick) / 60);
+        this.ctx.fillText(`Next round starting in ${secondsLeft} seconds...`, this.canvas.width / 2, this.canvas.height / 2 + 50);
     }
 
     // Bet butonlarına tıklama işlemi için
@@ -340,10 +371,11 @@ class Game {
                     if (this.playerGold >= this.betAmount && !this.selectedGoblin) {
                         this.selectedGoblin = goblin;
                         this.playerGold -= this.betAmount;
+                        // Düzeltme 1: Bahis yapıldıktan sonra listeyi kaldırmak için durumu hemen fighting'e çevir.
+                        this.state = "fighting"; 
                     }
                 }
             }
         }
     }
 }
-
