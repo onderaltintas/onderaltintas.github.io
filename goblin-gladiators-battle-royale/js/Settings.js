@@ -1,10 +1,10 @@
 class GameSettings {
     constructor() {
         // Goblin settings
-        this.GOBLIN_MIN_HEALTH = 80;
-        this.GOBLIN_MAX_HEALTH = 120;
-        this.GOBLIN_MIN_ATTACK_POWER = 15;
-        this.GOBLIN_MAX_ATTACK_POWER = 25;
+        this.GOBLIN_MIN_HEALTH = 90;
+        this.GOBLIN_MAX_HEALTH = 130;
+        this.GOBLIN_MIN_ATTACK_POWER = 10;
+        this.GOBLIN_MAX_ATTACK_POWER = 15;
         
         // Game settings
         this.SHOW_HEALTH_BARS = false;
@@ -15,4 +15,5 @@ class GameSettings {
         this.BET_REDUCTION_ON_DEATH = 10;
         this.MIN_BET_AMOUNT = 10;
     }
+
 }
