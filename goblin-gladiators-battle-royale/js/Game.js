@@ -53,9 +53,9 @@ class Game {
 
         // places.json ve names.json yükle
         try {
-            const placesResponse = await fetch('places.json');
+            const placesResponse = await fetch('js/places.json');
             this.places = await placesResponse.json();
-            const namesResponse = await fetch('names.json');
+            const namesResponse = await fetch('js/names.json');
             this.names = await namesResponse.json();
         } catch (error) {
             console.error('Dosyalar yüklenirken hata oluştu:', error);
