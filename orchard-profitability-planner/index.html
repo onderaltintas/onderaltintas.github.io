@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="appTitle">Ayva Kâr Hesaplama Aracı</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        /* Genel Stil Ayarları */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .container {
+            max-width: 850px;
+            margin: auto;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+        th {
+            background-color: #e9ecef;
+            font-weight: 600;
+        }
+        
+        /* Dil Seçimi Stili */
+        .language-switcher {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+        .language-switcher button {
+            background: none;
+            border: 1px solid #007bff;
+            color: #007bff;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .language-switcher button.active, .language-switcher button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Girdi ve Buton Stilleri */
+        .input-cell {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            width: 100px;
+            text-align: right;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .birim {
+            font-size: 0.9em;
+            color: #6c757d;
+            padding-left: 5px;
+            white-space: nowrap;
+        }
+        .sonuc-satir {
+            background-color: #e8f5e9; 
+            font-weight: bold;
+        }
+        .btn-grup {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .hesapla-btn, .kaydet-btn {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .hesapla-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .kaydet-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* MOBİL UYUMLULUK (Responsive Design) */
+        @media screen and (max-width: 768px) {
+            .btn-grup {
+                flex-direction: column;
+            }
+            table, thead, tbody, th, td, tr { 
+                display: block; 
+            }
+            thead tr { position: absolute; top: -9999px; left: -9999px; }
+            tr { border: 1px solid #ccc; margin-bottom: 8px; border-radius: 5px; }
+            td {
+                border: none; border-bottom: 1px solid #eee; position: relative;
+                padding-left: 55%; text-align: right; min-height: 40px;
+            }
+            td:before { 
+                position: absolute; top: 0; left: 10px; width: 45%; 
+                padding-top: 10px; white-space: nowrap;
+                content: attr(data-label); font-weight: bold; text-align: left; color: #495057;
+            }
+            td:nth-child(2) { display: none; }
+            td:nth-child(4) { display: none; }
+            .input-cell { justify-content: flex-end; padding-top: 5px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="hesaplamaAlani">
+    
+    <div class="language-switcher">
+        <button id="langTR" onclick="setLanguage('tr')" class="active">Türkçe</button>
+        <button id="langEN" onclick="setLanguage('en')">English</button>
+    </div>
+    
+    <h2 id="mainHeading">Ayva Kâr Hesaplama Aracı</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th id="headerOlcut">Ölçüt</th>
+                <th id="headerVarsayim">Varsayım/Hesaplama</th>
+                <th id="headerDeger">Değer</th>
+                <th id="headerBirim">Birim</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td data-label="" id="labelAgacSayisi">Toplam Ağaç Sayısı</td>
+                <td data-label="" id="varsayimAgacSayisi">Tam verime ulaşan ağaç sayısı.</td>
+                <td data-label="" class="input-cell"><input type="number" id="agacSayisi" data-key="agacSayisi" value="1500" onchange="hesapla()"> <span class="birim" id="birimAgac">adet</span></td>
+                <td data-label="Birim">adet</td>
+            </tr>
+            <tr>
+                <td data-label="" id="labelVerim">Ağaç Başı Ortalama Verim</td>
+                <td data-label="" id="varsayimVerim">İyi bakımla ulaşılan verim varsayımı.</td>
+                <td data-label="" class="input-cell"><input type="number" id="verim" data-key="verim" value="50" onchange="hesapla()"> <span class="birim" id="birimVerim">kg/ağaç</span></td>
+                <td data-label="Birim">kg/ağaç</td>
+            </tr>
+            <tr>
+                <td data-label="" id="labelSatisFiyati">Toptan Satış Fiyatı</td>
+                <td data-label="" id="varsayimSatisFiyati">Sizin belirlediğiniz hedef fiyat.</td>
+                <td data-label="" class="input-cell"><input type="number" id="satisFiyati" data-key="satisFiyati" value="30" onchange="hesapla()"> <span class="birim" id="birimSatis">₺/kg</span></td>
+                <td data-label="Birim">₺/kg</td>
+            </tr>
+            <tr>
+                <td data-label="" id="labelGider">Toplam Yıllık Gider</td>
+                <td data-label="" id="varsayimGider">(Gübre, ilaç, işçilik, diğer masraflar)</td>
+                <td data-label="" class="input-cell"><input type="number" id="toplamGider" data-key="toplamGider" value="450000" onchange="hesapla()"> <span class="birim" id="birimGider">₺</span></td>
+                <td data-label="Birim">₺</td>
+            </tr>
+        
+            <tr>
+                <td colspan="4" style="text-align: center; font-weight: bold; background-color: #e0e0e0;" id="labelSonucBaslik">Sonuç</td>
+            </tr>
+
+            <tr class="sonuc-satir">
+                <td data-label="" id="labelUrunMiktari">Toplam Ürün Miktarı</td>
+                <td data-label="Hesaplama" id="hesaplamaUrun"></td>
+                <td data-label="Değer" id="urunMiktari">0</td>
+                <td data-label="Birim">kg</td>
+            </tr>
+            <tr class="sonuc-satir">
+                <td data-label="" id="labelCiro">Brüt Ciro</td>
+                <td data-label="Hesaplama" id="hesaplamaCiro"></td>
+                <td data-label="Değer" id="brutCiro">₺0</td>
+                <td data-label="Birim" id="birimCiro">₺</td>
+            </tr>
+            <tr class="sonuc-satir">
+                <td data-label="" id="labelNetKar">Net Faaliyet Kârı</td>
+                <td data-label="Hesaplama" id="hesaplamaKar"></td>
+                <td data-label="Değer" id="netKar">₺0</td>
+                <td data-label="Birim" id="birimNetKar">₺</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="btn-grup">
+        <button class="hesapla-btn" onclick="hesapla()" id="btnHesapla">Değerleri Kaydet & Hesapla</button>
+        <button class="kaydet-btn" onclick="resimKaydet()" id="btnKaydet">Sonuçları Resim Olarak Kaydet (PNG)</button>
+    </div>
+
+</div>
+
+<script>
+    const inputIds = ['agacSayisi', 'verim', 'satisFiyati', 'toplamGider'];
+    let currentLang = localStorage.getItem('appLang') || 'tr'; // Başlangıç dili TR
+    
+    // Çeviri Sözlüğü
+    const translations = {
+        'tr': {
+            title: "Ayva Kâr Hesaplama Aracı",
+            heading: "Ayva Kâr Hesaplama Aracı",
+            headerOlcut: "Ölçüt", headerVarsayim: "Varsayım/Hesaplama", headerDeger: "Değer", headerBirim: "Birim",
+            labelAgacSayisi: "Toplam Ağaç Sayısı", varsayimAgacSayisi: "Tam verime ulaşan ağaç sayısı.", birimAgac: "adet",
+            labelVerim: "Ağaç Başı Ortalama Verim", varsayimVerim: "İyi bakımla ulaşılan verim varsayımı.", birimVerim: "kg/ağaç",
+            labelSatisFiyati: "Toptan Satış Fiyatı", varsayimSatisFiyati: "Sizin belirlediğiniz hedef fiyat.", birimSatis: "₺/kg",
+            labelGider: "Toplam Yıllık Gider", varsayimGider: "(Gübre, ilaç, işçilik, diğer masraflar)", birimGider: "₺",
+            labelSonucBaslik: "Sonuç", labelUrunMiktari: "Toplam Ürün Miktarı", labelCiro: "Brüt Ciro", labelNetKar: "Net Faaliyet Kârı",
+            currencySymbol: "₺", btnHesapla: "Değerleri Kaydet & Hesapla", btnKaydet: "Sonuçları Resim Olarak Kaydet (PNG)",
+            alertSuccess: "Hesaplama tablosu başarıyla kaydedildi!", alertError: "Resim kaydetme başarısız oldu. Cihazınızın izinlerini kontrol edin. (Dosyayı bir web sunucusu üzerinden çalıştırmak sorunu çözebilir.)",
+            mobileLabelAgacSayisi: "Toplam Ağaç Sayısı", mobileLabelVerim: "Ağaç Başı Verim", mobileLabelSatisFiyati: "Toptan Fiyat", mobileLabelGider: "Toplam Gider", mobileLabelUrunMiktari: "TOPLAM ÜRÜN", mobileLabelCiro: "BRÜT CİRO", mobileLabelNetKar: "NET KÂR"
+        },
+        'en': {
+            title: "Quince Farm Profit Calculator",
+            heading: "Quince Farm Profit Calculator",
+            headerOlcut: "Metric", headerVarsayim: "Assumption/Calculation", headerDeger: "Value", headerBirim: "Unit",
+            labelAgacSayisi: "Total Tree Count", varsayimAgacSayisi: "Number of trees at full yield capacity.", birimAgac: "units",
+            labelVerim: "Average Yield per Tree", varsayimVerim: "Estimated yield with good maintenance.", birimVerim: "kg/tree",
+            labelSatisFiyati: "Wholesale Price", varsayimSatisFiyati: "Your determined target price.", birimSatis: "$/kg",
+            labelGider: "Total Annual Expense", varsayimGider: "(Fertilizer, labor, other costs)", birimGider: "$",
+            labelSonucBaslik: "Results", labelUrunMiktari: "Total Product Amount", labelCiro: "Gross Revenue", labelNetKar: "Net Operating Profit",
+            currencySymbol: "$", btnHesapla: "Save Values & Calculate", btnKaydet: "Save Results as Image (PNG)",
+            alertSuccess: "The calculation table has been saved successfully!", alertError: "Image saving failed. Check your device permissions. (Running the file via a web server might solve the issue.)",
+            mobileLabelAgacSayisi: "Total Tree Count", mobileLabelVerim: "Avg. Yield/Tree", mobileLabelSatisFiyati: "Wholesale Price", mobileLabelGider: "Total Expense", mobileLabelUrunMiktari: "TOTAL PRODUCT", mobileLabelCiro: "GROSS REVENUE", mobileLabelNetKar: "NET PROFIT"
+        }
+    };
+    
+    // Dil Ayarlama Fonksiyonu
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('appLang', lang);
+        const t = translations[lang];
+
+        // Başlıklar
+        document.getElementById('appTitle').textContent = t.title;
+        document.getElementById('mainHeading').textContent = t.heading;
+        document.getElementById('headerOlcut').textContent = t.headerOlcut;
+        document.getElementById('headerVarsayim').textContent = t.headerVarsayim;
+        document.getElementById('headerDeger').textContent = t.headerDeger;
+        document.getElementById('headerBirim').textContent = t.headerBirim;
+        document.getElementById('labelSonucBaslik').textContent = t.labelSonucBaslik;
+
+        // Girdi Etiketleri
+        document.getElementById('labelAgacSayisi').textContent = t.labelAgacSayisi;
+        document.getElementById('varsayimAgacSayisi').textContent = t.varsayimAgacSayisi;
+        document.getElementById('birimAgac').textContent = t.birimAgac;
+        
+        document.getElementById('labelVerim').textContent = t.labelVerim;
+        document.getElementById('varsayimVerim').textContent = t.varsayimVerim;
+        document.getElementById('birimVerim').textContent = t.birimVerim;
+
+        document.getElementById('labelSatisFiyati').textContent = t.labelSatisFiyati;
+        document.getElementById('varsayimSatisFiyati').textContent = t.varsayimSatisFiyati;
+        document.getElementById('birimSatis').textContent = `${t.currencySymbol}/kg`; // Para birimi + kg
+        
+        document.getElementById('labelGider').textContent = t.labelGider;
+        document.getElementById('varsayimGider').textContent = t.varsayimGider;
+        document.getElementById('birimGider').textContent = t.currencySymbol;
+        
+        // Sonuç Etiketleri
+        document.getElementById('labelUrunMiktari').textContent = t.labelUrunMiktari;
+        document.getElementById('labelCiro').textContent = t.labelCiro;
+        document.getElementById('labelNetKar').textContent = t.labelNetKar;
+        document.getElementById('birimCiro').textContent = t.currencySymbol;
+        document.getElementById('birimNetKar').textContent = t.currencySymbol;
+
+        // Butonlar
+        document.getElementById('btnHesapla').textContent = t.btnHesapla;
+        document.getElementById('btnKaydet').textContent = t.btnKaydet;
+
+        // Mobil Etiketler (data-label'ları güncelleme)
+        document.querySelector('tr:nth-child(1) td').dataset.label = t.mobileLabelAgacSayisi;
+        document.querySelector('tr:nth-child(2) td').dataset.label = t.mobileLabelVerim;
+        document.querySelector('tr:nth-child(3) td').dataset.label = t.mobileLabelSatisFiyati;
+        document.querySelector('tr:nth-child(4) td').dataset.label = t.mobileLabelGider;
+        document.querySelector('tr:nth-child(6) td').dataset.label = t.mobileLabelUrunMiktari;
+        document.querySelector('tr:nth-child(7) td').dataset.label = t.mobileLabelCiro;
+        document.querySelector('tr:nth-child(8) td').dataset.label = t.mobileLabelNetKar;
+        
+        // Aktif dil butonunu vurgula
+        document.getElementById('langTR').classList.remove('active');
+        document.getElementById('langEN').classList.remove('active');
+        document.getElementById(`lang${lang.toUpperCase()}`).classList.add('active');
+
+        hesapla(); // Dil değişince hesaplamayı tekrar yaparak para birimini güncelle
+    }
+
+
+    // 3. Hesaplama Fonksiyonu (Para birimi ve formatı dile göre ayarlanmıştır)
+    function hesapla() {
+        const agacSayisi = parseFloat(document.getElementById('agacSayisi').value) || 0;
+        const verim = parseFloat(document.getElementById('verim').value) || 0;
+        const satisFiyati = parseFloat(document.getElementById('satisFiyati').value) || 0;
+        const toplamGider = parseFloat(document.getElementById('toplamGider').value) || 0;
+
+        const urunMiktari = agacSayisi * verim;
+        const brutCiro = urunMiktari * satisFiyati;
+        const netKar = brutCiro - toplamGider;
+        
+        const t = translations[currentLang];
+        const currency = t.currencySymbol;
+        const langCode = currentLang === 'tr' ? 'tr-TR' : 'en-US';
+
+        // Sayı formatlama (Binlik ayracı ekler)
+        const formatNumber = (num) => num.toLocaleString(langCode, { maximumFractionDigits: 0 });
+
+        // Çıktıları DOM'a yaz
+        document.getElementById('urunMiktari').textContent = formatNumber(urunMiktari);
+        document.getElementById('brutCiro').textContent = currency + formatNumber(brutCiro);
+        document.getElementById('netKar').textContent = currency + formatNumber(netKar);
+
+        // Hesaplama formüllerini yaz
+        document.getElementById('hesaplamaUrun').textContent = `${formatNumber(agacSayisi)} ${t.birimAgac} × ${formatNumber(verim)} ${t.birimVerim}`;
+        document.getElementById('hesaplamaCiro').textContent = `${formatNumber(urunMiktari)} kg × ${currency}${formatNumber(satisFiyati)}/kg`;
+        document.getElementById('hesaplamaKar').textContent = `${currency}${formatNumber(brutCiro)} - ${currency}${formatNumber(toplamGider)}`;
+
+        saveValues();
+    }
+
+    // Geri kalan yardımcı fonksiyonlar (loadValues, saveValues, resimKaydet)
+    function loadValues() {
+        inputIds.forEach(id => {
+            const storedValue = localStorage.getItem(id);
+            if (storedValue !== null) {
+                document.getElementById(id).value = storedValue;
+            }
+        });
+        setLanguage(currentLang); // Başlangıçta dili ayarla ve hesapla
+    }
+
+    function saveValues() {
+        inputIds.forEach(id => {
+            const value = document.getElementById(id).value;
+            localStorage.setItem(id, value);
+        });
+    }
+    
+    function resimKaydet() {
+        const inputContainer = document.getElementById('hesaplamaAlani');
+        const btnGrup = document.querySelector('.btn-grup');
+        
+        btnGrup.style.display = 'none'; // Düğmeleri gizle
+        
+        html2canvas(inputContainer, {
+            allowTaint: true,
+            useCORS: true,
+        }).then(canvas => {
+            btnGrup.style.display = 'flex'; // Düğmeleri geri göster
+            
+            const image = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = image;
+            a.download = translations[currentLang].title.replace(/ /g, '_') + '_' + new Date().toLocaleDateString('tr-TR') + '.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            alert(translations[currentLang].alertSuccess);
+        }).catch(err => {
+            btnGrup.style.display = 'flex'; // Hata olsa da geri göster
+            console.error("Resim kaydetme hatası:", err);
+            alert(translations[currentLang].alertError);
+        });
+    }
+
+
+    // Sayfa yüklendiğinde değerleri yükle ve dili ayarla
+    document.addEventListener('DOMContentLoaded', loadValues);
+</script>
+
+</body>
+</html>
