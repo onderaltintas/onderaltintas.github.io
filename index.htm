@@ -55,7 +55,7 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center content within the container */
+            align-items: center;
         }
 
         header {
@@ -64,7 +64,7 @@
             padding: 40px 0 20px;
             text-align: center;
             box-shadow: 0 4px 8px var(--shadow-color);
-            width: 100%; /* Header takes full width */
+            width: 100%;
         }
 
         header h1 {
@@ -102,8 +102,8 @@
 
         .profile-image-wrapper {
             text-align: center;
-            margin-top: 20px; /* Space below the header */
-            margin-bottom: 20px; /* Space above the notices */
+            margin-top: 20px;
+            margin-bottom: 20px;
             position: relative;
             z-index: 10;
             opacity: 0;
@@ -138,7 +138,7 @@
             opacity: 0;
             transform: translateY(20px);
             animation: slideInFromBottom 0.8s forwards 0.8s;
-            width: 100%; /* Section title takes full width */
+            width: 100%;
         }
 
         .card-grid {
@@ -146,7 +146,7 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
             margin-top: 20px;
-            width: 100%; /* Card grid takes full container width */
+            width: 100%;
         }
 
         .card {
@@ -209,8 +209,8 @@
             opacity: 0;
             transform: translateX(-20px);
             animation: slideInFromLeft 0.8s forwards 1s;
-            width: 100%; /* Notices take full container width */
-            box-sizing: border-box; /* Ensure padding doesn't break layout */
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .notice:nth-of-type(2) {
@@ -273,7 +273,7 @@
             opacity: 0;
             transform: translateY(20px);
             animation: slideInFromBottom 0.8s forwards 1.7s;
-            width: 100%; /* Footer takes full container width */
+            width: 100%;
         }
 
         .footer-links h3 {
@@ -301,6 +301,7 @@
             opacity: 0;
             transform: translateY(20px);
             animation: slideInFromBottom 0.8s forwards 1.9s;
+            width: 100%;
         }
 
         .visitor-count h3 {
@@ -524,6 +525,16 @@
         <div class="card-grid">
 
             <div class="card">
+                <a href="./orchard-profitability-planner/index.html">
+                    Orchard Profitability Planner (Quince)
+                    <span class="date">(05.02.2026)</span>
+                </a>
+                <p class="description">
+                    Dual-language (Turkish/English) calculator for estimating Quince farm yield, gross revenue, and net profit.
+                    Remembers last entered values using Local Storage and allows saving results as a PNG image.
+                </p>
+            </div>
+            <div class="card">
                 <a href="https://onderaltintas.github.io/goblin-gladiators-battle-royale/">
                     Goblin Gladiators Battle Royale
                     <span class="date">(02.10.2025)</span>
@@ -541,7 +552,7 @@
                     <span class="date">(08.08.2025)</span>
                 </a>
                 <p class="description">Your own ACNH creature tracker for fishes, bugs, seaCreatures. Turkish language support(defaults) for those who don't understand english.
-                Forked from https://github.com/JenniGee/acnhTracker , added save support(local storage), language, currently active creatures, creatures.json data etc.
+                    Forked from https://github.com/JenniGee/acnhTracker , added save support(local storage), language, currently active creatures, creatures.json data etc.
                 </p>
             </div>
             
@@ -723,13 +734,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
