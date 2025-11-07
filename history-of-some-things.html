@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Zaman Çizgisi — Evren → Dünya → Dinozorlar → İnsanlık</title>
+<style>
+  :root{
+    --bg:#071027;
+    --line-h:8px;
+    --pad:18px;
+    --font-sans: "Segoe UI", Roboto, Arial, sans-serif;
+    --blue:#2b8cff;   /* evren */
+    --green:#28c76f;  /* dünya */
+    --orange:#ff8a3d; /* dinozor */
+    --red:#ff4d6d;    /* insan */
+    --muted:#9aa5b1;
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#020417 0%,var(--bg) 100%);color:#e6eef6;font-family:var(--font-sans);}
+  .wrap{width:calc(100% - 40px);max-width:1400px;margin:24px auto;padding:var(--pad);box-sizing:border-box;}
+  h1{margin:0 0 12px;font-weight:600;font-size:20px;color:#fff}
+  .controls{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  button{background:#0f2938;border:1px solid #203445;color:#d9e6f2;padding:8px 12px;border-radius:8px;cursor:pointer}
+  button:hover{opacity:.95}
+  .muted{color:var(--muted);font-size:13px}
+  .timeline{position:relative;height:160px;padding:20px 0}
+  .line{position:relative;height:var(--line-h);background:#142233;border-radius:6px;overflow:visible;width:100%}
+  .segment{position:absolute;top:50%;transform:translateY(-50%);height:var(--line-h);border-radius:6px}
+  .label{position:absolute;top:calc(50% - 42px);transform:translateX(-50%);font-size:13px;white-space:nowrap}
+  .marker{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 12px rgba(255,255,255,0.06);z-index:20}
+  .playhead{position:absolute;left:0;top:0;width:2px;height:100%;background:rgba(255,255,255,0.06);pointer-events:none;z-index:10}
+  .desc{margin-top:18px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:8px;font-size:14px}
+  .legend{display:flex;gap:14px;margin-top:12px;flex-wrap:wrap}
+  .legitem{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+  .dot{width:12px;height:12px;border-radius:3px}
+  .controls input[type=range]{width:220px}
+  .time-display{margin-left:auto;font-weight:600}
+  .small{font-size:13px;color:var(--muted)}
+  .credit{font-size:12px;color:var(--muted);margin-top:10px}
+  @media (max-width:620px){
+    .controls{flex-direction:column;align-items:flex-start}
+    .time-display{margin-left:0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Zaman Çizgisi: Evren → Dünya → Dinozorlar → İnsanlık</h1>
+
+  <div class="controls">
+    <button id="playBtn">Oynat</button>
+    <button id="pauseBtn">Duraklat</button>
+    <button id="resetBtn">Sıfırla</button>
+    <label class="muted">Toplam Süre (s)</label>
+    <input id="durationRange" type="range" min="8" max="240" value="60">
+    <div class="time-display"><span id="totalTime">60</span>s</div>
+    <label class="muted">Ses</label>
+    <button id="muteBtn">Sessiz</button>
+  </div>
+
+  <div class="timeline" id="timeline">
+    <div class="line" id="line"></div>
+    <div class="playhead" id="playhead" style="left:0%"></div>
+    <div id="marker" class="marker" style="left:0%"></div>
+  </div>
+
+  <div class="desc" id="desc">
+    Başlangıç. Evren doğuyor.
+  </div>
+
+  <div class="legend">
+    <div class="legitem"><div class="dot" style="background:var(--blue)"></div>Evren</div>
+    <div class="legitem"><div class="dot" style="background:var(--green)"></div>Dünya</div>
+    <div class="legitem"><div class="dot" style="background:var(--orange)"></div>Dinozorlar</div>
+    <div class="legitem"><div class="dot" style="background:var(--red)"></div>İnsanlık</div>
+  </div>
+
+  <div class="credit small">Renkler: Evren mavi, Dünya yeşil, Dinozor turuncu, İnsan kırmızı.</div>
+</div>
+
+<script>
+/* Sabitler: kullanıcı verileri */
+const universeAge = 13.75e9; // yıl (13.5-14 aralığının ortası)
+const earthAge = 4.543e9;
+const dinosStartAgo = 245e6;
+const dinosEndAgo = 66e6;
+const humansAgo = 300000;
+
+// Zaman ekseni: 0 = Big Bang, T = bugün
+const T = universeAge;
+
+// BB'den itibaren olay zamanları (yıl)
+const earthFormTime = T - earthAge;
+const dinosStartTime = T - dinosStartAgo;
+const dinosEndTime = T - dinosEndAgo;
+const humansStartTime = T - humansAgo;
+
+const epochs = [
+  { id:'evren', name:'Evren (başlangıç → bugüne kadar)', color:getComputedStyle(document.documentElement).getPropertyValue('--blue').trim() || '#2b8cff', start:0, end:T },
+  { id:'dunya', name:"Dünya", color:getComputedStyle(document.documentElement).getPropertyValue('--green').trim() || '#28c76f', start:earthFormTime, end:T },
+  { id:'dino', name:'Dinozorlar', color:getComputedStyle(document.documentElement).getPropertyValue('--orange').trim() || '#ff8a3d', start:dinosStartTime, end:dinosEndTime },
+  { id:'insan', name:'İnsanlık', color:getComputedStyle(document.documentElement).getPropertyValue('--red').trim() || '#ff4d6d', start:humansStartTime, end:T }
+];
+
+/* DOM */
+const lineEl = document.getElementById('line');
+const timelineEl = document.getElementById('timeline');
+const playheadEl = document.getElementById('playhead');
+const markerEl = document.getElementById('marker');
+const descEl = document.getElementById('desc');
+const totalTimeEl = document.getElementById('totalTime');
+const durationRange = document.getElementById('durationRange');
+const playBtn = document.getElementById('playBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const resetBtn = document.getElementById('resetBtn');
+const muteBtn = document.getElementById('muteBtn');
+
+let totalAnimationSeconds = Number(durationRange.value) || 60;
+totalTimeEl.textContent = totalAnimationSeconds;
+
+durationRange.addEventListener('input',()=>{
+  totalAnimationSeconds = Number(durationRange.value);
+  totalTimeEl.textContent = totalAnimationSeconds;
+});
+
+/* Segmentleri çiz — çizgi tüm genişliği kullanır, sol=BB sağ=bugün */
+function renderSegments(){
+  lineEl.querySelectorAll('.segment').forEach(s=>s.remove());
+  lineEl.querySelectorAll('.label').forEach(l=>l.remove());
+
+  const W = lineEl.clientWidth;
+  epochs.forEach(e=>{
+    const leftPct = (e.start / T) * 100;
+    const rightPct = (e.end / T) * 100;
+    const widthPct = Math.max(rightPct - leftPct, 0.2);
+    const seg = document.createElement('div');
+    seg.className = 'segment';
+    seg.style.left = leftPct + '%';
+    seg.style.width = widthPct + '%';
+    seg.style.background = e.color;
+    seg.style.opacity = 0.95;
+    seg.title = e.name;
+    lineEl.appendChild(seg);
+
+    // labelleri daha sol-sağ okunur şekilde üstte göster
+    const lab = document.createElement('div');
+    lab.className = 'label';
+    lab.style.left = (leftPct + widthPct/2) + '%';
+    lab.textContent = e.id === 'evren' ? `Evren (${(T/1e9).toFixed(2)} milyar yıl)` 
+                   : e.id === 'dunya' ? `Dünya (oluştu: ${(earthAge/1e9).toFixed(3)} milyar yıl önce)` 
+                   : e.id === 'dino' ? `Dinozorlar (${(dinosStartAgo/1e6)|0}M - ${(dinosEndAgo/1e6)|0}M yıl önce)`
+                   : `İnsanlık (~${(humansAgo/1000)|0}k yıl)`;
+    lineEl.appendChild(lab);
+  });
+
+  markerEl.style.left = '0%';
+  playheadEl.style.left = '0%';
+}
+window.addEventListener('resize', renderSegments);
+renderSegments();
+
+/* Yardımcı: format */
+function formatYears(y){
+  y = Math.max(0, Math.round(y));
+  if (y >= 1e9) return (y/1e9).toFixed(3).replace(/\.?0+$/,'') + ' milyar yıl';
+  if (y >= 1e6) return (y/1e6).toFixed(0) + ' milyon yıl';
+  if (y >= 1e3) return (y/1e3).toFixed(0) + ' bin yıl';
+  return y + ' yıl';
+}
+
+/* Animasyon kontrol */
+let rafId = null;
+let running = false;
+let progress = 0; // 0..1
+let startWall = null; // performance.now() referansı
+
+function updateFrame(now){
+  if (startWall === null) startWall = now - progress * totalAnimationSeconds * 1000;
+  const elapsed = (now - startWall) / 1000;
+  progress = Math.min(elapsed / totalAnimationSeconds, 1);
+  const pct = progress * 100;
+  playheadEl.style.left = pct + '%';
+  markerEl.style.left = pct + '%';
+
+  // timeline içindeki "zaman" (BB'den itibaren)
+  const currentTime = progress * T;
+
+  // OLUSTURULMUŞ yaş hesapları (olay bazlı doğru hesaplama)
+  // Dünya yaşı şu an: earthAge. Animasyon ilerledikçe Dünya doğduktan sonra geçen süre:
+  let displayEarthAge = 0;
+  if (currentTime >= earthFormTime) displayEarthAge = Math.min(currentTime - earthFormTime, earthAge);
+  // Dinozorlar: sürecin hangi noktasındayız
+  let inDino = (currentTime >= dinosStartTime && currentTime <= dinosEndTime);
+  let dinoProgressYears = 0;
+  if (currentTime >= dinosStartTime) dinoProgressYears = Math.min(currentTime - dinosStartTime, dinosEndTime - dinosStartTime);
+  // İnsanlık yaşı: insan başlangıç zamanından itibaren geçen süre, maksimum humansAgo
+  let displayHumanAge = 0;
+  if (currentTime >= humansStartTime) displayHumanAge = Math.min(currentTime - humansStartTime, humansAgo);
+
+  // Mesaj mantığı: olayların durumuna göre net ifadeler
+  let message = '';
+  if (currentTime < earthFormTime){
+    // Henüz Dünya yok
+    message = `Evrenin yaşı: ${formatYears(currentTime)} — Dünya henüz oluşmadı.`;
+  } else if (currentTime >= earthFormTime && currentTime < dinosStartTime){
+    message = `Dünya oluştu. Bu anda Dünya'nın yaşı: ${formatYears(displayEarthAge)}.`;
+  } else if (inDino){
+    const into = formatYears(dinoProgressYears);
+    const totalDino = formatYears(dinosEndTime - dinosStartTime);
+    message = `Dinozorlar dönemi. Dönemin ${into} geçti (toplam: ${totalDino}). Dünya'nın yaşı: ${formatYears(displayEarthAge)}.`;
+  } else if (currentTime > dinosEndTime && currentTime < humansStartTime){
+    message = `Dinozorlar sonlandı. Dünya evrimleşiyor. Dünya'nın yaşı: ${formatYears(displayEarthAge)}.`;
+  } else if (currentTime >= humansStartTime){
+    message = `İnsanlık dönemi. İnsanlığın yaşı: ${formatYears(displayHumanAge)}. Dünya'nın yaşı: ${formatYears(displayEarthAge)}.`;
+  } else {
+    message = `Zaman: ${formatYears(currentTime)}`;
+  }
+  descEl.textContent = message;
+
+  // Ses için epoch tetikleyicileri
+  scheduleAudioEvents(currentTime, progress);
+
+  if (progress < 1 && running){
+    rafId = requestAnimationFrame(updateFrame);
+  } else {
+    running = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    startWall = null;
+  }
+}
+
+/* Ses: Web Audio basit motifler */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let isMuted = false;
+muteBtn.addEventListener('click',()=>{
+  isMuted = !isMuted;
+  muteBtn.textContent = isMuted ? 'Ses Aç' : 'Sessiz';
+  if (!isMuted && audioCtx.state === 'suspended') audioCtx.resume();
+});
+function playTone(freq, dur, when=0){
+  if (isMuted) return;
+  const t0 = audioCtx.currentTime + when;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine';
+  o.frequency.value = freq;
+  g.gain.value = 0.0001;
+  o.connect(g); g.connect(audioCtx.destination);
+  g.gain.linearRampToValueAtTime(0.07, t0 + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur - 0.02);
+  o.start(t0);
+  o.stop(t0 + dur);
+}
+
+/* Tetikleme kontrolü — yalnızca bir kez çalacak olaylar */
+let notified = {evren:false,dunya:false,dinoStart:false,dinoEnd:false,insan:false};
+function scheduleAudioEvents(currentTime, progress){
+  const tol = T * 0.0025; // daha hassas tolerans
+  if (!notified.evren && currentTime <= tol){
+    notified.evren = true;
+    playTone(220,0.6);
+  }
+  if (!notified.dunya && Math.abs(currentTime - earthFormTime) <= tol){
+    notified.dunya = true;
+    playTone(330,0.6); playTone(440,0.2,0.08); playTone(550,0.2,0.18);
+  }
+  if (!notified.dinoStart && Math.abs(currentTime - dinosStartTime) <= tol){
+    notified.dinoStart = true;
+    playTone(160,0.9);
+  }
+  if (!notified.dinoEnd && Math.abs(currentTime - dinosEndTime) <= tol){
+    notified.dinoEnd = true;
+    playTone(120,0.9);
+  }
+  if (!notified.insan && Math.abs(currentTime - humansStartTime) <= tol){
+    notified.insan = true;
+    playTone(660,0.6); playTone(880,0.25,0.12);
+  }
+}
+
+/* Kontroller: oynat/duraklat/sıfırla */
+playBtn.addEventListener('click', async ()=>{
+  if (audioCtx.state === 'suspended') await audioCtx.resume();
+  if (!running){
+    running = true;
+    // startWall hesapla böylece progress korunur (sıfırdan veya devam)
+    startWall = performance.now() - progress * totalAnimationSeconds * 1000;
+    rafId = requestAnimationFrame(updateFrame);
+  }
+});
+pauseBtn.addEventListener('click', ()=>{
+  if (running){
+    running = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    // progress korunur, startWall resetlenir (resume hesaplanırken yeniden ayarlanacak)
+    startWall = null;
+  }
+});
+resetBtn.addEventListener('click', ()=>{
+  running = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  progress = 0;
+  startWall = null;
+  notified = {evren:false,dunya:false,dinoStart:false,dinoEnd:false,insan:false};
+  playheadEl.style.left = '0%';
+  markerEl.style.left = '0%';
+  descEl.textContent = 'Başlangıç. Evren doğuyor.';
+});
+
+/* İsteğe bağlı: tıklayınca oynat/duraklat */
+playheadEl.addEventListener('click', ()=> playBtn.click());
+
+/* Başlangıç konsol çıktısı (geliştirici için) */
+console.log("BB'den itibaren (yıl): T=",T);
+console.log("Dünya oluşma zamanı:", earthFormTime);
+console.log("Dinozor başlangıç:", dinosStartTime, "bitiş:", dinosEndTime);
+console.log("İnsan başlangıç:", humansStartTime);
+</script>
+</body>
+</html>
