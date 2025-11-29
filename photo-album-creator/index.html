@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="pageTitle">🖼️ Resim Albümü Oluşturucu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* CSS */
+        #drop-zone {
+            border: 2px dashed #0d6efd;
+            border-radius: 0.5rem;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #drop-zone.dragover {
+            background-color: #e9f7ff;
+        }
+        .image-pool-item {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+            border: 1px solid #ccc;
+            cursor: grab;
+        }
+        .image-pool-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+        .delete-pool-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            font-size: 1.2rem;
+            background-color: rgba(220, 53, 69, 0.8);
+            color: white;
+            border: none;
+            border-radius: 0 0 0 5px;
+        }
+        #album-grid {
+            border: 1px solid #adb5bd;
+            margin: 0 auto;
+        }
+        .album-grid-item {
+            border: 1px dashed #adb5bd;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative; 
+            cursor: pointer; 
+        }
+        .album-grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none; 
+        }
+        .album-grid-item.drag-over {
+            background-color: #f0f0f0;
+        }
+        .album-grid-item.dragging {
+            opacity: 0.5;
+            border: 2px solid #0d6efd;
+        }
+        #album-canvas {
+            display: block;
+            max-width: 100%; 
+            height: auto;
+            margin: 20px auto 0;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h1 class="mb-4" data-i18n="mainHeading">🖼️ Resim Albümü Oluşturucu</h1>
+        
+        <div id="alert-messages" class="mb-3">
+             <div class="alert alert-info" role="alert">
+                <span data-i18n="infoTitle">ℹ️ Çözünürlük:</span> <span data-i18n="infoText">Çıktı, eklenen resimlerin ortalama boyutları temel alınarak satır ve sütun sayısıyla çarpılır. Resimler hücreye tam sığacak şekilde kırpılır.</span>
+                <div id="current-avg-size" class="mt-2"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 data-i18n="uploadHeader">⬆️ Resim Yükleme ve Havuz</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="drop-zone" class="mb-3">
+                            <p class="lead" data-i18n="dropZoneText">Resimleri Buraya Sürükleyin veya Tıklayın</p>
+                            <input type="file" id="file-input" multiple accept="image/*" class="d-none">
+                        </div>
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="button" class="btn btn-danger btn-sm" id="clear-pool-btn" data-i18n="clearPoolBtn">
+                                🗑️ Havuzu Sıfırla (IndexDB Temizle)
+                            </button>
+                        </div>
+                        <p class="mb-2" data-i18n="poolHeader">**Fotoğraf Havuzu** (Sürükleyip Izgaraya Bırakın)</p>
+                        <div id="image-pool" class="border p-2" style="max-height: 300px; overflow-y: auto;">
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 data-i18n="settingsHeader">⚙️ Albüm Ayarları</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="album-settings-form" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="rows" class="form-label" data-i18n="rowsLabel">Satır Sayısı (Row)</label>
+                                <input type="number" class="form-control" id="rows" value="2" min="1">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cols" class="form-label" data-i18n="colsLabel">Sütun Sayısı (Column)</label>
+                                <input type="number" class="form-control" id="cols" value="5" min="1">
+                            </div>
+                            
+                            <div class="col-12 d-flex gap-2">
+                                <button type="button" class="btn btn-primary" id="auto-place-btn" data-i18n="autoPlaceBtn">
+                                    ➡️ Otomatik Yerleştir
+                                </button>
+                                <button type="button" class="btn btn-success" id="generate-album-btn" data-i18n="generateBtn">
+                                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                    Albüm Oluştur & Önizle
+                                </button>
+                                <button type="button" class="btn btn-primary d-none" id="save-album-btn" data-i18n="saveBtn">
+                                    <i class="bi bi-download"></i> Resmi Kaydet
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="reset-preview-btn" data-i18n="resetBtn">
+                                    🔄 Temizle
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 data-i18n="previewHeader">✨ Albüm Önizlemesi</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="album-grid" class="mb-3">
+                            </div>
+                        <div class="text-center">
+                            <canvas id="album-canvas" class="d-none"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- LOCALIZATION (i18n) AYARLARI ---
+        const translations = {
+            'en': {
+                pageTitle: '🖼️ Image Album Creator',
+                mainHeading: '🖼️ Image Album Creator',
+                infoTitle: 'ℹ️ Resolution:',
+                infoText: 'The output resolution is calculated by multiplying the average image dimensions by the number of rows and columns. Images are cropped to fully fill the cell.',
+                uploadHeader: '⬆️ Image Upload and Pool',
+                dropZoneText: 'Drag or Click Here to Upload Images',
+                clearPoolBtn: '🗑️ Clear Pool (Clear IndexDB)',
+                poolHeader: '**Photo Pool** (Drag and Drop onto Grid)',
+                settingsHeader: '⚙️ Album Settings',
+                rowsLabel: 'Rows Count (Row)',
+                colsLabel: 'Columns Count (Column)',
+                autoPlaceBtn: '➡️ Auto Place',
+                generateBtn: 'Generate Album & Preview',
+                saveBtn: 'Save Image',
+                resetBtn: '🔄 Clear Preview',
+                // Alerts
+                confirmClearPool: 'Are you sure you want to delete all images in the photo pool and clear browser data?',
+                alertPoolCleared: 'Pool cleared and database reset.',
+                alertAutoPlaced: 'Images placed in the grid sequentially.',
+                confirmClearPreview: 'Are you sure you want to clear the album preview and Canvas output?',
+                alertPreviewCleared: 'Preview cleared.',
+                alertSaveError: 'Save failed. Canvas content may be empty or a browser error occurred.',
+                alertDBError: '❌ Error: Storage (IndexedDB) could not be opened in your browser. The application may not work.',
+            },
+            'tr': {
+                pageTitle: '🖼️ Resim Albümü Oluşturucu',
+                mainHeading: '🖼️ Resim Albümü Oluşturucu',
+                infoTitle: 'ℹ️ Çözünürlük:',
+                infoText: 'Çıktı, eklenen resimlerin ortalama boyutları temel alınarak satır ve sütun sayısıyla çarpılır. Resimler hücreye tam sığacak şekilde kırpılır.',
+                uploadHeader: '⬆️ Resim Yükleme ve Havuz',
+                dropZoneText: 'Resimleri Buraya Sürükleyin veya Tıklayın',
+                clearPoolBtn: '🗑️ Havuzu Sıfırla (IndexDB Temizle)',
+                poolHeader: '**Fotoğraf Havuzu** (Sürükleyip Izgaraya Bırakın)',
+                settingsHeader: '⚙️ Albüm Ayarları',
+                rowsLabel: 'Satır Sayısı (Row)',
+                colsLabel: 'Sütun Sayısı (Column)',
+                autoPlaceBtn: '➡️ Otomatik Yerleştir',
+                generateBtn: 'Albüm Oluştur & Önizle',
+                saveBtn: 'Resmi Kaydet',
+                resetBtn: '🔄 Temizle',
+                // Alerts
+                confirmClearPool: 'Fotoğraf havuzundaki tüm resimleri ve tarayıcı verilerini silmek istediğinizden emin misiniz?',
+                alertPoolCleared: 'Havuz temizlendi ve veritabanı sıfırlandı.',
+                alertAutoPlaced: 'Resimler ızgaraya sırayla yerleştirildi.',
+                confirmClearPreview: 'Albüm önizlemesini ve Canvas çıktısını temizlemek istediğinizden emin misiniz?',
+                alertPreviewCleared: 'Önizleme temizlendi.',
+                alertSaveError: 'Kaydetme işlemi başarısız. Canvas içeriği boş olabilir veya tarayıcı hatası.',
+                alertDBError: '❌ Hata: Tarayıcınızda depolama (IndexedDB) açılamadı. Uygulama çalışmayabilir.',
+            }
+        };
+
+        const defaultLang = 'tr';
+        // Tarayıcı dilini al, ilk iki harfini kullan ve desteklenmiyorsa varsayılana dön.
+        let userLang = (navigator.language || navigator.userLanguage).substring(0, 2);
+        if (!translations[userLang]) {
+            userLang = defaultLang;
+        }
+
+        // DOM'daki metinleri çeviren fonksiyon
+        function updateText() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[userLang] && translations[userLang][key]) {
+                    // Span ve div içindeki metinler için innerHTML kullanıyoruz (bold vs için)
+                    if (element.tagName === 'P' || element.tagName === 'H5' || element.tagName === 'SPAN' || element.tagName === 'DIV' || element.tagName === 'B') {
+                        element.innerHTML = translations[userLang][key];
+                    } else if (element.tagName === 'INPUT' && element.type === 'button') {
+                         element.value = translations[userLang][key];
+                    } else if (element.tagName === 'BUTTON') {
+                        // Buton içeriğinde emoji de olduğu için innerHTML kullanıyoruz
+                        const span = element.querySelector('span.spinner-border-sm') || ''; // Spinner'ı koru
+                        element.innerHTML = span.outerHTML + translations[userLang][key];
+                    } else {
+                        element.textContent = translations[userLang][key];
+                    }
+                }
+            });
+            // Sayfa başlığını da güncelle
+            document.title = translations[userLang].pageTitle;
+            // HTML dil niteliğini ayarla
+            document.documentElement.lang = userLang;
+        }
+
+        // --- GLOBAL DEĞİŞKENLER VE DOM REFERANSLARI ---
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const imagePool = document.getElementById('image-pool');
+        const rowsInput = document.getElementById('rows');
+        const colsInput = document.getElementById('cols');
+        const generateBtn = document.getElementById('generate-album-btn');
+        const saveBtn = document.getElementById('save-album-btn');
+        const albumGrid = document.getElementById('album-grid');
+        const albumCanvas = document.getElementById('album-canvas');
+        const ctx = albumCanvas.getContext('2d');
+        const avgSizeDisplay = document.getElementById('current-avg-size');
+        
+        const clearPoolBtn = document.getElementById('clear-pool-btn');
+        const autoPlaceBtn = document.getElementById('auto-place-btn');
+        const resetPreviewBtn = document.getElementById('reset-preview-btn');
+        
+        // IndexedDB Ayarları
+        const DB_NAME = 'PhotoAlbumDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'images';
+        let db;
+
+        const PREVIEW_CELL_SIZE = 120; 
+
+        let avgWidth = 400;  
+        let avgHeight = 400; 
+
+        // --- 1. INDEXEDDB İŞLEMLERİ (ASENKRON) ---
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                };
+
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    resolve(db);
+                };
+
+                request.onerror = (e) => {
+                    console.error("IndexedDB açılırken hata:", e.target.error);
+                    reject(e.target.error);
+                };
+            });
+        }
+
+        async function saveImageToDB(data) {
+            if (!db) await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put(data);
+                request.onsuccess = () => resolve();
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function getAllImagesFromDB() {
+            if (!db) await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.getAll();
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+        
+        async function removeImageFromDB(id) {
+            if (!db) await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+        
+        async function clearAllImagesFromDB() {
+            if (!db) await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.clear();
+                request.onsuccess = () => resolve();
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        // --- 1.5. ORTALAMA ORAN HESAPLAMA ---
+
+        async function calculateAverageRatio() {
+            const allImages = await getAllImagesFromDB();
+            
+            if (allImages.length === 0) {
+                avgWidth = 400;
+                avgHeight = 400; 
+                avgSizeDisplay.textContent = `(${translations[userLang].rowsLabel.split('(')[0]}: 400 x ${translations[userLang].colsLabel.split('(')[0]}: 400)`;
+                createAlbumGrid();
+                return;
+            }
+
+            let totalWidth = 0;
+            let totalHeight = 0;
+
+            allImages.forEach(img => {
+                totalWidth += img.width || 0;
+                totalHeight += img.height || 0;
+            });
+
+            avgWidth = Math.floor(totalWidth / allImages.length);
+            avgHeight = Math.floor(totalHeight / allImages.length);
+
+            avgSizeDisplay.textContent = `Ortalama boyut: ${avgWidth} x ${avgHeight}`;
+            
+            createAlbumGrid();
+        }
+
+        // --- 2. YÜKLEME VE HAVUZ OLUŞTURMA ---
+
+        function createPoolItem(data) {
+            const container = document.createElement('div');
+            container.className = 'image-pool-item';
+            container.draggable = true;
+            container.dataset.id = data.id;
+            container.dataset.base64 = data.base64; 
+
+            const img = document.createElement('img');
+            img.src = data.base64;
+            img.alt = 'Havuz Resmi';
+            img.draggable = false;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-danger btn-sm delete-pool-btn';
+            deleteBtn.innerHTML = '&times;';
+            deleteBtn.onclick = async (e) => {
+                e.stopPropagation();
+                await removeImageFromDB(data.id);
+                container.remove();
+                await calculateAverageRatio(); 
+            };
+
+            container.appendChild(img);
+            container.appendChild(deleteBtn);
+            imagePool.appendChild(container);
+            
+            container.addEventListener('dragstart', handleDragStart);
+        }
+        
+        function processFile(file) {
+            if (!file.type.startsWith('image/')) {
+                console.error('Sadece resim dosyaları kabul edilir.');
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                const base64Data = e.target.result;
+                const id = 'img_' + Date.now().toString() + '_' + Math.random().toString(36).substring(2, 9);
+                
+                const img = new Image();
+                img.onload = async () => {
+                    const width = img.width;
+                    const height = img.height;
+                    
+                    const imageData = { id, base64: base64Data, width, height };
+
+                    try {
+                        await saveImageToDB(imageData);
+                        createPoolItem(imageData);
+                        await calculateAverageRatio(); 
+                    } catch (error) {
+                        console.error("Resim IndexedDB'ye kaydedilemedi:", error);
+                        alert(translations[userLang].alertDBError);
+                    }
+                };
+                img.src = base64Data;
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            Array.from(e.target.files).forEach(processFile);
+            fileInput.value = '';
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+
+            if (e.dataTransfer.files) {
+                Array.from(e.dataTransfer.files).forEach(processFile);
+            }
+        });
+
+        // --- 3. ALBÜM IZGARASI OLUŞTURMA VE SÜRÜKLEME ---
+
+        function createAlbumGrid() {
+            const rows = parseInt(rowsInput.value) || 1;
+            const cols = parseInt(colsInput.value) || 1;
+            
+            let previewWidth = avgWidth;
+            let previewHeight = avgHeight;
+            
+            const ratio = previewWidth / previewHeight;
+            
+            if (previewWidth < previewHeight) { 
+                previewWidth = PREVIEW_CELL_SIZE;
+                previewHeight = PREVIEW_CELL_SIZE / ratio;
+            } else { 
+                previewHeight = PREVIEW_CELL_SIZE;
+                previewWidth = PREVIEW_CELL_SIZE * ratio;
+            }
+            
+            previewWidth = Math.min(250, previewWidth);
+            previewHeight = Math.min(250, previewHeight);
+
+            albumGrid.innerHTML = '';
+            
+            const gridWidth = cols * previewWidth;
+            const gridHeight = rows * previewHeight;
+            
+            albumGrid.style.width = `${gridWidth}px`;
+            albumGrid.style.height = `${gridHeight}px`; 
+            albumGrid.style.display = 'grid';
+            albumGrid.style.gridTemplateColumns = `repeat(${cols}, ${previewWidth}px)`;
+            albumGrid.style.gridTemplateRows = `repeat(${rows}, ${previewHeight}px)`;
+            
+            for (let i = 0; i < rows * cols; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'album-grid-item';
+                cell.dataset.index = i;
+                
+                cell.addEventListener('dragstart', handleGridDragStart);
+                cell.addEventListener('dragenter', handleGridDragEnter);
+                cell.addEventListener('dragover', handleGridDragOver);
+                cell.addEventListener('dragleave', handleGridDragLeave);
+                cell.addEventListener('drop', handleGridDrop);
+                cell.addEventListener('dragend', handleGridDragEnd);
+                cell.draggable = true;
+                
+                albumGrid.appendChild(cell);
+            }
+
+            restoreImagesToGrid(); 
+        }
+
+        function restoreImagesToGrid() {
+             const cells = Array.from(albumGrid.children);
+             cells.forEach(cell => {
+                 const existingImg = cell.querySelector('img');
+                 if (existingImg) {
+                     const base64Data = existingImg.src;
+                     cell.innerHTML = '';
+                     const newImg = document.createElement('img');
+                     newImg.src = base64Data;
+                     newImg.draggable = false;
+                     cell.appendChild(newImg);
+                 }
+             });
+        }
+        
+        let draggedCell = null;
+        
+        function handleDragStart(e) {
+            const container = e.target.closest('.image-pool-item');
+            if (container) {
+                e.dataTransfer.setData('pool-data', container.dataset.base64);
+                e.dataTransfer.effectAllowed = 'copy'; 
+            }
+        }
+        
+        function handleGridDragStart(e) {
+            if (!e.currentTarget.querySelector('img')) {
+                e.preventDefault();
+                return;
+            }
+            draggedCell = e.currentTarget;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', draggedCell.innerHTML);
+            e.currentTarget.classList.add('dragging');
+        }
+
+        function handleGridDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            if (e.currentTarget !== draggedCell) {
+                e.currentTarget.classList.add('drag-over');
+            }
+        }
+        
+        function handleGridDragEnter(e) {
+             e.preventDefault();
+        }
+
+        function handleGridDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleGridDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            const poolData = e.dataTransfer.getData('pool-data');
+            const draggedContent = e.dataTransfer.getData('text/html');
+
+            if (poolData) {
+                e.currentTarget.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = poolData;
+                img.draggable = false;
+                e.currentTarget.appendChild(img);
+                
+            } else if (draggedContent && draggedCell !== e.currentTarget) {
+                const targetCell = e.currentTarget;
+                const targetContent = targetCell.innerHTML;
+                
+                targetCell.innerHTML = draggedCell.innerHTML;
+                draggedCell.innerHTML = targetContent;
+            }
+        }
+        
+        function handleGridDragEnd(e) {
+            draggedCell.classList.remove('dragging');
+            draggedCell = null;
+            document.querySelectorAll('.album-grid-item').forEach(cell => {
+                cell.classList.remove('drag-over');
+            });
+        }
+        
+        rowsInput.addEventListener('change', createAlbumGrid);
+        colsInput.addEventListener('change', createAlbumGrid);
+        
+        // --- Ek Özelliklerin Fonksiyonları ---
+
+        clearPoolBtn.addEventListener('click', async () => {
+            if (confirm(translations[userLang].confirmClearPool)) {
+                await clearAllImagesFromDB();
+                imagePool.innerHTML = '';
+                await calculateAverageRatio(); 
+                alert(translations[userLang].alertPoolCleared);
+            }
+        });
+        
+        autoPlaceBtn.addEventListener('click', async () => {
+            const allImages = await getAllImagesFromDB();
+            const cells = Array.from(albumGrid.children);
+            
+            cells.forEach((cell, index) => {
+                cell.innerHTML = ''; 
+                if (index < allImages.length) {
+                    const img = document.createElement('img');
+                    img.src = allImages[index].base64;
+                    img.draggable = false;
+                    cell.appendChild(img);
+                }
+            });
+            alert(translations[userLang].alertAutoPlaced);
+        });
+
+        resetPreviewBtn.addEventListener('click', () => {
+            if (confirm(translations[userLang].confirmClearPreview)) {
+                albumGrid.querySelectorAll('.album-grid-item').forEach(cell => cell.innerHTML = '');
+                albumCanvas.classList.add('d-none');
+                saveBtn.classList.add('d-none');
+                alert(translations[userLang].alertPreviewCleared);
+            }
+        });
+
+        // --- 4. CANVAS ALBÜM OLUŞTURMA VE KAYDETME (Kırpma/Cover mantığı) ---
+
+        function generateAlbum() {
+            generateBtn.disabled = true;
+            generateBtn.querySelector('span.spinner-border-sm').classList.remove('d-none');
+            saveBtn.classList.add('d-none');
+            
+            const rows = parseInt(rowsInput.value) || 1;
+            const cols = parseInt(colsInput.value) || 1;
+            
+            const targetCellWidth = avgWidth;
+            const targetCellHeight = avgHeight;
+
+            const totalWidth = cols * targetCellWidth;
+            const totalHeight = rows * targetCellHeight;
+
+            albumCanvas.width = totalWidth;
+            albumCanvas.height = totalHeight;
+            
+            albumCanvas.style.width = `100%`;
+            albumCanvas.style.height = `auto`;
+            albumCanvas.classList.remove('d-none');
+
+            const cells = Array.from(albumGrid.children);
+            const imagePromises = [];
+
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, totalWidth, totalHeight);
+            
+            cells.forEach((cell, index) => {
+                const imgElement = cell.querySelector('img');
+
+                if (imgElement) {
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous'; 
+                    img.src = imgElement.src;
+                    
+                    const promise = new Promise((resolve) => {
+                        img.onload = () => {
+                            const row = Math.floor(index / cols);
+                            const col = index % cols;
+                            const x = col * targetCellWidth;
+                            const y = row * targetCellHeight;
+                            
+                            let sourceX = 0;
+                            let sourceY = 0;
+                            let sourceWidth = img.width;
+                            let sourceHeight = img.height;
+
+                            const cellRatio = targetCellWidth / targetCellHeight;
+                            const imgRatio = img.width / img.height;
+
+                            if (imgRatio > cellRatio) {
+                                sourceWidth = img.height * cellRatio;
+                                sourceX = (img.width - sourceWidth) / 2;
+                            } else {
+                                sourceHeight = img.width / cellRatio;
+                                sourceY = (img.height - sourceHeight) / 2;
+                            }
+
+                            ctx.drawImage(img, 
+                                sourceX, sourceY, sourceWidth, sourceHeight, 
+                                x, y, targetCellWidth, targetCellHeight);
+                            
+                            resolve();
+                        };
+                        img.onerror = () => resolve();
+                    });
+                    imagePromises.push(promise);
+                }
+            });
+
+            Promise.all(imagePromises).then(() => {
+                generateBtn.disabled = false;
+                generateBtn.querySelector('span.spinner-border-sm').classList.add('d-none');
+                saveBtn.classList.remove('d-none');
+            }).catch(err => {
+                 console.error("Albüm oluşturulurken hata oluştu:", err);
+                 generateBtn.disabled = false;
+                 generateBtn.querySelector('span.spinner-border-sm').classList.add('d-none');
+            });
+        }
+
+        function saveAlbum() {
+            try {
+                 const dataURL = albumCanvas.toDataURL('image/png');
+
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = `resim_albumu_${avgWidth}x${avgHeight}_Toplam.png`;
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e) {
+                alert(translations[userLang].alertSaveError);
+                console.error("Kaydetme hatası:", e);
+            }
+        }
+        
+        generateBtn.addEventListener('click', generateAlbum);
+        saveBtn.addEventListener('click', saveAlbum);
+
+        // Sayfa Yüklendiğinde
+        window.onload = async () => {
+             updateText(); // Önce metinleri çevir
+            try {
+                await openDB();
+                await calculateAverageRatio(); 
+                const images = await getAllImagesFromDB();
+                images.forEach(imgData => createPoolItem(imgData));
+            } catch (error) {
+                document.getElementById('alert-messages').innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                       ${translations[userLang].alertDBError}
+                    </div>
+                `;
+                console.error("Başlangıç yükleme hatası:", error);
+            }
+        };
+
+    </script>
+</body>
+</html>
