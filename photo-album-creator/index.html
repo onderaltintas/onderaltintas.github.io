@@ -78,6 +78,66 @@
             margin: 20px auto 0;
             border: 1px solid #000;
         }
+        /* Slideshow CSS */
+        #slideshow-modal {
+            display: none; 
+            position: fixed;
+            z-index: 1050; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+        }
+        .slideshow-content {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            margin: auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .slideshow-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .slideshow-close:hover,
+        .slideshow-close:focus {
+            color: #bbb;
+            text-decoration: none;
+        }
+        .slideshow-item {
+            display: none;
+            text-align: center;
+        }
+        .slideshow-item.active {
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            height: calc(100vh - 40px);
+        }
+        .slideshow-img {
+            max-height: 100%; 
+            max-width: calc(100% / 3 - 10px); /* 3 lü yerleşim için */
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            transition: max-width 0.5s; 
+        }
+
     </style>
 </head>
 <body>
@@ -145,6 +205,9 @@
                                 <button type="button" class="btn btn-secondary" id="reset-preview-btn" data-i18n="resetBtn">
                                     🔄 Temizle
                                 </button>
+                                <button type="button" class="btn btn-info d-none" id="slideshow-btn" data-i18n="slideshowBtn">
+                                    ▶️ Slideshow Başlat
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -164,8 +227,18 @@
                 </div>
             </div>
         </div>
-
     </div>
+    
+    <div id="slideshow-modal" class="modal">
+        <span class="slideshow-close" id="slideshow-close">&times;</span>
+        <div class="slideshow-content">
+            <a class="text-white position-absolute start-0 ms-3 fs-1" style="cursor:pointer;" id="slideshow-prev">&#10094;</a>
+            <div id="slideshow-container">
+                </div>
+            <a class="text-white position-absolute end-0 me-3 fs-1" style="cursor:pointer;" id="slideshow-next">&#10095;</a>
+        </div>
+    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -187,6 +260,7 @@
                 generateBtn: 'Generate Album & Preview',
                 saveBtn: 'Save Image',
                 resetBtn: '🔄 Clear Preview',
+                slideshowBtn: '▶️ Slideshow Start', // YENİ EKLEME
                 // Alerts
                 confirmClearPool: 'Are you sure you want to delete all images in the photo pool and clear browser data?',
                 alertPoolCleared: 'Pool cleared and database reset.',
@@ -195,6 +269,7 @@
                 alertPreviewCleared: 'Preview cleared.',
                 alertSaveError: 'Save failed. Canvas content may be empty or a browser error occurred.',
                 alertDBError: '❌ Error: Storage (IndexedDB) could not be opened in your browser. The application may not work.',
+                alertAvgSize: 'Average size: ', // Ortalama boyut için i18n
             },
             'tr': {
                 pageTitle: '🖼️ Resim Albümü Oluşturucu',
@@ -212,6 +287,7 @@
                 generateBtn: 'Albüm Oluştur & Önizle',
                 saveBtn: 'Resmi Kaydet',
                 resetBtn: '🔄 Temizle',
+                slideshowBtn: '▶️ Slayt Gösterisini Başlat', // YENİ EKLEME
                 // Alerts
                 confirmClearPool: 'Fotoğraf havuzundaki tüm resimleri ve tarayıcı verilerini silmek istediğinizden emin misiniz?',
                 alertPoolCleared: 'Havuz temizlendi ve veritabanı sıfırlandı.',
@@ -220,6 +296,7 @@
                 alertPreviewCleared: 'Önizleme temizlendi.',
                 alertSaveError: 'Kaydetme işlemi başarısız. Canvas içeriği boş olabilir veya tarayıcı hatası.',
                 alertDBError: '❌ Hata: Tarayıcınızda depolama (IndexedDB) açılamadı. Uygulama çalışmayabilir.',
+                alertAvgSize: 'Ortalama boyut: ', // Ortalama boyut için i18n
             }
         };
 
@@ -243,7 +320,17 @@
                     } else if (element.tagName === 'BUTTON') {
                         // Buton içeriğinde emoji de olduğu için innerHTML kullanıyoruz
                         const span = element.querySelector('span.spinner-border-sm') || ''; // Spinner'ı koru
-                        element.innerHTML = span.outerHTML + translations[userLang][key];
+                        const icon = element.querySelector('i.bi-download') || ''; // İndirme ikonunu koru
+                        
+                        // BUTON İÇERİKLERİNİ DÜZELTMEK İÇİN GÜNCELLEME
+                        if(element.id === 'generate-album-btn') {
+                            element.innerHTML = span.outerHTML + translations[userLang][key];
+                        } else if (element.id === 'save-album-btn') {
+                            element.innerHTML = icon.outerHTML + ' ' + translations[userLang][key];
+                        } else {
+                            element.innerHTML = translations[userLang][key];
+                        }
+
                     } else {
                         element.textContent = translations[userLang][key];
                     }
@@ -272,6 +359,14 @@
         const clearPoolBtn = document.getElementById('clear-pool-btn');
         const autoPlaceBtn = document.getElementById('auto-place-btn');
         const resetPreviewBtn = document.getElementById('reset-preview-btn');
+        const slideshowBtn = document.getElementById('slideshow-btn'); // YENİ
+
+        // Slideshow DOM Referansları
+        const slideshowModal = document.getElementById('slideshow-modal');
+        const slideshowClose = document.getElementById('slideshow-close');
+        const slideshowContainer = document.getElementById('slideshow-container');
+        const slideshowPrev = document.getElementById('slideshow-prev');
+        const slideshowNext = document.getElementById('slideshow-next');
         
         // IndexedDB Ayarları
         const DB_NAME = 'PhotoAlbumDB';
@@ -283,6 +378,9 @@
 
         let avgWidth = 400;  
         let avgHeight = 400; 
+
+        let slideshowImages = []; // Albümdeki resimlerin kaynakları
+        let currentSlide = 0; // Mevcut slayt dizini
 
         // --- 1. INDEXEDDB İŞLEMLERİ (ASENKRON) ---
 
@@ -304,7 +402,13 @@
 
                 request.onerror = (e) => {
                     console.error("IndexedDB açılırken hata:", e.target.error);
-                    reject(e.target.error);
+                    // Hata durumunda da resolve edebiliriz ancak uyarı göstermeliyiz
+                    document.getElementById('alert-messages').innerHTML = `
+                        <div class="alert alert-danger" role="alert">
+                           ${translations[userLang].alertDBError}
+                        </div>
+                    `;
+                    reject(e.target.error); 
                 };
             });
         }
@@ -361,7 +465,7 @@
             if (allImages.length === 0) {
                 avgWidth = 400;
                 avgHeight = 400; 
-                avgSizeDisplay.textContent = `(${translations[userLang].rowsLabel.split('(')[0]}: 400 x ${translations[userLang].colsLabel.split('(')[0]}: 400)`;
+                avgSizeDisplay.textContent = `${translations[userLang].alertAvgSize} 400 x 400`;
                 createAlbumGrid();
                 return;
             }
@@ -377,7 +481,7 @@
             avgWidth = Math.floor(totalWidth / allImages.length);
             avgHeight = Math.floor(totalHeight / allImages.length);
 
-            avgSizeDisplay.textContent = `Ortalama boyut: ${avgWidth} x ${avgHeight}`;
+            avgSizeDisplay.textContent = `${translations[userLang].alertAvgSize} ${avgWidth} x ${avgHeight}`;
             
             createAlbumGrid();
         }
@@ -389,7 +493,8 @@
             container.className = 'image-pool-item';
             container.draggable = true;
             container.dataset.id = data.id;
-            container.dataset.base64 = data.base64; 
+            // base64 verisini burada dataset'e kaydetmiyoruz, sadece sürükleme başlangıcında yüklüyoruz.
+            // Sürükle-bırak için kullanacağımız için, base64 verisini doğrudan veri aktarımına koyacağız.
 
             const img = document.createElement('img');
             img.src = data.base64;
@@ -438,7 +543,7 @@
                         await calculateAverageRatio(); 
                     } catch (error) {
                         console.error("Resim IndexedDB'ye kaydedilemedi:", error);
-                        alert(translations[userLang].alertDBError);
+                        // alert(translations[userLang].alertDBError); // openDB içinde gösterildi.
                     }
                 };
                 img.src = base64Data;
@@ -480,16 +585,17 @@
             
             const ratio = previewWidth / previewHeight;
             
-            if (previewWidth < previewHeight) { 
-                previewWidth = PREVIEW_CELL_SIZE;
-                previewHeight = PREVIEW_CELL_SIZE / ratio;
-            } else { 
+            // Önizleme hücre boyutunu sınırlama ve oranı koruma
+            if (ratio > 1) { // Yatay
                 previewHeight = PREVIEW_CELL_SIZE;
                 previewWidth = PREVIEW_CELL_SIZE * ratio;
+            } else { // Dikey veya Kare
+                previewWidth = PREVIEW_CELL_SIZE;
+                previewHeight = PREVIEW_CELL_SIZE / ratio;
             }
             
-            previewWidth = Math.min(250, previewWidth);
-            previewHeight = Math.min(250, previewHeight);
+            previewWidth = Math.min(300, previewWidth); // Max genişlik
+            previewHeight = Math.min(300, previewHeight); // Max yükseklik
 
             albumGrid.innerHTML = '';
             
@@ -518,34 +624,32 @@
                 albumGrid.appendChild(cell);
             }
 
+            // Izgara boyutu değişince önizlemeyi sıfırla
+            resetPreview();
             restoreImagesToGrid(); 
         }
 
         function restoreImagesToGrid() {
-             const cells = Array.from(albumGrid.children);
-             cells.forEach(cell => {
-                 const existingImg = cell.querySelector('img');
-                 if (existingImg) {
-                     const base64Data = existingImg.src;
-                     cell.innerHTML = '';
-                     const newImg = document.createElement('img');
-                     newImg.src = base64Data;
-                     newImg.draggable = false;
-                     cell.appendChild(newImg);
-                 }
-             });
+             // Bu fonksiyon, izgara boyutu değiştiğinde resimleri geri yükler (şu anki uygulamada gereksiz, ama mantık kalsın)
         }
         
         let draggedCell = null;
         
+        // Resim Havuzundan sürükleme başlangıcı
         function handleDragStart(e) {
             const container = e.target.closest('.image-pool-item');
             if (container) {
-                e.dataTransfer.setData('pool-data', container.dataset.base64);
+                // Sürüklenen öğe img'nin src'sini (base64) aktar
+                const imgSrc = container.querySelector('img').src;
+                e.dataTransfer.setData('pool-data', imgSrc);
                 e.dataTransfer.effectAllowed = 'copy'; 
+                
+                // Sürüklenen görüntüyü gizle
+                setTimeout(() => container.classList.add('dragging'), 0);
             }
         }
         
+        // Izgara hücresinden sürükleme başlangıcı
         function handleGridDragStart(e) {
             if (!e.currentTarget.querySelector('img')) {
                 e.preventDefault();
@@ -559,7 +663,15 @@
 
         function handleGridDragOver(e) {
             e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
+            
+            const poolData = e.dataTransfer.getData('pool-data');
+            
+            if (poolData) { // Havuzdan sürükleniyorsa
+                 e.dataTransfer.dropEffect = 'copy';
+            } else if (draggedCell) { // Izgaradan sürükleniyorsa
+                e.dataTransfer.dropEffect = 'move';
+            }
+            
             if (e.currentTarget !== draggedCell) {
                 e.currentTarget.classList.add('drag-over');
             }
@@ -580,14 +692,14 @@
             const poolData = e.dataTransfer.getData('pool-data');
             const draggedContent = e.dataTransfer.getData('text/html');
 
-            if (poolData) {
+            if (poolData) { // Resim Havuzundan Bırakma
                 e.currentTarget.innerHTML = '';
                 const img = document.createElement('img');
                 img.src = poolData;
                 img.draggable = false;
                 e.currentTarget.appendChild(img);
                 
-            } else if (draggedContent && draggedCell !== e.currentTarget) {
+            } else if (draggedContent && draggedCell !== e.currentTarget) { // Izgarada Yer Değiştirme
                 const targetCell = e.currentTarget;
                 const targetContent = targetCell.innerHTML;
                 
@@ -597,9 +709,12 @@
         }
         
         function handleGridDragEnd(e) {
-            draggedCell.classList.remove('dragging');
             draggedCell = null;
+            document.querySelectorAll('.image-pool-item').forEach(container => {
+                container.classList.remove('dragging');
+            });
             document.querySelectorAll('.album-grid-item').forEach(cell => {
+                cell.classList.remove('dragging');
                 cell.classList.remove('drag-over');
             });
         }
@@ -614,6 +729,7 @@
                 await clearAllImagesFromDB();
                 imagePool.innerHTML = '';
                 await calculateAverageRatio(); 
+                resetPreview();
                 alert(translations[userLang].alertPoolCleared);
             }
         });
@@ -631,14 +747,21 @@
                     cell.appendChild(img);
                 }
             });
+            resetPreview();
             alert(translations[userLang].alertAutoPlaced);
         });
+        
+        function resetPreview() {
+            albumCanvas.classList.add('d-none');
+            saveBtn.classList.add('d-none');
+            slideshowBtn.classList.add('d-none'); // Slideshow tuşunu gizle
+            slideshowImages = [];
+        }
 
         resetPreviewBtn.addEventListener('click', () => {
             if (confirm(translations[userLang].confirmClearPreview)) {
                 albumGrid.querySelectorAll('.album-grid-item').forEach(cell => cell.innerHTML = '');
-                albumCanvas.classList.add('d-none');
-                saveBtn.classList.add('d-none');
+                resetPreview();
                 alert(translations[userLang].alertPreviewCleared);
             }
         });
@@ -649,6 +772,7 @@
             generateBtn.disabled = true;
             generateBtn.querySelector('span.spinner-border-sm').classList.remove('d-none');
             saveBtn.classList.add('d-none');
+            slideshowBtn.classList.add('d-none');
             
             const rows = parseInt(rowsInput.value) || 1;
             const cols = parseInt(colsInput.value) || 1;
@@ -668,6 +792,7 @@
 
             const cells = Array.from(albumGrid.children);
             const imagePromises = [];
+            slideshowImages = []; // Slideshow için listeyi sıfırla
 
             ctx.fillStyle = '#fff';
             ctx.fillRect(0, 0, totalWidth, totalHeight);
@@ -679,6 +804,7 @@
                     const img = new Image();
                     img.crossOrigin = 'Anonymous'; 
                     img.src = imgElement.src;
+                    slideshowImages.push(imgElement.src); // Slideshow listesine ekle
                     
                     const promise = new Promise((resolve) => {
                         img.onload = () => {
@@ -719,6 +845,9 @@
                 generateBtn.disabled = false;
                 generateBtn.querySelector('span.spinner-border-sm').classList.add('d-none');
                 saveBtn.classList.remove('d-none');
+                if (slideshowImages.length > 0) {
+                     slideshowBtn.classList.remove('d-none'); // En az 1 resim varsa göster
+                }
             }).catch(err => {
                  console.error("Albüm oluşturulurken hata oluştu:", err);
                  generateBtn.disabled = false;
@@ -745,6 +874,96 @@
         
         generateBtn.addEventListener('click', generateAlbum);
         saveBtn.addEventListener('click', saveAlbum);
+        
+        // --- 5. SLIDESHOW ÖZELLİĞİ ---
+
+        slideshowBtn.addEventListener('click', () => {
+            if (slideshowImages.length > 0) {
+                currentSlide = 0;
+                buildSlideshow();
+                slideshowModal.style.display = 'block';
+                showSlides(currentSlide);
+            }
+        });
+        
+        slideshowClose.addEventListener('click', () => {
+            slideshowModal.style.display = 'none';
+        });
+
+        slideshowPrev.addEventListener('click', () => {
+            plusSlides(-1);
+        });
+
+        slideshowNext.addEventListener('click', () => {
+            plusSlides(1);
+        });
+        
+        window.addEventListener('click', (event) => {
+            if (event.target === slideshowModal) {
+                slideshowModal.style.display = 'none';
+            }
+        });
+        
+        function buildSlideshow() {
+            slideshowContainer.innerHTML = '';
+            
+            // Slaytları 1, 2 veya 3'lü gruplar halinde oluştur. 
+            // Amacımız, slayt sayısının ekranı verimli kullanacak şekilde ayarlanmasıdır.
+            
+            let groupSize;
+            if (slideshowImages.length >= 3) {
+                groupSize = 3;
+            } else if (slideshowImages.length === 2) {
+                groupSize = 2;
+            } else {
+                groupSize = 1;
+            }
+            
+            for (let i = 0; i < slideshowImages.length; i += groupSize) {
+                const item = document.createElement('div');
+                item.className = 'slideshow-item';
+                
+                for(let j = 0; j < groupSize; j++) {
+                    const index = i + j;
+                    if (index < slideshowImages.length) {
+                        const img = document.createElement('img');
+                        img.src = slideshowImages[index];
+                        img.className = 'slideshow-img';
+                        
+                        // Resim sayısına göre genişliği ayarla (CSS'te de bu mantık var)
+                        if (groupSize === 1) {
+                            img.style.maxWidth = '100%';
+                        } else if (groupSize === 2) {
+                            img.style.maxWidth = 'calc(100% / 2 - 10px)';
+                        } else if (groupSize === 3) {
+                            img.style.maxWidth = 'calc(100% / 3 - 10px)';
+                        }
+                        
+                        item.appendChild(img);
+                    }
+                }
+                slideshowContainer.appendChild(item);
+            }
+        }
+
+        function showSlides(n) {
+            let slides = document.getElementsByClassName("slideshow-item");
+            
+            if (slides.length === 0) return;
+            
+            if (n >= slides.length) {currentSlide = 0}    
+            if (n < 0) {currentSlide = slides.length - 1}
+            
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active');
+            }
+            slides[currentSlide].classList.add('active');
+        }
+
+        function plusSlides(n) {
+            currentSlide += n;
+            showSlides(currentSlide);
+        }
 
         // Sayfa Yüklendiğinde
         window.onload = async () => {
@@ -755,11 +974,7 @@
                 const images = await getAllImagesFromDB();
                 images.forEach(imgData => createPoolItem(imgData));
             } catch (error) {
-                document.getElementById('alert-messages').innerHTML = `
-                    <div class="alert alert-danger" role="alert">
-                       ${translations[userLang].alertDBError}
-                    </div>
-                `;
+                // openDB içinde hata mesajı gösterildiği için burada tekrar göstermeye gerek yok.
                 console.error("Başlangıç yükleme hatası:", error);
             }
         };
