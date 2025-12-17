@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>3D Spiral Bildirim Kartları - Three.js Demo</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background: radial-gradient(circle at top, #101623, #050711 60%, #020308);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #f5f5f5;
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .overlay-ui {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 12px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(10, 10, 20, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      z-index: 10;
+      color: #d7d8ff;
+      pointer-events: none;
+    }
+
+    .overlay-ui span {
+      opacity: 0.8;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #fff, #7dd3fc 45%, transparent 70%);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.9);
+    }
+
+    @media (max-width: 768px) {
+      .overlay-ui {
+        inset-inline: 12px;
+        left: 12px;
+        right: 12px;
+        transform: none;
+        justify-content: space-between;
+        font-size: 10px;
+        gap: 8px;
+      }
+
+      .overlay-ui span:nth-child(3) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div class="overlay-ui">
+    <div class="dot"></div>
+    <span>Fare ile sürükle: Yukarı / aşağı kaydır</span>
+    <span>Mouse wheel / İki parmak pinch: Spiral genişliği</span>
+    <span>Karta tıkla: Vurgu</span>
+  </div>
+
+  <!-- Three.js ES module -->
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.161.0/build/three.module.js';
+
+    // === Temel Three.js kurulum ===
+    const container = document.getElementById('app');
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x050711, 0.06);
+
+    const camera = new THREE.PerspectiveCamera(
+      50,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      100
+    );
+
+    // Kamerayı hafif aşağıdan yukarı bakan bir konuma yerleştir
+    camera.position.set(0, 3, 14);
+    camera.lookAt(0, 6, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0); // arka planı CSS'den al
+    container.appendChild(renderer.domElement);
+
+    // Hafif ortam ışığı + üstten vurgu ışığı
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+    dirLight.position.set(4, 10, 8);
+    scene.add(dirLight);
+
+    // Kartları tek bir grup altında toplayalım ki tüm spiral tek obje gibi dönebilsin
+    const cardsGroup = new THREE.Group();
+    scene.add(cardsGroup);
+
+    // === Dummy JSON kart verisi (50 adet) ===
+    const cardData = Array.from({ length: 50 }).map((_, i) => ({
+      id: i + 1,
+      title: `Bildirim #${i + 1}`,
+      subtitle: `Kategori ${(i % 5) + 1}`,
+      message: `Bu, ${i + 1}. deneme bildirimi. JSON dummy data ile oluşturuldu.`,
+      // 0–1 arası hue, kartlar arasında yumuşak geçiş
+      hue: (i / 50) * 0.9
+    }));
+
+    // === Spiral / sinüs parametreleri ===
+    const CARD_COUNT = cardData.length;
+    const CARD_HEIGHT = 0.9;
+    const CARD_WIDTH = 1.6;
+    const CARD_DEPTH = 0.04;
+
+    const VERTICAL_SPACING = 0.5; // kartlar arası dikey mesafe
+    const FREQUENCY = 0.45;       // sinüs frekansı (y eksenine göre)
+    const MAX_SCROLL = (CARD_COUNT - 1) * VERTICAL_SPACING;
+
+    let amplitude = 0.8;          // başlangıç spiral genişliği
+    const MIN_AMPLITUDE = 0.15;   // en dar durum (kartlar alta doğru üst üste gibi)
+    const MAX_AMPLITUDE = 4.0;    // en geniş spiral
+
+    // Spiral boyunca kaydırma offset'i (fare/touch ile yukarı-aşağı sürükleme)
+    let scrollOffset = 0;
+
+    // Kart verisini saklayacağımız küçük model
+    const cards = [];
+
+    // === Kart geometrisi ve materyalleri ===
+    const cardGeometry = new THREE.BoxGeometry(CARD_WIDTH, CARD_HEIGHT, CARD_DEPTH, 1, 1, 1);
+
+    // Kenarlara hafif parlaklık verecek basit bir shader benzeri etki yerine
+    // normal lambert materyali kullanıp renkleri HSL ile canlı tutalım.
+
+    for (let i = 0; i < CARD_COUNT; i++) {
+      const data = cardData[i];
+      const hue = data.hue; // JSON içindeki hue değeri
+      const color = new THREE.Color().setHSL(hue, 0.7, 0.55);
+
+      const material = new THREE.MeshStandardMaterial({
+        color,
+        roughness: 0.3,
+        metalness: 0.35,
+        emissive: color.clone().multiplyScalar(0.2),
+        emissiveIntensity: 0.65
+      });
+
+      const mesh = new THREE.Mesh(cardGeometry, material);
+      mesh.castShadow = false;
+      mesh.receiveShadow = false;
+
+      // Kartın indeksini mesh üzerinde saklayalım (etkileşim için)
+      mesh.userData.index = i;
+
+      cardsGroup.add(mesh);
+
+      cards.push({
+        mesh,
+        baseHue: hue,
+        targetScale: 1,
+        currentScale: 1,
+      });
+    }
+
+    // === Kartları spiral/sinüs hattına yerleştiren fonksiyon ===
+    function updateCardPositions(time) {
+      for (let i = 0; i < cards.length; i++) {
+        const c = cards[i];
+        const mesh = c.mesh;
+
+        const idx = i;
+
+        // Dikey konum: scrollOffset ile yukarı/aşağı kaydır
+        const y = idx * VERTICAL_SPACING - scrollOffset;
+
+        // Spiral hattı: sin/cos ile tam dairesel değil, hafif eliptik
+        const angle = y * FREQUENCY;
+
+        const radiusX = amplitude;
+        const radiusZ = amplitude * 0.5; // Z biraz daha dar: perspektifte derinlik azalsın
+
+        const x = Math.sin(angle) * radiusX;
+        const z = Math.cos(angle) * radiusZ;
+
+        mesh.position.set(x, y, z);
+
+        // Kartların yönü sabit kalsın: yüzleri her zaman ekrana dönük olsun
+        // (sadece konumları spiral hattı boyunca değişiyor)
+
+        // Kartlar dik dursun, hafif salınım efekti için küçük scale dalgası ekle
+        const wobble = Math.sin(time * 0.002 + idx * 0.35) * 0.04;
+
+        // Ekranın altına yaklaştıkça kartlar küçülsün, yukarı çıktıkça normal boyuta gelsin
+        // Yaklaşık aralık: y ≈ [-4, 12] varsayımıyla 0–1 aralığına map edelim
+        const t = THREE.MathUtils.clamp((y + 4) / 16, 0, 1);
+        const depthScale = 0.1 + 0.8 * t; // altta 0.2x, üstte 1x
+
+        const baseScale = c.targetScale * depthScale;
+
+        c.currentScale += (baseScale + wobble - c.currentScale) * 0.15;
+
+        mesh.scale.set(c.currentScale, c.currentScale, 1.0);
+
+        // Kartın z ekseni kartın tam ortasından geçecek şekilde, dik ve ekrana dönük
+        mesh.rotation.set(0, 0, 0);
+      }
+
+      // Grubu biraz aşağı kaydırarak alt kısmın ekranın alt-ortasında konumlanmasını sağla
+      cardsGroup.position.y = -3.0; // hafif sabit offset
+      cardsGroup.position.z = 0;
+    }
+
+    // === Etkileşim: mouse & touch ===
+    let isDragging = false;
+    let lastPointerX = 0;
+    let lastPointerY = 0;
+
+    // Pinch için
+    let activeTouches = [];
+    let initialPinchDistance = 0;
+    let initialAmplitude = amplitude;
+
+    function screenToRaycaster(x, y) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      const ndcX = ((x - rect.left) / rect.width) * 2 - 1;
+      const ndcY = -((y - rect.top) / rect.height) * 2 + 1;
+
+      const mouse = new THREE.Vector2(ndcX, ndcY);
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
+      return raycaster;
+    }
+
+    function handleCardTap(clientX, clientY) {
+      const raycaster = screenToRaycaster(clientX, clientY);
+      const intersects = raycaster.intersectObjects(cardsGroup.children, false);
+      if (intersects.length > 0) {
+        const hit = intersects[0].object;
+        const idx = hit.userData.index;
+        const card = cards[idx];
+
+        // Vurgu: biraz büyüt ve emmisive'i güçlendir
+        card.targetScale = 1.25;
+        setTimeout(() => {
+          card.targetScale = 1.0;
+        }, 350);
+
+        const mat = hit.material;
+        if (mat && mat.emissive) {
+          const original = mat.emissive.clone();
+          mat.emissive.multiplyScalar(2.0);
+          setTimeout(() => {
+            mat.emissive.copy(original);
+          }, 250);
+        }
+      }
+    }
+
+    // --- Mouse ---
+    renderer.domElement.addEventListener('mousedown', (e) => {
+      if (e.button === 0) {
+        isDragging = true;
+        lastPointerX = e.clientX;
+        lastPointerY = e.clientY;
+      }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (e.button === 0) {
+        isDragging = false;
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dy = e.clientY - lastPointerY;
+      lastPointerY = e.clientY;
+
+      // Dikey sürükleme ile spiral boyunca yukarı/aşağı kaydır
+      const SCROLL_SENSITIVITY = 0.02;
+      scrollOffset = THREE.MathUtils.clamp(
+        scrollOffset + dy * SCROLL_SENSITIVITY,
+        0,
+        MAX_SCROLL
+      );
+    });
+
+    // Kart tıklaması (click)
+    renderer.domElement.addEventListener('click', (e) => {
+      handleCardTap(e.clientX, e.clientY);
+    });
+
+    // Mouse wheel: amplitude değişimi
+    renderer.domElement.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.25 : 0.25;
+      amplitude = THREE.MathUtils.clamp(amplitude + delta, MIN_AMPLITUDE, MAX_AMPLITUDE);
+    }, { passive: false });
+
+    // --- Touch / Pointer ---
+    function updateActiveTouches(touches) {
+      activeTouches = [];
+      for (let i = 0; i < touches.length; i++) {
+        activeTouches.push({
+          id: touches[i].identifier,
+          x: touches[i].clientX,
+          y: touches[i].clientY
+        });
+      }
+    }
+
+    function getPinchDistance() {
+      if (activeTouches.length < 2) return 0;
+      const t0 = activeTouches[0];
+      const t1 = activeTouches[1];
+      const dx = t0.x - t1.x;
+      const dy = t0.y - t1.y;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    renderer.domElement.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      updateActiveTouches(e.touches);
+
+      if (activeTouches.length === 1) {
+        // Tek parmak: yukarı/aşağı kaydırma
+        lastPointerY = activeTouches[0].y;
+      } else if (activeTouches.length === 2) {
+        // İki parmak: pinch start
+        initialPinchDistance = getPinchDistance();
+        initialAmplitude = amplitude;
+      }
+    }, { passive: false });
+
+    renderer.domElement.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      updateActiveTouches(e.touches);
+
+      if (activeTouches.length === 1) {
+        // Tek parmak sürükleme: spiral boyunca kaydırma
+        const t = activeTouches[0];
+        const dy = t.y - lastPointerY;
+        lastPointerY = t.y;
+
+        const SCROLL_SENSITIVITY = 0.02;
+        scrollOffset = THREE.MathUtils.clamp(
+          scrollOffset + dy * SCROLL_SENSITIVITY,
+          0,
+          MAX_SCROLL
+        );
+      } else if (activeTouches.length === 2) {
+        // Pinch zoom: amplitude değişimi
+        const dist = getPinchDistance();
+        if (initialPinchDistance > 0) {
+          const scale = dist / initialPinchDistance;
+          amplitude = THREE.MathUtils.clamp(initialAmplitude * scale, MIN_AMPLITUDE, MAX_AMPLITUDE);
+        }
+      }
+    }, { passive: false });
+
+    renderer.domElement.addEventListener('touchend', (e) => {
+      e.preventDefault();
+
+      // Eğer tek dokunuş kısa sürdüyse tap olarak sayabiliriz
+      if (e.touches.length === 0 && e.changedTouches.length === 1) {
+        const t = e.changedTouches[0];
+        handleCardTap(t.clientX, t.clientY);
+      }
+
+      updateActiveTouches(e.touches);
+
+      if (activeTouches.length < 2) {
+        initialPinchDistance = 0;
+      }
+    }, { passive: false });
+
+    // === Resize ===
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // === Animasyon döngüsü ===
+    let startTime = performance.now();
+
+    function animate() {
+      const now = performance.now();
+      const elapsed = now - startTime;
+
+      // Hafif global animasyon: tüm spiral yavaşça yukarı akıyor gibi hissedilsin
+      const floatOffset = Math.sin(elapsed * 0.00015) * 0.5;
+      cardsGroup.position.y = -3.0 + floatOffset;
+
+      updateCardPositions(elapsed);
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
+
+

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>3D Spiral Kartlar – Mobil Önizleme ve Geliştirici Notları</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050816;
+      --bg-soft: #080c18;
+      --bg-softer: #0d1220;
+      --border-soft: rgba(255, 255, 255, 0.06);
+      --accent: #60a5fa;
+      --accent-soft: rgba(96, 165, 250, 0.16);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --muted-soft: rgba(148, 163, 184, 0.18);
+      --code-bg: #020617;
+      --scrollbar: rgba(148, 163, 184, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(circle at top, #020617, #020617 45%, #000 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 16px 24px;
+      gap: 16px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1120px;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 4fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .header {
+      width: 100%;
+      max-width: 1120px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #f9fafb;
+    }
+
+    .title-block p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .signature {
+      font-size: 11px;
+      text-align: right;
+      color: var(--muted);
+    }
+
+    .signature a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .signature a:hover {
+      text-decoration: underline;
+    }
+
+    .phone-frame {
+      position: relative;
+      margin: 0 auto;
+      width: 360px;
+      max-width: 100%;
+      aspect-ratio: 9 / 19.5;
+      border-radius: 32px;
+      padding: 10px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.35), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(129, 140, 248, 0.4), transparent 60%),
+        radial-gradient(circle at 0% 100%, rgba(251, 191, 36, 0.3), transparent 65%),
+        #020617;
+      box-shadow:
+        0 18px 45px rgba(15, 23, 42, 0.95),
+        0 0 0 1px rgba(148, 163, 184, 0.12);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .phone-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #020617;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 22px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 50% 0, #020617, #000 80%);
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9);
+      z-index: 5;
+    }
+
+    .phone-iframe {
+      position: absolute;
+      inset: 0;
+      top: 32px;
+      bottom: 0;
+      border: none;
+      width: 100%;
+      height: calc(100% - 32px);
+      border-radius: 0 0 24px 24px;
+      background: #000;
+    }
+
+    .phone-label {
+      position: absolute;
+      left: 50%;
+      bottom: 8px;
+      transform: translateX(-50%);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(209, 213, 219, 0.7);
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .phone-hint {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .panel {
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.95));
+      border-radius: 22px;
+      padding: 14px 16px 14px;
+      border: 1px solid var(--border-soft);
+      box-shadow:
+        0 20px 45px rgba(15, 23, 42, 0.8),
+        inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #f9fafb;
+    }
+
+    .pill {
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 10px;
+      color: var(--muted);
+      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.28), transparent 55%);
+      white-space: nowrap;
+    }
+
+    .content {
+      max-height: calc(100vh - 140px);
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .section {
+      margin-bottom: 14px;
+      padding: 10px 10px 9px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(148, 163, 184, 0.22);
+    }
+
+    .section h3 {
+      margin: 0 0 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #e5e7eb;
+    }
+
+    .section p {
+      margin: 0 0 4px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    ul, ol {
+      margin: 4px 0 2px 16px;
+      padding: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 2px 5px;
+      border-radius: 6px;
+      border: 1px solid rgba(30, 64, 175, 0.45);
+      color: #bfdbfe;
+    }
+
+    pre {
+      margin: 6px 0 2px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #020617, #020617 40%, #020617);
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      color: #e5e7eb;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      overflow-x: auto;
+      line-height: 1.4;
+    }
+
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .badge {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(96, 165, 250, 0.5);
+      background: rgba(15, 23, 42, 0.95);
+      color: #bfdbfe;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .footnote {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      border-top: 1px dashed rgba(148, 163, 184, 0.5);
+      padding-top: 6px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--scrollbar);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="title-block">
+      <h1>3D Spiral Kartlar · Mobil Önizleme</h1>
+      <p>Sinüs tabanlı spiral üzerinde etkileşimli bildirim kartları – dokunmatik dostu deneyim.</p>
+    </div>
+    <div class="signature">
+      Geliştirici notları · <strong>Halit YEŞİL</strong><br />
+      <a href="https://halityesil.com" target="_blank" rel="noreferrer">halityesil.com</a>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- Sol: Mobil cihaz önizlemesi -->
+    <section>
+      <div class="phone-frame">
+        <div class="phone-inner">
+          <div class="phone-notch"></div>
+          <!-- Demo: gerçek sahne index.html üzerinden iframe ile gömülüyor -->
+          <iframe
+            class="phone-iframe"
+            src="preview.html"
+            title="3D Spiral Kartlar – Mobil Önizleme"
+          ></iframe>
+          <div class="phone-label">Spiral kart demo · dokun ve sürükle</div>
+        </div>
+      </div>
+      <p class="phone-hint">
+        * Mobilde gerçek boyutta his için bu sayfayı telefon tarayıcısında açabilir veya tarayıcınızın
+        geliştirici araçlarında cihaz simülasyonunu kullanabilirsiniz.
+      </p>
+    </section>
+
+    <!-- Sağ: Geliştirici dokümantasyonu -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Geliştirici Dokümantasyonu</h2>
+        <div class="pill">Three.js · Tek sayfa demo</div>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h3>Mimari Özeti</h3>
+          <p>
+            Uygulama, tek bir <code>preview.html</code> içinde Three.js sahnesi kurar ve bildirim kartlarını
+            dikey eksende uzanan bir sinüs/spiral hattı boyunca konumlandırır. Bu sayfa
+            (<code>preview.html</code>) ise aynı sahneyi mobil bir cihaz çerçevesi içinde
+            <code>&lt;iframe&gt;</code> ile önizleme olarak sunar.
+          </p>
+          <p>
+            Demo; <strong>scrollOffset</strong> ve <strong>amplitude</strong> parametreleri üzerinden
+            sırayla dikey kaydırma ve spiral genişliğini kontrol eder.
+          </p>
+          <div class="badge-row">
+            <span class="badge">Three.js</span>
+            <span class="badge">Pinch &amp; Scroll</span>
+            <span class="badge">Spiral / Sinüs Yörüngesi</span>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Spiral Konumlandırma Mantığı</h3>
+          <p>
+            Her kart için dikey eksen <code>y</code> indekse göre artar, yatay sapma ve derinlik ise sinüs
+            tabanlı bir spiral fonksiyonla hesaplanır:
+          </p>
+          <pre><code>// preview.html içindeki mantığın özeti
+const y = index * VERTICAL_SPACING - scrollOffset;
+const angle = y * FREQUENCY;
+
+const radiusX = amplitude;
+const radiusZ = amplitude * 0.5;
+
+const x = Math.sin(angle) * radiusX;
+const z = Math.cos(angle) * radiusZ;
+
+mesh.position.set(x, y, z);</code></pre>
+          <p>
+            Böylece kartlar, alt tarafta birbirine yakın ve perspektiften dolayı daha dar, yukarı doğru
+            çıktıkça ekranın üst kısmında daha geniş bir spiral izler.
+          </p>
+        </div>
+
+        <div class="section">
+          <h3>Derinlik Hissi &amp; Ölçek Animasyonu</h3>
+          <p>
+            Kartların boyutu, ekranın altından üstüne doğru hareket ederken konumlarına bağlı olarak
+            dinamik değişir. Bu sayede kartlar “geriden gelip büyüyormuş” gibi bir derinlik hissi verir.
+          </p>
+          <pre><code>// Dikey konuma göre ölçekleme ve hafif wobble
+const t = THREE.MathUtils.clamp((y + 4) / 16, 0, 1);
+const depthScale = 0.1 + 0.8 * t;
+
+const wobble = Math.sin(time * 0.002 + index * 0.35) * 0.04;
+const baseScale = targetScale * depthScale;
+
+currentScale += (baseScale + wobble - currentScale) * 0.15;
+mesh.scale.set(currentScale, currentScale, 1.0);</code></pre>
+          <p>
+            <code>depthScale</code> altta ~0.1, üstte ise yaklaşık 0.9–1.0 arasında değişir.
+            <code>wobble</code> parametresi küçük bir salınım ekleyerek sahneyi canlı tutar.
+          </p>
+        </div>
+
+        <div class="section">
+          <h3>Etkileşim: Dikey Sürükleme &amp; Pinch Zoom</h3>
+          <p>
+            Fare ile sol tuş basılı iken yukarı–aşağı sürükleme veya tek parmakla dikey kaydırma,
+            spiral boyunca <code>scrollOffset</code> değerini değiştirir:
+          </p>
+          <pre><code>const SCROLL_SENSITIVITY = 0.02;
+scrollOffset = THREE.MathUtils.clamp(
+  scrollOffset + deltaY * SCROLL_SENSITIVITY,
+  0,
+  MAX_SCROLL
+);</code></pre>
+          <p>
+            İki parmak pinch hareketi veya mouse wheel, spiral genişliğini belirleyen
+            <code>amplitude</code> değerini kontrol eder. En dar durumda tüm kartlar ekranın alt
+            merkezinde üst üste biner gibi görünüp, zoom yaptıkça üst tarafta genişleyen bir sinüs
+            dalgasına dönüşür.
+          </p>
+          <pre><code>// Amplitude güncelleme (wheel / pinch)
+amplitude = THREE.MathUtils.clamp(
+  amplitude * scaleOrDelta,
+  MIN_AMPLITUDE,
+  MAX_AMPLITUDE
+);</code></pre>
+        </div>
+
+        <div class="section">
+          <h3>Dummy Kart JSON Verisi</h3>
+          <p>
+            Kartlar, <strong>50 öğelik</strong> basit bir JSON dizisinden üretilir ve her kartın rengi
+            <code>hue</code> alanı ile HSL tabanlı olarak atanır:
+          </p>
+          <pre><code>// preview.html içinde kullanılan dummy veri
+const cardData = Array.from({ length: 50 }).map((_, i) =&gt; ({
+  id: i + 1,
+  title: `Bildirim #${i + 1}`,
+  subtitle: `Kategori ${(i % 5) + 1}`,
+  message: `Bu, ${i + 1}. deneme bildirimi. JSON dummy data ile oluşturuldu.`,
+  hue: (i / 50) * 0.9
+}));</code></pre>
+          <p>
+            Bu yapı, ileride gerçek API verisine bağlanmak için kolayca genişletilebilir; sadece
+            <code>cardData</code> kaynağı değiştirilerek aynı geometri ve etkileşim korunur.
+          </p>
+        </div>
+
+        <div class="section">
+          <h3>Three.js Kurulumu &amp; Sahne</h3>
+          <p>
+            Demo, harici bir bundler ihtiyacı olmadan, doğrudan tarayıcıda ES module ile Three.js
+            import eder:
+          </p>
+          <pre><code>&lt;script type="module"&gt;
+  import * as THREE from
+    'https://unpkg.com/three@0.161.0/build/three.module.js';
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(
+    50,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+  );
+
+  const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true
+  });
+&lt;/script&gt;</code></pre>
+          <p>
+            Kamera hafifçe aşağıdan yukarı bakan bir açıya yerleştirilir; böylece spiral, ekranda
+            “yukarı doğru çıkan” bir çizgi gibi algılanır.
+          </p>
+        </div>
+
+        <div class="section">
+          <h3>Geliştirici Notları</h3>
+          <p>
+            Bu demo, konsept tasarım ve etkileşim prototipi olarak düşünülmüştür. Üretim ortamı
+            için; performans optimizasyonu, kart içeriklerinin dinamik olarak doldurulması
+            (örneğin bildirim API&apos;lerinden) ve erişilebilirlik (odak yönetimi, ekran okuyucu
+            metinleri vb.) gibi ek katmanlar rahatlıkla üzerine inşa edilebilir.
+          </p>
+          <p class="footnote">
+            Geliştirici notları · <strong>Halit YEŞİL</strong> ·
+            <a href="https://halityesil.com" target="_blank" rel="noreferrer">halityesil.com</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
+
+
