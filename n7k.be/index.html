@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>n7k.be – Ne Yedik Be</title>
+
+<style>
+:root {
+  --bg: #f6f5f2;
+  --card: #ffffff;
+  --text: #1f1f1f;
+  --muted: #6e6e6e;
+  --accent: #111111;
+  --warm: #b55a2a;
+  --radius: 26px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px 80px;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+.brand {
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.brand span {
+  color: var(--warm);
+}
+
+.nav-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.nav-btn.hidden {
+  display: none;
+}
+
+/* LIST */
+.recipe-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 36px;
+}
+
+.recipe-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.recipe-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+}
+
+.recipe-image {
+  width: 100%;
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+}
+
+.recipe-content {
+  padding: 28px;
+}
+
+.recipe-content h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.recipe-content p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* VIEWER */
+.viewer {
+  display: none;
+  height: calc(100vh - 160px);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.viewer iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 60px;
+}
+
+@media (max-width: 768px) {
+  .brand {
+    font-size: 42px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <header>
+    <div class="brand">n7k<span>.be</span></div>
+    <button id="homeBtn" class="nav-btn hidden">Ana Sayfa</button>
+  </header>
+
+  <!-- TARİF LİSTESİ -->
+  <div id="listView" class="recipe-list"></div>
+
+  <!-- IFRAME VIEWER -->
+  <div id="viewer" class="viewer">
+    <iframe id="recipeFrame"></iframe>
+  </div>
+
+  <footer>
+    Ne yedik be • Tarif koleksiyonu
+  </footer>
+
+</div>
+
+<script>
+/*
+  Tarif tanımları
+  Yeni tarif eklemek için sadece buraya obje eklemen yeterli
+*/
+const recipes = [
+  {
+    title: "Avokadolu Scrambled Egg & Havyarlı Ekmek",
+    desc: "Kremamsı yumurta, avokado tabanı ve soğuk havyar.",
+    path: "/Avokadolu-Scrambled-Egg-Havyarlı-Ekmek/",
+    image: "./Avokadolu-Scrambled-Egg-Havyarlı-Ekmek/gorsel.png"
+  },
+  {
+    title: "Mango Sticky Rice",
+    desc: "Michelin referanslı Tay tatlısı.",
+    path: "/Mango-Sticky-Rice-Recipe/",
+    image: "./Mango-Sticky-Rice-Recipe/gorsel.png"
+  },
+  {
+    title: "Pastırmalı – Tulum Peynirli Fırın Domatesli Sandviç",
+    desc: "Yağ, tuz ve asit dengesi üzerine kurulu net sandviç.",
+    path: "/Pastırmalı-Tulum-Peynirli-Fırın-Domatesli-Sandviç/",
+    image: "./Pastırmalı-Tulum-Peynirli-Fırın-Domatesli-Sandviç/gorsel.png"
+  }
+];
+
+const listView = document.getElementById("listView");
+const viewer = document.getElementById("viewer");
+const frame = document.getElementById("recipeFrame");
+const homeBtn = document.getElementById("homeBtn");
+
+function renderList() {
+  listView.innerHTML = "";
+  recipes.forEach(r => {
+    const card = document.createElement("div");
+    card.className = "recipe-card";
+    card.innerHTML = `
+      <div class="recipe-image" style="background-image:url('${r.image}')"></div>
+      <div class="recipe-content">
+        <h2>${r.title}</h2>
+        <p>${r.desc}</p>
+      </div>
+    `;
+    card.onclick = () => openRecipe(r.path);
+    listView.appendChild(card);
+  });
+}
+
+function openRecipe(path) {
+  frame.src = "."+path+"index.html";
+  listView.style.display = "none";
+  viewer.style.display = "block";
+  homeBtn.classList.remove("hidden");
+}
+
+function goHome() {
+  frame.src = "";
+  viewer.style.display = "none";
+  listView.style.display = "grid";
+  homeBtn.classList.add("hidden");
+}
+
+homeBtn.addEventListener("click", goHome);
+
+renderList();
+</script>
+</body>
+</html>

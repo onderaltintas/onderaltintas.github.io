@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mango Sticky Rice – R-Haan Usulü</title>
+
+  <style>
+    :root {
+      --bg: #faf7f2;
+      --text: #2b2b2b;
+      --accent: #f4b400;
+      --soft: #ffffff;
+      --muted: #6b6b6b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+      margin-bottom: 60px;
+    }
+
+    header img {
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+      object-fit: cover;
+    }
+
+    .title-block h1 {
+      font-size: 42px;
+      margin: 0 0 16px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 520px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #000;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    section {
+      background: var(--soft);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    section h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .note {
+      background: #fff6df;
+      border-left: 4px solid var(--accent);
+      padding: 16px 20px;
+      border-radius: 12px;
+      font-size: 15px;
+      color: #3b3b3b;
+      margin-top: 20px;
+    }
+
+    .step {
+      margin-bottom: 22px;
+    }
+
+    .step span {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        grid-template-columns: 1fr;
+      }
+
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .title-block h1 {
+        font-size: 34px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header>
+      <div class="title-block">
+        <div class="badge">Michelin Guide • R-Haan</div>
+        <h1>Mango Sticky Rice</h1>
+        <p class="subtitle">
+          Tayland mutfağının ikonik tatlısı.  
+          Buharda pişirilmiş yapışkan pirinç, hindistancevizi sütü ve olgun mango ile.
+        </p>
+      </div>
+
+      <img src="gorsel.png" alt="Mango Sticky Rice">
+    </header>
+
+    <section>
+      <h2>Malzemeler</h2>
+
+      <div class="two-col">
+        <div>
+          <h3>Yapışkan Pirinç</h3>
+          <ul>
+            <li>250 g yapışkan pirinç (glutinous rice)</li>
+            <li>150 g tam yağlı hindistancevizi sütü</li>
+            <li>110 g şeker</li>
+            <li>6 g tuz</li>
+            <li>1 adet pandan yaprağı (isteğe bağlı)</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>Servis & Sos</h3>
+          <ul>
+            <li>1 adet olgun mango</li>
+            <li>200 g hindistancevizi sütü</li>
+            <li>½ çay kaşığı tuz</li>
+            <li>1 yemek kaşığı pirinç unu</li>
+            <li>Üzeri için: kavrulmuş susam veya çıtır mung fasulyesi</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="note">
+        Pandan yaprağı Türkiye’de bulunamazsa, aroma için  
+        <strong>vanilya çubuğu</strong> veya çok az <strong>limon kabuğu rendesi</strong> kullanılabilir.
+      </div>
+    </section>
+
+    <section>
+      <h2>Hazırlanışı</h2>
+
+      <div class="step">
+        <span>1.</span> Pirinci bol suyla yıkayın ve en az 3 saat suda bekletin.
+      </div>
+
+      <div class="step">
+        <span>2.</span> Pirinci süzüp bez serili buhar sepetinde 45–60 dakika buharda pişirin.
+        Pirinç suda veya sütle pişirilmez.
+      </div>
+
+      <div class="step">
+        <span>3.</span> Hindistancevizi sütü, şeker ve tuzu kısık ateşte ısıtın.
+        Kaynatmayın. Pandan yaprağını bu aşamada ekleyin.
+      </div>
+
+      <div class="step">
+        <span>4.</span> Sıcak pirincin üzerine sıcak süt karışımını dökün.
+        Karıştırın, kapağını kapatın ve pirincin sıvıyı tamamen çekmesini bekleyin.
+      </div>
+
+      <div class="step">
+        <span>5.</span> Ayrı bir tencerede sos için hindistancevizi sütü, tuz ve pirinç ununu
+        karıştırarak hafif koyu kıvam alana kadar pişirin.
+      </div>
+
+      <div class="step">
+        <span>6.</span> Mangoyu dilimleyin. Pirinci tabağa alın, mango ile servis edin.
+        Üzerine sos gezdirin.
+      </div>
+
+      <div class="note">
+        Bu tarifte amaç lapa değil;  
+        <strong>yumuşak ama tane dokusu hissedilen</strong> bir pirinç elde etmektir.
+      </div>
+    </section>
+
+    <footer>
+      Michelin Guide – R-Haan referans alınarak hazırlanmıştır.
+    </footer>
+
+  </div>
+
+  <script>
+    // İleride animasyon veya ölçü dönüştürme eklemek için boş bırakıldı
+  </script>
+</body>
+</html>
