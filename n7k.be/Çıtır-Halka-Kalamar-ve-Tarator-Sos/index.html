@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Çıtır Halka Kalamar & Tarator Sos</title>
+
+  <style>
+    :root {
+      --bg: #f7f6f3;
+      --card: #ffffff;
+      --text: #2a2a2a;
+      --muted: #6e6e6e;
+      --accent: #111111;
+      --gold: #c7a44a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 50px 20px 80px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: center;
+      margin-bottom: 60px;
+    }
+
+    header img {
+      width: 100%;
+      border-radius: 22px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.18);
+    }
+
+    .title h1 {
+      font-size: 42px;
+      margin: 0 0 16px;
+      line-height: 1.2;
+    }
+
+    .title p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #000;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    section {
+      background: var(--card);
+      border-radius: 26px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    section h2 {
+      margin-top: 0;
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .step {
+      margin-bottom: 18px;
+    }
+
+    .step span {
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .note {
+      margin-top: 30px;
+      background: #f3f3f3;
+      border-left: 4px solid var(--gold);
+      padding: 18px 22px;
+      border-radius: 14px;
+      font-size: 15px;
+      color: #333;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 40px;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        grid-template-columns: 1fr;
+      }
+
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .title h1 {
+        font-size: 34px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header>
+      <div class="title">
+        <div class="tag">Çıtır • Deniz Ürünü</div>
+        <h1>Çıtır Halka Kalamar<br>& Tarator Sos</h1>
+        <p>
+          Süt ve karbonatla yumuşatılmış kalamar,
+          kısa sürede kızartılmış ve klasik tarator sos ile servis edilir.
+        </p>
+      </div>
+
+      <img src="gorsel.png" alt="Çıtır Halka Kalamar ve Tarator Sos">
+    </header>
+
+    <section>
+      <h2>Kalamar – Malzemeler</h2>
+      <ul>
+        <li>500 g halka kalamar (donmuş)</li>
+        <li>1 su bardağı süt</li>
+        <li>1 çay kaşığı tuz</li>
+        <li>1 çay kaşığı karbonat</li>
+        <li>1 su bardağı un</li>
+        <li>2 yemek kaşığı mısır nişastası</li>
+        <li>Kızartmak için ayçiçek yağı</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Tarator Sos – Malzemeler</h2>
+      <ul>
+        <li>4 yemek kaşığı süzme yoğurt</li>
+        <li>2 yemek kaşığı mayonez</li>
+        <li>2 yemek kaşığı dövülmüş ceviz</li>
+        <li>1–2 yemek kaşığı bayat ekmek içi</li>
+        <li>1 küçük diş sarımsak (ezilmiş)</li>
+        <li>1–2 yemek kaşığı zeytinyağı</li>
+        <li>1–2 yemek kaşığı limon suyu</li>
+        <li>1 çay kaşığı üzüm veya elma sirkesi</li>
+        <li>Tuz</li>
+        <li>Karabiber</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Hazırlanışı</h2>
+
+      <div class="step">
+        <span>1.</span> Kalamarları buzdolabında çözdür, süz ve kâğıt havluyla iyice kurula.
+      </div>
+
+      <div class="step">
+        <span>2.</span> Süt, tuz ve karbonat ile 20 dakika marine et.
+        Süre sonunda süz, nemini al.
+      </div>
+
+      <div class="step">
+        <span>3.</span> Un ve nişastayı karıştır.
+        Kalamarları hafif nemliyken bu karışıma bulayıp fazla unu silkele.
+      </div>
+
+      <div class="step">
+        <span>4.</span> 180–190 °C yağda, az az olacak şekilde
+        2–2,5 dakika kızart.
+        Kâğıt havlu üzerine al.
+      </div>
+
+      <div class="step">
+        <span>5.</span> Tarator için yoğurt ve mayonezi karıştır.
+        Sarımsak, limon, sirke, ceviz ve ekmek içini ekle.
+        Zeytinyağı, tuz ve karabiberle kıvam ayarla.
+      </div>
+
+      <div class="note">
+        <strong>İpucu:</strong><br>
+        • Kalamar uzun kızartılmaz, sertleşir.<br>
+        • Tuzlama kızartma sonrası yapılabilir.<br>
+        • Tarator servis öncesi 10–15 dk dinlendirilirse lezzeti oturur.
+      </div>
+    </section>
+
+    <footer>
+      Tarif ve sunum ev yapımıdır • Görsel ile birebir uyumludur
+    </footer>
+
+  </div>
+</body>
+</html>
