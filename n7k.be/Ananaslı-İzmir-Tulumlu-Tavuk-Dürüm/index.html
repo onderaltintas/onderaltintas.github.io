@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ananaslı & İzmir Tulumlu Tavuk Dürüm</title>
+
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --card: #ffffff;
+      --text: #2a2a2a;
+      --muted: #6b6b6b;
+      --accent: #111111;
+      --warm: #b55a2a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .container {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 50px 20px 80px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 50px;
+      align-items: center;
+      margin-bottom: 60px;
+    }
+
+    header img {
+      width: 100%;
+      border-radius: 22px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+      object-fit: cover;
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .title h1 {
+      font-size: 42px;
+      margin: 0 0 16px;
+      line-height: 1.2;
+    }
+
+    .title p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 560px;
+    }
+
+    section {
+      background: var(--card);
+      border-radius: 26px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    section h2 {
+      margin-top: 0;
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    ul { padding-left: 20px; }
+    li { margin-bottom: 10px; }
+
+    .step { margin-bottom: 18px; }
+    .step span {
+      font-weight: 700;
+      color: var(--warm);
+    }
+
+    .note {
+      margin-top: 30px;
+      background: #f3f3f3;
+      border-left: 4px solid var(--warm);
+      padding: 18px 22px;
+      border-radius: 14px;
+      font-size: 15px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 40px;
+    }
+
+    @media (max-width: 900px) {
+      header { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .title h1 { font-size: 34px; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <header>
+    <div class="title">
+      <div class="tag">Harlı Ateş • Dürüm • Sokak Yemeği</div>
+      <h1>Ananaslı & İzmir Tulumlu<br>Tavuk Dürüm</h1>
+      <p>
+        Yüksek ateşte mühürlenen tavuk,
+        kontrollü tatlılıkta ananas
+        ve ölçülü İzmir tulumu ile
+        dengeli bir dürüm.
+      </p>
+    </div>
+
+    <img src="gorsel.jpg" alt="Ananaslı İzmir Tulumlu Tavuk Dürüm">
+  </header>
+
+  <section>
+    <h2>Ön Bilgi</h2>
+    <ul>
+      <li>Tavuk lokmalık doğranır, jülyen yapılmaz</li>
+      <li>Ananas en son eklenir</li>
+      <li>Dürüm tavada kilitlenir</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Malzemeler (2 dürüm)</h2>
+    <div class="two-col">
+      <div>
+        <h3>İç Harç</h3>
+        <ul>
+          <li>300 g kemiksiz tavuk kalça</li>
+          <li>1 orta boy soğan</li>
+          <li>Kapya biber (ince jülyen)</li>
+          <li>Taze ananas (küçük küp)</li>
+          <li>Zeytinyağı</li>
+          <li>Tuz, karabiber</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Montaj</h3>
+        <ul>
+          <li>2 adet büyük lavaş</li>
+          <li>İzmir tulumu (10–15 g)</li>
+          <li>Ketçap</li>
+          <li>Mayonez</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pişirme</h2>
+
+    <div class="step">
+      <span>1.</span> Tavayı harlı ateşte iyice kızdır, zeytinyağını ekle.
+    </div>
+
+    <div class="step">
+      <span>2.</span> Tavukları tek kat halinde at, karıştırma.
+      Mühürlenip kendini bırakınca çevir.
+    </div>
+
+    <div class="step">
+      <span>3.</span> Tavukları kenara al. Aynı tavada soğanı orta ateşte öldür,
+      kapya biberi ekle.
+    </div>
+
+    <div class="step">
+      <span>4.</span> Tavukları geri koy, tuzunu ver.
+      En son ananası ekle, 30–60 saniye çevir.
+    </div>
+
+    <div class="note">
+      • Ananas uzun pişmez.<br>
+      • Tavuk sulu kalmalı.
+    </div>
+  </section>
+
+  <section>
+    <h2>Dürümleme</h2>
+
+    <div class="step">
+      <span>5.</span> Lavaşı kuru tavada 10–15 sn ısıt.
+    </div>
+
+    <div class="step">
+      <span>6.</span> Alt ortaya harcı koy, üstüne az miktar İzmir tulumu serp.
+    </div>
+
+    <div class="step">
+      <span>7.</span> Ketçap–mayonez ekle, altı kapat, yanları içe al,
+      sıkı rulo yap.
+    </div>
+
+    <div class="step">
+      <span>8.</span> Ek yeri alta gelecek şekilde tavada 20–30 sn bastır.
+    </div>
+  </section>
+
+  <footer>
+    Dengeli tat, kontrollü malzeme, net teknik.
+  </footer>
+
+</div>
+</body>
+</html>
