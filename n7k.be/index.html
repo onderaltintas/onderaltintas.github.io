@@ -5,26 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="./favicon2.png">
 <title>n7k.be – Ne Yedik Be</title>
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://onderaltintas.github.io/n7k.be/">
-<meta property="og:title" content="Ne Yedik Be • Tarif koleksiyonu">
-<meta property="og:description" content="N7K – Ne Yedik Be, tarif koleksiyonunu keşfet.">
-
-<meta property="og:image" itemprop="image" content="https://onderaltintas.github.io/n7k.be/Wokta-Ananasl%C4%B1-Sweet-Chili-Tavuk/gorsel.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-
-
-<meta property="og:site_name" content="N7K BE!">
-<meta property="og:type" content="website" />
-<meta property="og:image:secure_url" itemprop="image" content="https://onderaltintas.github.io/n7k.be/Wokta-Ananasl%C4%B1-Sweet-Chili-Tavuk/gorsel.png">
-
-
-
-
-<meta name="twitter:card" content="summary_large_image">
-
 <style>
+/* Mevcut stillerine dokunmuyorum, sadece yeni butonlar için küçük eklemeler yapıyorum */
 :root {
   --bg: #f6f5f2;
   --card: #ffffff;
@@ -44,7 +26,6 @@ body {
   color: var(--text);
 }
 
-/* HEADER (STATİK) */
 header {
   position: fixed;
   top: 0;
@@ -69,6 +50,12 @@ header {
   color: var(--warm);
 }
 
+/* Buton grubu için konteyner */
+.nav-group {
+  display: flex;
+  gap: 10px;
+}
+
 .nav-btn {
   background: var(--accent);
   color: #fff;
@@ -79,23 +66,25 @@ header {
   cursor: pointer;
 }
 
+.share-btn {
+  background: var(--warm); /* Paylaş butonu farklılaşsın diye warm rengini verdim */
+}
+
 .nav-btn.hidden {
   display: none;
 }
 
+/* Geri kalan CSS aynı... */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 140px 20px 80px;
 }
-
-/* LIST */
 .recipe-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 36px;
 }
-
 .recipe-card {
   background: var(--card);
   border-radius: var(--radius);
@@ -104,35 +93,28 @@ header {
   cursor: pointer;
   transition: transform .25s ease, box-shadow .25s ease;
 }
-
 .recipe-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 25px 60px rgba(0,0,0,0.15);
 }
-
 .recipe-image {
   width: 100%;
   height: 220px;
   background-size: cover;
   background-position: center;
 }
-
 .recipe-content {
   padding: 28px;
 }
-
 .recipe-content h2 {
   margin: 0 0 12px;
   font-size: 22px;
 }
-
 .recipe-content p {
   margin: 0;
   color: var(--muted);
   font-size: 15px;
 }
-
-/* FULLSCREEN VIEWER */
 .viewer {
   position: fixed;
   top: 80px;
@@ -143,29 +125,20 @@ header {
   background: var(--bg);
   z-index: 900;
 }
-
 .viewer iframe {
   width: 100%;
   height: 100%;
   border: none;
 }
-
-/* FOOTER */
 footer {
   text-align: center;
   color: var(--muted);
   font-size: 14px;
   margin-top: 60px;
 }
-
 @media (max-width: 768px) {
-  header {
-    padding: 0 20px;
-  }
-
-  .brand {
-    font-size: 34px;
-  }
+  header { padding: 0 20px; }
+  .brand { font-size: 34px; }
 }
 </style>
 </head>
@@ -174,90 +147,42 @@ footer {
 
 <header>
   <div class="brand">n7k<span>.be</span></div>
-  <button id="homeBtn" class="nav-btn hidden">Ana Sayfa</button>
+  <div class="nav-group">
+    <button id="shareBtn" class="nav-btn share-btn hidden">Paylaş</button>
+    <button id="homeBtn" class="nav-btn hidden">Ana Sayfa</button>
+  </div>
 </header>
 
 <div class="container">
-
-  <!-- TARİF LİSTESİ -->
   <div id="listView" class="recipe-list"></div>
-
-  <!-- FULLSCREEN IFRAME -->
   <div id="viewer" class="viewer">
     <iframe id="recipeFrame"></iframe>
   </div>
-
   <footer>
     Ne yedik be • Tarif koleksiyonu
   </footer>
-
 </div>
 
 <script>
-/*
-  Tarif tanımları
-*/
 const recipes = [
-  {
-    title: "Avokadolu Scrambled Egg & Havyarlı Ekmek",
-    desc: "Kremamsı yumurta, avokado tabanı ve soğuk havyar.",
-    path: "/Avokadolu-Scrambled-Egg-Havyarlı-Ekmek/",
-    image: "./Avokadolu-Scrambled-Egg-Havyarlı-Ekmek/gorsel.png"
-  },
-  {
-    title: "Mango Sticky Rice",
-    desc: "Michelin referanslı Tay tatlısı.",
-    path: "/Mango-Sticky-Rice-Recipe/",
-    image: "./Mango-Sticky-Rice-Recipe/gorsel.png"
-  },
-  {
-    title: "Pastırmalı – Tulum Peynirli Fırın Domatesli Sandviç",
-    desc: "Yağ, tuz ve asit dengesi üzerine kurulu net sandviç.",
-    path: "/Pastırmalı-Tulum-Peynirli-Fırın-Domatesli-Sandviç/",
-    image: "./Pastırmalı-Tulum-Peynirli-Fırın-Domatesli-Sandviç/gorsel.png"
-  },
-  {
-    title: "Çıtır Halka Kalamar & Tarator Sos",
-    desc: "Kısa kızartılmış kalamar ve klasik tarator.",
-    path: "/Çıtır-Halka-Kalamar-ve-Tarator-Sos/",
-    image: "./Çıtır-Halka-Kalamar-ve-Tarator-Sos/gorsel.png"
-  },
-  {
-    title: "Wokta Ananaslı Sweet Chili Tavuk",
-    desc: "Yüksek ısıda mühürlenmiş, tatlı-acı dengeli wok yemeği.",
-    path: "/Wokta-Ananaslı-Sweet-Chili-Tavuk/",
-    image: "./Wokta-Ananaslı-Sweet-Chili-Tavuk/gorsel.png"
-  },
-  {
-    title: "Ananaslı ve İzmir Tulumlu Tavuk Dürüm",
-    desc: "Yüksek ateşte mühürlenen tavuk, kontrollü tatlılıkta ananas ve ölçülü İzmir tulumu ile dengeli bir dürüm.",
-    path: "/Ananaslı-İzmir-Tulumlu-Tavuk-Dürüm/",
-    image: "./Ananaslı-İzmir-Tulumlu-Tavuk-Dürüm/gorsel.png"
-  },
-  {
-    title: "Dolapta Kalmış Bagetle İzmir Tulumlu Çırpılmış Yumurta ve Dandik Dardanel Siyah Havyar",
-    desc: "Yüksek ateşte mühürlenen tavuk,kontrollü tatlılıkta ananas ve ölçülü İzmir tulumu ile dengeli bir dürüm.",
-    path: "/Dolapta-Kalmış-Bagetle-İzmir-Tulumlu-Çırpılmış-Yumurta-ve-Dandik-Dardanel-Siyah-Havyar/",
-    image: "./Dolapta-Kalmış-Bagetle-İzmir-Tulumlu-Çırpılmış-Yumurta-ve-Dandik-Dardanel-Siyah-Havyar/gorsel.png"
-  },
-  {
-    title: "Bağışıklık Destek Salatası",
-    desc: "Grip döneminde vücudu yormadan, ferah ve dengeli beslenmek için asidite ve yağ oranı kontrollü bir salata.",
-    path: "/Bağışıklık-Destek-Salatası/",
-    image: "./Bağışıklık-Destek-Salatası/gorsel.png"
-  },
-  {
-    title: "Un Helvası",
-    desc: "Un, su, yağ, şeker başka malzeme istemeyen gariban tatlısı Un helvası, gece canınız tatlı isterse diye",
-    path: "/Un-Helvası/",
-    image: "./Un-Helvası/gorsel.png"
-  }
+  { title: "Avokadolu Scrambled Egg & Havyarlı Ekmek", desc: "Kremamsı yumurta, avokado tabanı ve soğuk havyar.", path: "/Avokadolu-Scrambled-Egg-Havyarlı-Ekmek/", image: "./Avokadolu-Scrambled-Egg-Havyarlı-Ekmek/gorsel.png" },
+  { title: "Mango Sticky Rice", desc: "Michelin referanslı Tay tatlısı.", path: "/Mango-Sticky-Rice-Recipe/", image: "./Mango-Sticky-Rice-Recipe/gorsel.png" },
+  { title: "Pastırmalı – Tulum Peynirli Fırın Domatesli Sandviç", desc: "Yağ, tuz ve asit dengesi üzerine kurulu net sandviç.", path: "/Pastırmalı-Tulum-Peynirli-Fırın-Domatesli-Sandviç/", image: "./Pastırmalı-Tulum-Peynirli-Fırın-Domatesli-Sandviç/gorsel.png" },
+  { title: "Çıtır Halka Kalamar & Tarator Sos", desc: "Kısa kızartılmış kalamar ve klasik tarator.", path: "/Çıtır-Halka-Kalamar-ve-Tarator-Sos/", image: "./Çıtır-Halka-Kalamar-ve-Tarator-Sos/gorsel.png" },
+  { title: "Wokta Ananaslı Sweet Chili Tavuk", desc: "Yüksek ısıda mühürlenmiş, tatlı-acı dengeli wok yemeği.", path: "/Wokta-Ananaslı-Sweet-Chili-Tavuk/", image: "./Wokta-Ananaslı-Sweet-Chili-Tavuk/gorsel.png" },
+  { title: "Ananaslı ve İzmir Tulumlu Tavuk Dürüm", desc: "Yüksek ateşte mühürlenen tavuk, kontrollü tatlılıkta ananas ve ölçülü İzmir tulumu ile dengeli bir dürüm.", path: "/Ananaslı-İzmir-Tulumlu-Tavuk-Dürüm/", image: "./Ananaslı-İzmir-Tulumlu-Tavuk-Dürüm/gorsel.png" },
+  { title: "Dolapta Kalmış Bagetle İzmir Tulumlu Çırpılmış Yumurta ve Dandik Dardanel Siyah Havyar", desc: "Yüksek ateşte mühürlenen tavuk,kontrollü tatlılıkta ananas ve ölçülü İzmir tulumu ile dengeli bir dürüm.", path: "/Dolapta-Kalmış-Bagetle-İzmir-Tulumlu-Çırpılmış-Yumurta-ve-Dandik-Dardanel-Siyah-Havyar/", image: "./Dolapta-Kalmış-Bagetle-İzmir-Tulumlu-Çırpılmış-Yumurta-ve-Dandik-Dardanel-Siyah-Havyar/gorsel.png" },
+  { title: "Bağışıklık Destek Salatası", desc: "Grip döneminde vücudu yormadan, ferah ve dengeli beslenmek için asidite ve yağ oranı kontrollü bir salata.", path: "/Bağışıklık-Destek-Salatası/", image: "./Bağışıklık-Destek-Salatası/gorsel.png" },
+  { title: "Un Helvası", desc: "Un, su, yağ, şeker başka malzeme istemeyen gariban tatlısı Un helvası, gece canınız tatlı isterse diye", path: "/Un-Helvası/", image: "./Un-Helvası/gorsel.png" }
 ];
 
 const listView = document.getElementById("listView");
 const viewer = document.getElementById("viewer");
 const frame = document.getElementById("recipeFrame");
 const homeBtn = document.getElementById("homeBtn");
+const shareBtn = document.getElementById("shareBtn");
+
+let currentRecipePath = "";
 
 function renderList() {
   listView.innerHTML = "";
@@ -277,20 +202,57 @@ function renderList() {
 }
 
 function openRecipe(path) {
+  currentRecipePath = path;
   frame.src = "." + path + "index.html";
   listView.style.display = "none";
   viewer.style.display = "block";
   homeBtn.classList.remove("hidden");
+  shareBtn.classList.remove("hidden");
 }
 
 function goHome() {
+  // Geri döndüğümüzde URL parametresini temizleyelim
+  const url = new URL(window.location);
+  url.searchParams.delete('shared');
+  window.history.replaceState({}, '', url);
+
   frame.src = "";
   viewer.style.display = "none";
   listView.style.display = "grid";
   homeBtn.classList.add("hidden");
+  shareBtn.classList.add("hidden");
 }
 
+function copyShareLink() {
+  // Path'ten başındaki ve sonundaki slash'ları temizleyip query'e uygun hale getirelim
+  const slug = currentRecipePath.replace(/\//g, '');
+  const shareUrl = `${window.location.origin}${window.location.pathname}?shared=${slug}`;
+  
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    const originalText = shareBtn.innerText;
+    shareBtn.innerText = "Kopyalandı!";
+    setTimeout(() => {
+      shareBtn.innerText = originalText;
+    }, 2000);
+  });
+}
+
+// Sayfa yüklendiğinde parametre kontrolü
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedRecipe = urlParams.get('shared');
+  
+  if (sharedRecipe) {
+    // Tarif listesinde eşleşen path'i bulalım
+    const recipe = recipes.find(r => r.path.includes(sharedRecipe));
+    if (recipe) {
+      openRecipe(recipe.path);
+    }
+  }
+});
+
 homeBtn.addEventListener("click", goHome);
+shareBtn.addEventListener("click", copyShareLink);
 
 renderList();
 </script>
