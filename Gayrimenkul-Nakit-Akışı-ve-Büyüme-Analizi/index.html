@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gayrimenkul Nakit Akışı Analizi</title>
+    <style>
+        :root {
+            --primary: #34495e;
+            --secondary: #2980b9;
+            --accent: #27ae60;
+            --border: #dee2e6;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        .input-card {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            background: #fdfdfd;
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        .input-field {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        button {
+            grid-column: 1 / -1;
+            padding: 12px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #1f6391;
+        }
+        .summary-box {
+            display: none;
+            padding: 15px;
+            background: #eef7ff;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--secondary);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            display: none;
+            font-size: 0.9rem;
+        }
+        th {
+            background-color: #f1f3f5;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .acquisition-row {
+            background-color: #f0fff4 !important;
+            font-weight: bold;
+        }
+        .badge {
+            background-color: var(--accent);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        .stat-val {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Gayrimenkul Nakit Akışı Analizi</h1>
+    
+    <div class="input-card">
+        <div class="input-field">
+            <label>Mevcut Mülk Sayısı</label>
+            <input type="number" id="currentHomes" value="10">
+        </div>
+        <div class="input-field">
+            <label>Mülk Fiyatı (₺)</label>
+            <input type="number" id="homePrice" value="3000000">
+        </div>
+        <div class="input-field">
+            <label>Mülk Başı Aylık Kira (₺)</label>
+            <input type="number" id="monthlyRent" value="16666">
+        </div>
+        <div class="input-field">
+            <label>Analiz Süresi (Yıl)</label>
+            <input type="number" id="years" value="10">
+        </div>
+        <button onclick="runAnalysis()">Analizi Çalıştır</button>
+    </div>
+
+    <div id="summary" class="summary-box"></div>
+
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Ay</th>
+                <th>Toplam Mülk</th>
+                <th>Aylık Toplam Kira</th>
+                <th>Kasa (Kümülatif)</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    function runAnalysis() {
+        const initialHomes = parseInt(document.getElementById('currentHomes').value);
+        const price = parseFloat(document.getElementById('homePrice').value);
+        const rentPerHome = parseFloat(document.getElementById('monthlyRent').value);
+        const totalMonths = parseInt(document.getElementById('years').value) * 12;
+
+        let currentHomes = initialHomes;
+        let cashPool = 0;
+        let tableRows = '';
+        let newAcquisitions = 0;
+
+        for (let month = 1; month <= totalMonths; month++) {
+            let currentMonthlyIncome = currentHomes * rentPerHome;
+            cashPool += currentMonthlyIncome;
+            
+            let actionText = "";
+            let rowStyle = "";
+
+            if (cashPool >= price) {
+                currentHomes++;
+                newAcquisitions++;
+                cashPool -= price;
+                actionText = `<span class="badge">+1 Mülk Alındı</span>`;
+                rowStyle = "acquisition-row";
+            }
+
+            tableRows += `<tr class="${rowStyle}">
+                <td>${month}</td>
+                <td>${currentHomes}</td>
+                <td>${currentMonthlyIncome.toLocaleString('tr-TR')} ₺</td>
+                <td>${cashPool.toLocaleString('tr-TR')} ₺</td>
+                <td>${actionText}</td>
+            </tr>`;
+        }
+
+        document.getElementById('tableBody').innerHTML = tableRows;
+        document.getElementById('resultsTable').style.display = 'table';
+        
+        const summary = document.getElementById('summary');
+        summary.style.display = 'block';
+        summary.innerHTML = `
+            <strong>Özet:</strong> ${totalMonths / 12} yıl sonunda toplam <span class="stat-val">${currentHomes}</span> mülke ulaştınız. 
+            Sadece kira gelirleriyle <span class="stat-val">${newAcquisitions}</span> adet yeni mülk eklendi. 
+            Dönem sonu aylık gelir: <span class="stat-val">${(currentHomes * rentPerHome).toLocaleString('tr-TR')} ₺</span>
+        `;
+    }
+</script>
+</body>
+</html>
