@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Üç Lezzetli Sushi: Sıfırdan Yüze Detaylı Tarif</title>
+
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --card: #ffffff;
+      --text: #2a2a2a;
+      --muted: #6b6b6b;
+      --accent: #111111;
+      --warm: #b55a2a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .container {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 50px 20px 80px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 50px;
+      align-items: center;
+      margin-bottom: 60px;
+    }
+
+    header img {
+      width: 100%;
+      border-radius: 22px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+      object-fit: cover;
+    }
+
+    .title h1 {
+      font-size: 42px;
+      margin: 0 0 16px;
+      line-height: 1.2;
+    }
+
+    .title p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 560px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    section {
+      background: var(--card);
+      border-radius: 26px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    section h2 {
+      margin-top: 0;
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .step {
+      margin-bottom: 18px;
+    }
+
+    .step span {
+      font-weight: 700;
+      color: var(--warm);
+    }
+
+    .note {
+      margin-top: 30px;
+      background: #f3f3f3;
+      border-left: 4px solid var(--warm);
+      padding: 18px 22px;
+      border-radius: 14px;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .recipe-header {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 30px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .recipe-header img {
+      width: 100%;
+      border-radius: 15px;
+      object-fit: cover;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 40px;
+    }
+
+    @media (max-width: 900px) {
+      header, .recipe-header {
+        grid-template-columns: 1fr;
+      }
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header>
+      <div class="title">
+        <div class="tag">Detaylı Rehber • Pişirme Yok • Ev Yapımı</div>
+        <h1>Üç Lezzetli Sushi:<br>Sıfırdan Yüze Detaylı Tarif</h1>
+        <p>
+          Konserve ton balığı ve surimi kullanarak, ev ortamında 
+          gastronomik bir sushi deneyimi oluşturmanın teknik yolu.
+        </p>
+      </div>
+      <img src="genel_sushi.png" alt="Sushi Sunum">
+    </header>
+
+    <section>
+      <h2>Temel Hazırlık: Sushi Pirinci</h2>
+      <p>Pirincin dokusu, sushinin en kritik elementidir. Doğru nişasta dengesi ve ısıl işlem şarttır.</p>
+      
+      <div class="two-col">
+        <div>
+          <h3>Malzemeler</h3>
+          <ul>
+            <li>2 su bardağı sushi pirinci (veya baldo)</li>
+            <li>2.5 su bardağı su</li>
+            <li>4 YK pirinç sirkesi</li>
+            <li>2 YK toz şeker</li>
+            <li>2 çay kaşığı tuz</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Yapılışı</h3>
+          <div class="step"><span>1.</span> Pirinci suyu tamamen şeffaf olana dek yıkayın. Tencereye alıp üzerine suyu ekleyin ve 15 dk dinlendirin.</div>
+          <div class="step"><span>2.</span> Önce yüksek ateşte kaynatın, kaynayınca kapağı kapatıp en kısık ateşte 12 dk pişirin. Ateşi kapatıp 10 dk demlendirin.</div>
+          <div class="step"><span>3.</span> Sirke, şeker ve tuzu karıştırın. Pirinci geniş bir kaba alıp sosu üzerine dökün; ezmeden karıştırıp oda sıcaklığına getirin.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="recipe-header">
+        <div>
+          <h2>1. California Roll</h2>
+          <p>Surimi ve avokadonun kremsi uyumu, susamın çıtırlığıyla birleşir.</p>
+          <h3>Malzemeler</h3>
+          <ul>
+            <li>2-3 adet surimi (boylamasına ikiye bölünmüş)</li>
+            <li>Çeyrek avokado (ince dilimlenmiş)</li>
+            <li>2 adet uzun salatalık şeridi (çekirdeksiz kısımdan)</li>
+            <li>1 tatlı kaşığı mayonez ve kavrulmuş susam</li>
+          </ul>
+        </div>
+        <img src="gorsel1.png" alt="California Roll">
+      </div>
+      <h3>Hazırlanış & Diziliş</h3>
+      <div class="step"><span>Sıralama:</span> Yosun üzerine pirinci ince yay, susam serp ve ters çevir. Yosun üste gelsin. Tam ortaya boydan boya mayonez çek. Üzerine surimi, avokado ve salatalığı dizip matla sıkıca sar.</div>
+    </section>
+
+    <section>
+      <div class="recipe-header">
+        <div>
+          <h2>2. Philadelphia Roll</h2>
+          <p>Krem peynir ve süzülmüş ton balığının yumuşak içimli kombinasyonu.</p>
+          <h3>Malzemeler</h3>
+          <ul>
+            <li>2 YK Dardanel ton balığı (yağı tamamen süzülmüş)</li>
+            <li>2 YK krem peynir</li>
+            <li>Salatalık ve avokado şeritleri</li>
+          </ul>
+        </div>
+        <img src="gorsel2.png" alt="Philadelphia Roll">
+      </div>
+      <h3>Hazırlanış & Diziliş</h3>
+      <div class="step"><span>Sıralama:</span> Yosuna pirinci yay (üstte 2 cm boşluk bırak). Ortaya kesintisiz bir hat halinde krem peyniri sür. Peynirin üzerine ton balığını ve sebze şeritlerini diz. Boş yosun ucunu ıslatıp rulo yap.</div>
+    </section>
+
+    <section>
+      <div class="recipe-header">
+        <div>
+          <h2>3. Spicy & Creamy Tuna Roll</h2>
+          <p>Taze soğan ve mayonez harcıyla zenginleştirilmiş gurme rulo.</p>
+          <h3>Malzemeler</h3>
+          <ul>
+            <li>3 YK ton balığı + 1 YK mayonez + acı sos karışımı</li>
+            <li>1 dal taze soğan (yeşil kısmı, uzun şerit)</li>
+            <li>İnce havuç şeritleri</li>
+          </ul>
+        </div>
+        <img src="gorsel3.png" alt="Spicy Tuna Roll">
+      </div>
+      <h3>Hazırlanış & Diziliş</h3>
+      <div class="step"><span>Sıralama:</span> Hazırladığın mayonezli ton balığı harcını pirinçli yosunun ortasına yay. İçine havuçları göm ve en üste taze soğan dallarını boydan boya yerleştirip sar.</div>
+    </section>
+
+    <section>
+      <h2>Genel Teknik Notlar</h2>
+      <div class="note">
+        • <strong>Kesim:</strong> Bıçağı her dilimde ıslatın; aksi halde pirinç yapışır ve rulo dağılır.<br>
+        • <strong>Nem Kontrolü:</strong> Salatalığın sulu iç kısmını asla kullanmayın. Ton balığının yağını kağıt havluyla iyice alın.<br>
+        • <strong>Isı:</strong> Pirinç asla sıcak kullanılmaz; yosunu anında haşlar ve lastikleştirir.
+      </div>
+    </section>
+
+    <footer>
+      Teknik hassasiyet, malzemenin önüne geçer. Afiyet olsun.
+    </footer>
+
+  </div>
+</body>
+</html>
