@@ -130,6 +130,28 @@
       object-fit: cover;
     }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .total-row {
+      background: #f9f9f9;
+      font-weight: 700;
+    }
+
     footer {
       text-align: center;
       font-size: 14px;
@@ -240,6 +262,42 @@
       </div>
       <h3>Hazırlanış & Diziliş</h3>
       <div class="step"><span>Sıralama:</span> Hazırladığın mayonezli ton balığı harcını pirinçli yosunun ortasına yay. İçine havuçları göm ve en üste taze soğan dallarını boydan boya yerleştirip sar.</div>
+    </section>
+
+    <section>
+      <h2>Kalori ve Besin Değerleri</h2>
+      <p>Porsiyon başına (1 rulo / 8 dilim) yaklaşık değerler:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Sushi Çeşidi</th>
+            <th>Ana Malzemeler</th>
+            <th>Kalori (8 Dilim)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>California Roll</td>
+            <td>Surimi, Avokado, Mayonez</td>
+            <td>~310 kcal</td>
+          </tr>
+          <tr>
+            <td>Philadelphia Roll</td>
+            <td>Ton Balığı, Krem Peynir</td>
+            <td>~350 kcal</td>
+          </tr>
+          <tr>
+            <td>Spicy Tuna Roll</td>
+            <td>Ton Balığı, Mayonez, Acı Sos</td>
+            <td>~340 kcal</td>
+          </tr>
+          <tr class="total-row">
+            <td>TOPLAM MENÜ</td>
+            <td>24 Dilim Toplamı</td>
+            <td>~1000 kcal</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
     <section>
