@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ege Esintisi: İzmir Tulumlu Gurme Menü</title>
+
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --card: #ffffff;
+      --text: #2a2a2a;
+      --muted: #6b6b6b;
+      --accent: #111111;
+      --warm: #b55a2a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .container {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 50px 20px 80px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 50px;
+      align-items: center;
+      margin-bottom: 60px;
+    }
+
+    header img {
+      width: 100%;
+      border-radius: 22px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+      object-fit: cover;
+    }
+
+    .title h1 {
+      font-size: 42px;
+      margin: 0 0 16px;
+      line-height: 1.2;
+    }
+
+    .date {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .title p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 560px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    section {
+      background: var(--card);
+      border-radius: 26px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    section h2 {
+      margin-top: 0;
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .step {
+      margin-bottom: 18px;
+    }
+
+    .step span {
+      font-weight: 700;
+      color: var(--warm);
+    }
+
+    .note {
+      margin-top: 30px;
+      background: #f3f3f3;
+      border-left: 4px solid var(--warm);
+      padding: 18px 22px;
+      border-radius: 14px;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .recipe-header {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 30px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .recipe-header img {
+      width: 100%;
+      border-radius: 15px;
+      object-fit: cover;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .total-row {
+      background: #f9f9f9;
+      font-weight: 700;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 40px;
+    }
+
+    @media (max-width: 900px) {
+      header, .recipe-header {
+        grid-template-columns: 1fr;
+      }
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header>
+      <div class="title">
+        <div class="date">22 Şubat 2026</div>
+        <div class="tag">Şefin Seçimi • 1200 kcal Dengesi • Tek Öğün</div>
+        <h1>Ege Esintisi:<br>İzmir Tulumlu Gurme Menü</h1>
+        <p>
+          Yumurtalı taze makarnanın zengin dokusunun, keskin İzmir tulumu 
+          ve ferahlatıcı özel ayranla kusursuz uyumu.
+        </p>
+      </div>
+      <img src="genel_menu.png" alt="Menü Sunum">
+    </header>
+
+    <section>
+      <div class="recipe-header">
+        <div>
+          <h2>1. Yumurtalı & İzmir Tulumlu Makarna</h2>
+          <p>Doku ve lezzet odaklı, yüksek teknik içeren ana öğün.</p>
+          <h3>Malzemeler</h3>
+          <ul>
+            <li>125g <strong>Barilla Tagliatelle all’Uovo</strong> (5 Yuva)</li>
+            <li>60g İzmir Tulum Peyniri (Ufalanmış)</li>
+            <li>50g Ceviz İçi (İri parçalanmış)</li>
+            <li>2 YK Tereyağı + 1 YK Zeytinyağı</li>
+            <li>Taze çekilmiş karabiber, Pul biber</li>
+          </ul>
+        </div>
+        <img src="makarna.png" alt="Tulumlu Makarna">
+      </div>
+      <h3>Detaylı Hazırlanış</h3>
+      <div class="step"><span>Adım 1:</span> Büyük bir tencerede 1.5 litre suyu kaynatın. Kaynayınca 1 tatlı kaşığı tuz atın. Makarnaları ekleyin ve <strong>tam 6 dakika</strong> orta ateşte haşlayın. Süre sonunda 1 küçük su bardağı haşlama suyunu kenara ayırıp makarnayı süzün.</div>
+      <div class="step"><span>Adım 2:</span> Geniş bir tavada zeytinyağı ve tereyağını <strong>orta ateşte</strong> eritin. Yağ köpürmeye başlayınca cevizleri ekleyip <strong>2-3 dakika</strong> altın sarısı olana dek kavurun.</div>
+      <div class="step"><span>Adım 3:</span> Karabiber ve pul biberi yağa atıp 10 saniye çevirin. Süzdüğünüz makarnayı tavaya ekleyin. Ayırdığınız haşlama suyunu üzerine dökün. <strong>Yüksek ateşte</strong> hızlıca karıştırarak suyun nişastasıyla makarnanın parlamasını sağlayın (yaklaşık 1 dakika).</div>
+      <div class="step"><span>Adım 4:</span> <strong>Ocağı tamamen kapatın.</strong> Peynirin yarısını ekleyip 30 saniye harmanlayın. Kalan peyniri tabakladıktan sonra üzerine serpiştirin.</div>
+    </section>
+
+    <section>
+      <div class="recipe-header">
+        <div>
+          <h2>2. İzmir Tulumlu & Cevizli Bahçe Salatası</h2>
+          <p>Asidite dengesi makarnanın ağırlığını kırar.</p>
+          <h3>Malzemeler</h3>
+          <ul>
+            <li>150g Karışık yeşillik (Roka ağırlıklı)</li>
+            <li>40g İzmir Tulum Peyniri (Küçük küpler)</li>
+            <li>10 adet Çeri domates, 1 adet Salatalık, Yarım kırmızı soğan</li>
+            <li>2 YK Zeytinyağı, Yarım limonun suyu</li>
+          </ul>
+        </div>
+        <img src="salata.png" alt="Tulumlu Salata">
+      </div>
+      <h3>Detaylı Hazırlanış</h3>
+      <div class="step"><span>Adım 1:</span> Yeşillikleri yıkayıp kurutun. Nemli kalmamaları hayati önemdedir. Sosu çekmesi için elinizle iri parçalara bölün.</div>
+      <div class="step"><span>Adım 2:</span> Domatesleri ikiye bölün, soğanları piyazlık (ay şeklinde) çok ince doğrayın. Salatalıkları soyup halka yapın.</div>
+      <div class="step"><span>Adım 3:</span> Küçük bir kavanozda zeytinyağı, limon suyu ve bir tutam tuzu iyice çalkalayın. Sosu geniş bir kapta sebzelerle birleştirin. En son tulum peynirlerini ekleyip bir kez karıştırın.</div>
+    </section>
+
+    <section>
+      <div class="recipe-header">
+        <div>
+          <h2>3. Nane ve Acı Biberli "Şef" Ayranı</h2>
+          <p>Boza kıvamında, sindirim dostu ferahlık.</p>
+          <h3>Malzemeler</h3>
+          <ul>
+            <li>5 tepeleme YK Süzme Yoğurt</li>
+            <li>1 adet Acı Biber Turşusu (Zar kadar küçük doğranmış)</li>
+            <li>6 yaprak Taze Nane, Yarım limonun suyu, Yarım bardak buz gibi su</li>
+          </ul>
+        </div>
+        <img src="ayran.png" alt="Özel Ayran">
+      </div>
+      <h3>Detaylı Hazırlanış</h3>
+      <div class="step"><span>Adım 1:</span> Yoğurdu derin bir kapta hiç pürüz kalmayana kadar 1 dakika çırpın. Limon suyunu ekleyip çırpmaya devam edin.</div>
+      <div class="step"><span>Adım 2:</span> Suyu ip gibi akıtarak yoğurda ekleyin. Kıvam yoğun (bardaktan ağır akan) bir yapıda kalmalı.</div>
+      <div class="step"><span>Adım 3:</span> İncecik kıyılmış naneleri ve acı biber turşusunu ekleyip kaşıkla karıştırın. En az 10 dakika dolapta bekletip servis edin.</div>
+    </section>
+
+    <section>
+      <h2>Kalori ve Besin Değerleri</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Öğün Bileşeni</th>
+            <th>Miktar</th>
+            <th>Kalori (Porsiyon)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Yumurtalı Makarna & Tulum</td>
+            <td>125g Makarna + Ekler</td>
+            <td>~680 kcal</td>
+          </tr>
+          <tr>
+            <td>İzmir Tulumlu Salata</td>
+            <td>Sebze + Peynir + Yağ</td>
+            <td>~380 kcal</td>
+          </tr>
+          <tr>
+            <td>Şefin Özel Ayranı</td>
+            <td>Yoğurt + Aromalar</td>
+            <td>~140 kcal</td>
+          </tr>
+          <tr class="total-row">
+            <td>TOPLAM MENÜ</td>
+            <td>Tek Öğün Toplamı</td>
+            <td>~1200 kcal</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>
+      Hata yapmaman için süreler optimize edilmiştir. Afiyet olsun.
+    </footer>
+
+  </div>
+</body>
+</html>
