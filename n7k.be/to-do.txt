@@ -1,0 +1,6 @@
+1- Görseller standart isimlere sahip olsun, yarın öbürsü gün veritabanına alırsam ve görsel yükleme mekanizması olursa, thumb.jpg gorsel.png gibi standart isimlerle dinamik çalışsın.
+2- Görsel optimizasyonu. Boyutlar küçük olsun.
+3- HTML seo
+4- HTML twitter, facebook, whatsapp vs. paylaşım kartları.
+5- Açılan recipe paylaş linkindeki gibi url'yi değiştirsin. Böylece adam adres satırını kopyalayıp yapıştıra dabilir. 
+6- Un helvası tarifi açıldığında Aşık Veysel'in "Beni hor görme kardaşım" türküsü çalsın. Bence çok anlamlı.
