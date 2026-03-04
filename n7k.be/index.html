@@ -11,7 +11,6 @@
 <meta name="apple-mobile-web-app-title" content="n7k.be" />
 <title>n7k.be – Ne Yedik Be</title>
 <style>
-/* Mevcut stillerine dokunmuyorum, sadece yeni butonlar için küçük eklemeler yapıyorum */
 :root {
   --bg: #f6f5f2;
   --card: #ffffff;
@@ -55,7 +54,6 @@ header {
   color: var(--warm);
 }
 
-/* Buton grubu için konteyner */
 .nav-group {
   display: flex;
   gap: 10px;
@@ -72,14 +70,13 @@ header {
 }
 
 .share-btn {
-  background: var(--warm); /* Paylaş butonu farklılaşsın diye warm rengini verdim */
+  background: var(--warm);
 }
 
 .nav-btn.hidden {
   display: none;
 }
 
-/* Geri kalan CSS aynı... */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -214,35 +211,41 @@ function renderList() {
         <p>${r.desc}</p>
       </div>
     `;
-    card.onclick = () => openRecipe(r.path);
+    card.onclick = () => openRecipe(r.path, true);
     listView.appendChild(card);
   });
 }
 
-function openRecipe(path) {
+function openRecipe(path, pushToHistory = true) {
   currentRecipePath = path;
   frame.src = "." + path + "index.html";
   listView.style.display = "none";
   viewer.style.display = "block";
   homeBtn.classList.remove("hidden");
   shareBtn.classList.remove("hidden");
+
+  if (pushToHistory) {
+    const slug = path.replace(/\//g, '');
+    const newUrl = `${window.location.origin}${window.location.pathname}?shared=${slug}`;
+    window.history.pushState({ path: path }, '', newUrl);
+  }
 }
 
-function goHome() {
-  // Geri döndüğümüzde URL parametresini temizleyelim
-  const url = new URL(window.location);
-  url.searchParams.delete('shared');
-  window.history.replaceState({}, '', url);
-
+function goHome(pushToHistory = true) {
   frame.src = "";
   viewer.style.display = "none";
   listView.style.display = "grid";
   homeBtn.classList.add("hidden");
   shareBtn.classList.add("hidden");
+
+  if (pushToHistory) {
+    const url = new URL(window.location);
+    url.searchParams.delete('shared');
+    window.history.pushState({}, '', url.pathname);
+  }
 }
 
 function copyShareLink() {
-  // Path'ten başındaki ve sonundaki slash'ları temizleyip query'e uygun hale getirelim
   const slug = currentRecipePath.replace(/\//g, '');
   const shareUrl = `${window.location.origin}${window.location.pathname}?shared=${slug}`;
   
@@ -255,21 +258,37 @@ function copyShareLink() {
   });
 }
 
+// Tarayıcı geri tuşu kontrolü
+window.addEventListener('popstate', (event) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedRecipe = urlParams.get('shared');
+  
+  if (sharedRecipe) {
+    const recipe = recipes.find(r => r.path.includes(sharedRecipe));
+    if (recipe) {
+      openRecipe(recipe.path, false);
+    } else {
+      goHome(false);
+    }
+  } else {
+    goHome(false);
+  }
+});
+
 // Sayfa yüklendiğinde parametre kontrolü
 window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const sharedRecipe = urlParams.get('shared');
   
   if (sharedRecipe) {
-    // Tarif listesinde eşleşen path'i bulalım
     const recipe = recipes.find(r => r.path.includes(sharedRecipe));
     if (recipe) {
-      openRecipe(recipe.path);
+      openRecipe(recipe.path, false);
     }
   }
 });
 
-homeBtn.addEventListener("click", goHome);
+homeBtn.addEventListener("click", () => goHome(true));
 shareBtn.addEventListener("click", copyShareLink);
 
 renderList();
