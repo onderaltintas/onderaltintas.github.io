@@ -238,5 +238,17 @@
     </footer>
 
   </div>
+  <audio id="myAudio">
+    <source src="Beni Hor Görme Kardeşim.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    document.addEventListener('click', function() {
+      var audio = document.getElementById("myAudio");
+      audio.play().catch(function(error) {
+        console.log("Oynatma engellendi: " + error);
+      });
+    }, { once: true }); // Sadece ilk tıklamada çalışır
+  </script>
 </body>
 </html>
