@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>2026 Kira Vergisi Hesaplayıcı v1.5</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; line-height: 1.6; color: #333; }
+        .container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; background: #f9f9f9; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; }
+        input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        button { background: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 20px; padding: 15px; border-left: 5px solid #28a745; background: #e9f7ef; }
+        .optimization { margin-top: 15px; padding: 15px; border-left: 5px solid #ffc107; background: #fffdf5; }
+        h2 { border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .version { font-size: 12px; color: #888; text-align: right; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Kira Vergisi Hesaplama (2026)</h2>
+    <p class="version">Versiyon: v1.5</p>
+    
+    <div class="input-group">
+        <label>Ev Sayısı:</label>
+        <input type="number" id="evSayisi" value="1" min="1">
+    </div>
+    
+    <div class="input-group">
+        <label>Ev Başına Aylık Ortalama Kira (TL):</label>
+        <input type="number" id="aylikKira" value="4050">
+    </div>
+
+    <button onclick="hesapla()">Hesapla</button>
+
+    <div id="sonucAlani" style="display:none;">
+        <div class="result" id="anaSonuc"></div>
+        <div id="optimizasyonAlani" class="optimization"></div>
+    </div>
+</div>
+
+<script>
+const KONUT_ISTISNA = 47000; // 2025 gelirleri için (Mart 2026 beyan)
+const GOTURU_GIDER_ORANI = 0.15;
+const DAMGA_VERGISI = 1189.50;
+
+// Yıllık NET kazancı hesaplayan fonksiyon
+function netKazancHesapla(yillikBrut) {
+    if (yillikBrut <= KONUT_ISTISNA) {
+        return yillikBrut; // İstisna altı: Vergi yok, damga vergisi yok
+    }
+    
+    let matrah = (yillikBrut - KONUT_ISTISNA) * (1 - GOTURU_GIDER_ORANI);
+    let vergi = 0;
+
+    // 2026 Beyan Dönemi Vergi Dilimleri
+    if (matrah <= 190000) {
+        vergi = matrah * 0.15;
+    } else if (matrah <= 400000) {
+        vergi = 28500 + (matrah - 190000) * 0.20;
+    } else if (matrah <= 1000000) {
+        vergi = 70500 + (matrah - 400000) * 0.27;
+    } else {
+        vergi = 232500 + (matrah - 1000000) * 0.35;
+    }
+
+    return yillikBrut - (vergi + DAMGA_VERGISI);
+}
+
+// Detaylı hesaplama fonksiyonu (Mevcut durum özeti için)
+function detayHesapla(yillikBrut) {
+    if (yillikBrut <= KONUT_ISTISNA) {
+        return { vergi: 0, damga: 0, net: yillikBrut };
+    }
+    let matrah = (yillikBrut - KONUT_ISTISNA) * (1 - GOTURU_GIDER_ORANI);
+    let vergi = 0;
+    if (matrah <= 190000) vergi = matrah * 0.15;
+    else if (matrah <= 400000) vergi = 28500 + (matrah - 190000) * 0.20;
+    else if (matrah <= 1000000) vergi = 70500 + (matrah - 400000) * 0.27;
+    else vergi = 232500 + (matrah - 1000000) * 0.35;
+    
+    return { vergi: vergi, damga: DAMGA_VERGISI, net: yillikBrut - (vergi + DAMGA_VERGISI) };
+}
+
+function format(num) {
+    return num.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+}
+
+function hesapla() {
+    const evSayisi = parseInt(document.getElementById('evSayisi').value);
+    const aylikKira = parseFloat(document.getElementById('aylikKira').value);
+    
+    const yillikBrut = aylikKira * 12 * evSayisi;
+    const mevcut = detayHesapla(yillikBrut);
+
+    document.getElementById('sonucAlani').style.display = 'block';
+    
+    document.getElementById('anaSonuc').innerHTML = `
+        <h3>Mevcut Durum Özeti (v1.5)</h3>
+        <table>
+            <tr><td>Yıllık Brüt Kira:</td><td>${format(yillikBrut)}</td></tr>
+            <tr><td>Hesaplanan Gelir Vergisi:</td><td>${format(mevcut.vergi)}</td></tr>
+            <tr><td>Damga Vergisi:</td><td>${format(mevcut.damga)}</td></tr>
+            <tr><td><b>Yıllık Net Kazanç:</b></td><td><b>${format(mevcut.net)}</b></td></tr>
+            <tr><td><b>Aylık Net Kazanç:</b></td><td>${format(mevcut.net / 12)}</td></tr>
+        </table>
+    `;
+
+    // --- OPTİMİZASYON ANALİZİ ---
+    let enIyiNet = mevcut.net;
+    let idealKira = aylikKira;
+    let bulundu = false;
+    let idealBrut = 0;
+
+    // Mevcut kiranın altına bakıyoruz (50 TL adımlarla kontrol)
+    for (let testKira = aylikKira - 50; testKira > 0 && testKira > aylikKira - 10000; testKira -= 50) {
+        let testBrut = testKira * 12 * evSayisi;
+        let testNet = netKazancHesapla(testBrut);
+
+        if (testNet > enIyiNet) {
+            enIyiNet = testNet;
+            idealKira = testKira;
+            idealBrut = testBrut;
+            bulundu = true;
+        }
+    }
+
+    const optDiv = document.getElementById('optimizasyonAlani');
+    if (bulundu) {
+        let fark = enIyiNet - mevcut.net;
+        optDiv.innerHTML = `
+            <h3>Kâr Optimizasyon Uyarısı!</h3>
+            <p>Kirayı <b>${format(idealKira)}</b> seviyesine düşürürseniz, toplam yıllık geliri <b>${format(idealBrut)}</b> yaparak istisna sınırının (47.000 TL) altına kalırsınız.</p>
+            <p>Bu durumda damga vergisi ve gelir vergisinden muaf olursunuz.</p>
+            <p><b>Yıllık Ekstra Kârınız:</b> ${format(fark)}<br>
+            <b>Yeni Yıllık Net Kazancınız:</b> ${format(enIyiNet)}</p>
+        `;
+    } else {
+        optDiv.innerHTML = `<h3>Optimizasyon Notu</h3><p>Mevcut kira seviyeniz, brüt gelire oranla en yüksek net kazancı sağlıyor.</p>`;
+    }
+}
+</script>
+
+</body>
+</html>
