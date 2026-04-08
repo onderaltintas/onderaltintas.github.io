@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>BIST Ana Kanal Terminali</title>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { padding: 10px 25px; background: #161b22; border-bottom: 2px solid #238636; display: flex; justify-content: space-between; align-items: center; }
+        h2 { margin: 0; font-size: 18px; color: #238636; }
+        .controls { padding: 15px 25px; background: #161b22; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #30363d; position: relative; }
+        input, button { padding: 10px; background: #21262d; color: white; border: 1px solid #30363d; border-radius: 6px; outline: none; }
+        button { background: #238636; border: none; font-weight: bold; cursor: pointer; }
+        #chart { flex-grow: 1; width: 100%; }
+        .suggestions { position: absolute; top: 60px; left: 115px; background: #161b22; border: 1px solid #30363d; width: 300px; z-index: 1000; display: none; }
+        .suggestion-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #30363d; }
+        .suggestion-item:hover { background: #1f6feb; }
+        .info-panel { padding: 15px 25px; display: flex; gap: 20px; background: #161b22; border-top: 1px solid #30363d; font-size: 13px; }
+        .res { color: #f85149; font-weight: bold; } .sup { color: #3fb950; font-weight: bold; }
+        #status { font-size: 12px; color: #8b949e; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>BIST Ana Trend ve Kanal Terminali</h2>
+    <div id="status">Sistem Hazır.</div>
+</header>
+
+<div class="controls">
+    <label>Hisse Ara:</label>
+    <input type="text" id="search" placeholder="Örn: ASELS, THYAO" autocomplete="off">
+    <div id="suggestions" class="suggestions"></div>
+    <button onclick="fetchAndInitialDraw()">Analiz Et</button>
+</div>
+
+<div id="chart"></div>
+
+<div class="info-panel">
+    <div style="flex:1"><strong>Kanal Üst Sınır (Direnç):</strong> <span id="res-val" class="res">-</span></div>
+    <div style="flex:1"><strong>Kanal Alt Sınır (Destek):</strong> <span id="sup-val" class="sup">-</span></div>
+</div>
+
+<script>
+let globalRawData = null;
+const searchInput = document.getElementById('search');
+const suggestionsBox = document.getElementById('suggestions');
+const status = document.getElementById('status');
+
+async function smartFetch(url) {
+    const proxies = ["https://api.codetabs.com/v1/proxy?quest=", "https://api.allorigins.win/get?url="];
+    for (let proxy of proxies) {
+        try {
+            const finalUrl = proxy.includes('allorigins') ? proxy + encodeURIComponent(url) : proxy + url;
+            const resp = await fetch(finalUrl);
+            if (!resp.ok) continue;
+            const data = await resp.json();
+            return proxy.includes('allorigins') ? JSON.parse(data.contents) : data;
+        } catch (e) { continue; }
+    }
+    throw new Error("Proxy hatası.");
+}
+
+searchInput.addEventListener('input', async (e) => {
+    const query = e.target.value;
+    if (query.length < 2) { suggestionsBox.style.display = 'none'; return; }
+    try {
+        const data = await smartFetch(`https://query1.finance.yahoo.com/v1/finance/search?q=${query}&quotesCount=5`);
+        const bistQuotes = data.quotes.filter(q => q.symbol && q.symbol.endsWith('.IS'));
+        suggestionsBox.innerHTML = '';
+        bistQuotes.forEach(q => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerText = `${q.symbol.replace('.IS', '')} - ${q.shortname}`;
+            div.onclick = () => { searchInput.value = q.symbol.replace('.IS', ''); suggestionsBox.style.display = 'none'; fetchAndInitialDraw(); };
+            suggestionsBox.appendChild(div);
+        });
+        suggestionsBox.style.display = bistQuotes.length ? 'block' : 'none';
+    } catch (err) { status.innerText = "Arama başarısız."; }
+});
+
+async function fetchAndInitialDraw() {
+    const symbol = searchInput.value.toUpperCase();
+    if (!symbol) return;
+    status.innerText = "Ana kanallar hesaplanıyor...";
+
+    try {
+        const data = await smartFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}.IS?range=1y&interval=1d`);
+        const res = data.chart.result[0];
+        globalRawData = {
+            dates: res.timestamp.map(t => new Date(t * 1000).toISOString().split('T')[0]),
+            high: res.indicators.quote[0].high,
+            low: res.indicators.quote[0].low,
+            close: res.indicators.quote[0].close,
+            open: res.indicators.quote[0].open,
+            symbol: symbol
+        };
+        drawChart();
+        status.innerText = "Kanal Analizi Tamamlandı.";
+    } catch (err) { status.innerText = "Veri hatası."; }
+}
+
+// Ana Kanal Hesaplama (Linear Regression tabanlı Envelope)
+function calculateMainChannel(sIdx, eIdx) {
+    const n = eIdx - sIdx + 1;
+    let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+    
+    const highs = globalRawData.high.slice(sIdx, eIdx + 1);
+    const lows = globalRawData.low.slice(sIdx, eIdx + 1);
+    const closes = globalRawData.close.slice(sIdx, eIdx + 1);
+
+    for (let i = 0; i < n; i++) {
+        sumX += i;
+        sumY += closes[i];
+        sumXY += i * closes[i];
+        sumXX += i * i;
+    }
+
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+
+    // Kanalı genişletmek için en uzak noktaları bul
+    let maxDiff = 0, minDiff = 0;
+    for (let i = 0; i < n; i++) {
+        const regY = slope * i + intercept;
+        maxDiff = Math.max(maxDiff, highs[i] - regY);
+        minDiff = Math.min(minDiff, lows[i] - regY);
+    }
+
+    document.getElementById('res-val').innerText = (slope * (n-1) + intercept + maxDiff).toFixed(2) + " TL";
+    document.getElementById('sup-val').innerText = (slope * (n-1) + intercept + minDiff).toFixed(2) + " TL";
+
+    return [
+        { // Üst Direnç Çizgisi
+            type: 'line', xref: 'x', yref: 'y',
+            x0: globalRawData.dates[sIdx], y0: intercept + maxDiff,
+            x1: globalRawData.dates[eIdx], y1: slope * (n - 1) + intercept + maxDiff,
+            line: { color: '#f85149', width: 3 }
+        },
+        { // Alt Destek Çizgisi
+            type: 'line', xref: 'x', yref: 'y',
+            x0: globalRawData.dates[sIdx], y0: intercept + minDiff,
+            x1: globalRawData.dates[eIdx], y1: slope * (n - 1) + intercept + minDiff,
+            line: { color: '#3fb950', width: 3 }
+        }
+    ];
+}
+
+function drawChart() {
+    const initialShapes = calculateMainChannel(0, globalRawData.dates.length - 1);
+    
+    const trace = {
+        x: globalRawData.dates, close: globalRawData.close, high: globalRawData.high, 
+        low: globalRawData.low, open: globalRawData.open,
+        type: 'candlestick', name: globalRawData.symbol,
+        increasing: {line: {color: '#3fb950'}}, decreasing: {line: {color: '#f85149'}}
+    };
+
+    const layout = {
+        plot_bgcolor: '#0d1117', paper_bgcolor: '#0d1117', font: { color: '#ccc' },
+        xaxis: { rangeslider: { visible: false }, gridcolor: '#30363d' },
+        yaxis: { gridcolor: '#30363d', side: 'right' },
+        margin: { t: 30, l: 10, r: 60, b: 40 },
+        shapes: initialShapes
+    };
+
+    Plotly.newPlot('chart', [trace], layout).then(gd => {
+        gd.on('plotly_relayout', (eventData) => {
+            let startD = eventData['xaxis.range[0]'] || globalRawData.dates[0];
+            let endD = eventData['xaxis.range[1]'] || globalRawData.dates[globalRawData.dates.length-1];
+
+            startD = typeof startD === 'number' ? new Date(startD).toISOString().split('T')[0] : startD.split(' ')[0];
+            endD = typeof endD === 'number' ? new Date(endD).toISOString().split('T')[0] : endD.split(' ')[0];
+
+            let sIdx = globalRawData.dates.findIndex(d => d >= startD);
+            let eIdx = globalRawData.dates.findLastIndex(d => d <= endD);
+            
+            if(sIdx !== -1 && eIdx !== -1) {
+                const updatedShapes = calculateMainChannel(sIdx, eIdx);
+                Plotly.relayout(gd, { shapes: updatedShapes });
+            }
+        });
+    });
+}
+document.onclick = (e) => { if(e.target !== searchInput) suggestionsBox.style.display = 'none'; };
+</script>
+</body>
+</html>

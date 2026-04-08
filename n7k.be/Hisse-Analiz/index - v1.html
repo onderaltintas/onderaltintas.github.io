@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>BIST Teknik Analiz - Stabil</title>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        .controls { padding: 15px; background: #161b22; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #30363d; position: relative; }
+        input, button { padding: 10px; background: #21262d; color: white; border: 1px solid #30363d; border-radius: 6px; }
+        button { background: #238636; border: none; font-weight: bold; cursor: pointer; }
+        #chart { flex-grow: 1; width: 100%; }
+        .suggestions { position: absolute; top: 60px; left: 105px; background: #161b22; border: 1px solid #30363d; width: 300px; z-index: 1000; display: none; }
+        .suggestion-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #30363d; }
+        .suggestion-item:hover { background: #1f6feb; }
+        .info-panel { padding: 15px; display: flex; gap: 20px; background: #161b22; border-top: 1px solid #30363d; font-size: 13px; }
+        #status { font-size: 12px; margin-left: 10px; color: #8b949e; }
+        .res { color: #f85149; } .sup { color: #3fb950; }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <label>Hisse Ara:</label>
+    <input type="text" id="search" placeholder="Örn: ASELS veya THYAO" autocomplete="off">
+    <div id="suggestions" class="suggestions"></div>
+    <button onclick="runAnalysis()">Analiz Et</button>
+    <span id="status">Sistem Hazır.</span>
+</div>
+
+<div id="chart"></div>
+
+<div class="info-panel">
+    <div style="flex:1"><strong>Direnç Seviyeleri:</strong> <span id="res-list" class="res">-</span></div>
+    <div style="flex:1"><strong>Destek Seviyeleri:</strong> <span id="sup-list" class="sup">-</span></div>
+</div>
+
+<script>
+const searchInput = document.getElementById('search');
+const suggestionsBox = document.getElementById('suggestions');
+const status = document.getElementById('status');
+
+// Proxy listesi - Biri bloklanırsa diğeri devreye girer
+async function smartFetch(url) {
+    const proxies = [
+        "https://api.codetabs.com/v1/proxy?quest=",
+        "https://api.allorigins.win/get?url="
+    ];
+
+    for (let proxy of proxies) {
+        try {
+            const finalUrl = proxy.includes('allorigins') ? proxy + encodeURIComponent(url) : proxy + url;
+            const resp = await fetch(finalUrl);
+            if (!resp.ok) continue;
+            
+            const data = await resp.json();
+            return proxy.includes('allorigins') ? JSON.parse(data.contents) : data;
+        } catch (e) {
+            continue;
+        }
+    }
+    throw new Error("Tüm proxy servisleri reddetti.");
+}
+
+searchInput.addEventListener('input', async (e) => {
+    const query = e.target.value;
+    if (query.length < 2) { suggestionsBox.style.display = 'none'; return; }
+
+    try {
+        const data = await smartFetch(`https://query1.finance.yahoo.com/v1/finance/search?q=${query}&quotesCount=5`);
+        const bistQuotes = data.quotes.filter(q => q.symbol && q.symbol.endsWith('.IS'));
+        
+        suggestionsBox.innerHTML = '';
+        bistQuotes.forEach(q => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerText = `${q.symbol.replace('.IS', '')} - ${q.shortname}`;
+            div.onclick = () => {
+                searchInput.value = q.symbol.replace('.IS', '');
+                suggestionsBox.style.display = 'none';
+                runAnalysis();
+            };
+            suggestionsBox.appendChild(div);
+        });
+        suggestionsBox.style.display = bistQuotes.length ? 'block' : 'none';
+    } catch (err) { status.innerText = "Arama başarısız."; }
+});
+
+async function runAnalysis() {
+    const symbol = searchInput.value.toUpperCase();
+    if (!symbol) return;
+    status.innerText = "Veri çekiliyor...";
+
+    try {
+        const data = await smartFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}.IS?range=6mo&interval=1d`);
+        const res = data.chart.result[0];
+        const q = res.indicators.quote[0];
+        const dates = res.timestamp.map(t => new Date(t * 1000).toISOString().split('T')[0]);
+
+        let levels = [];
+        for (let i = 4; i < q.high.length - 4; i++) {
+            if (q.high[i] === Math.max(...q.high.slice(i-4, i+5))) levels.push({ p: q.high[i].toFixed(2), t: 'R', d: dates[i] });
+            if (q.low[i] === Math.min(...q.low.slice(i-4, i+5))) levels.push({ p: q.low[i].toFixed(2), t: 'S', d: dates[i] });
+        }
+
+        document.getElementById('res-list').innerText = [...new Set(levels.filter(l=>l.t=='R').map(l=>l.p))].slice(-3).join(' TL, ') + " TL";
+        document.getElementById('sup-list').innerText = [...new Set(levels.filter(l=>l.t=='S').map(l=>l.p))].slice(-3).join(' TL, ') + " TL";
+
+        Plotly.newPlot('chart', [{
+            x: dates, close: q.close, high: q.high, low: q.low, open: q.open,
+            type: 'candlestick', increasing: {line: {color: '#3fb950'}}, decreasing: {line: {color: '#f85149'}}
+        }], {
+            plot_bgcolor: '#0d1117', paper_bgcolor: '#0d1117', font: { color: '#ccc' },
+            xaxis: { rangeslider: { visible: false }, gridcolor: '#333' },
+            yaxis: { gridcolor: '#333', side: 'right' },
+            shapes: levels.map(l => ({
+                type: 'line', x0: l.d, y0: l.p, x1: dates[dates.length-1], y1: l.p,
+                line: { color: l.t === 'R' ? '#f85149' : '#3fb950', width: 1, dash: 'dot' }, opacity: 0.3
+            }))
+        });
+        status.innerText = "Tamamlandı.";
+    } catch (err) { status.innerText = "Bağlantı Hatası."; }
+}
+</script>
+</body>
+</html>

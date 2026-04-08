@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>BIST Dinamik Trend Terminali</title>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { padding: 10px 25px; background: #161b22; border-bottom: 2px solid #238636; display: flex; justify-content: space-between; align-items: center; }
+        h2 { margin: 0; font-size: 18px; color: #238636; }
+        .controls { padding: 15px 25px; background: #161b22; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #30363d; position: relative; }
+        input, button { padding: 10px; background: #21262d; color: white; border: 1px solid #30363d; border-radius: 6px; outline: none; }
+        button { background: #238636; border: none; font-weight: bold; cursor: pointer; }
+        #chart { flex-grow: 1; width: 100%; }
+        .suggestions { position: absolute; top: 60px; left: 115px; background: #161b22; border: 1px solid #30363d; width: 300px; z-index: 1000; display: none; }
+        .suggestion-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #30363d; }
+        .suggestion-item:hover { background: #1f6feb; }
+        .info-panel { padding: 15px 25px; display: flex; gap: 20px; background: #161b22; border-top: 1px solid #30363d; font-size: 13px; }
+        .res { color: #f85149; font-weight: bold; } .sup { color: #3fb950; font-weight: bold; }
+        #status { font-size: 12px; color: #8b949e; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>BIST Dinamik Trend ve Analiz Terminali</h2>
+    <div id="status">Sistem Hazır.</div>
+</header>
+
+<div class="controls">
+    <label>Hisse Ara:</label>
+    <input type="text" id="search" placeholder="Örn: ASELS, THYAO" autocomplete="off">
+    <div id="suggestions" class="suggestions"></div>
+    <button onclick="fetchAndInitialDraw()">Analiz Et</button>
+</div>
+
+<div id="chart"></div>
+
+<div class="info-panel">
+    <div style="flex:1"><strong>Direnç Seviyeleri:</strong> <span id="res-list" class="res">-</span></div>
+    <div style="flex:1"><strong>Destek Seviyeleri:</strong> <span id="sup-list" class="sup">-</span></div>
+</div>
+
+<script>
+let globalRawData = null;
+const searchInput = document.getElementById('search');
+const suggestionsBox = document.getElementById('suggestions');
+const status = document.getElementById('status');
+
+async function smartFetch(url) {
+    const proxies = ["https://api.codetabs.com/v1/proxy?quest=", "https://api.allorigins.win/get?url="];
+    for (let proxy of proxies) {
+        try {
+            const finalUrl = proxy.includes('allorigins') ? proxy + encodeURIComponent(url) : proxy + url;
+            const resp = await fetch(finalUrl);
+            if (!resp.ok) continue;
+            const data = await resp.json();
+            return proxy.includes('allorigins') ? JSON.parse(data.contents) : data;
+        } catch (e) { continue; }
+    }
+    throw new Error("Proxy hatası.");
+}
+
+searchInput.addEventListener('input', async (e) => {
+    const query = e.target.value;
+    if (query.length < 2) { suggestionsBox.style.display = 'none'; return; }
+    try {
+        const data = await smartFetch(`https://query1.finance.yahoo.com/v1/finance/search?q=${query}&quotesCount=5`);
+        const bistQuotes = data.quotes.filter(q => q.symbol && q.symbol.endsWith('.IS'));
+        suggestionsBox.innerHTML = '';
+        bistQuotes.forEach(q => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerText = `${q.symbol.replace('.IS', '')} - ${q.shortname}`;
+            div.onclick = () => { searchInput.value = q.symbol.replace('.IS', ''); suggestionsBox.style.display = 'none'; fetchAndInitialDraw(); };
+            suggestionsBox.appendChild(div);
+        });
+        suggestionsBox.style.display = bistQuotes.length ? 'block' : 'none';
+    } catch (err) { status.innerText = "Arama başarısız."; }
+});
+
+async function fetchAndInitialDraw() {
+    const symbol = searchInput.value.toUpperCase();
+    if (!symbol) return;
+    status.innerText = "Veri işleniyor...";
+
+    try {
+        const data = await smartFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}.IS?range=1y&interval=1d`);
+        const res = data.chart.result[0];
+        globalRawData = {
+            dates: res.timestamp.map(t => new Date(t * 1000).toISOString().split('T')[0]),
+            high: res.indicators.quote[0].high,
+            low: res.indicators.quote[0].low,
+            open: res.indicators.quote[0].open,
+            close: res.indicators.quote[0].close,
+            symbol: symbol
+        };
+        drawChart();
+        status.innerText = "Analiz Tamamlandı.";
+    } catch (err) { status.innerText = "Veri çekme hatası."; }
+}
+
+function calculateTrends(startIndex, endIndex) {
+    if (!globalRawData) return [];
+    
+    let highs = [], lows = [];
+    const win = 5;
+
+    for (let i = startIndex + win; i <= endIndex - win; i++) {
+        if (globalRawData.high[i] === Math.max(...globalRawData.high.slice(i - win, i + win + 1))) 
+            highs.push({x: i, y: globalRawData.high[i]});
+        if (globalRawData.low[i] === Math.min(...globalRawData.low.slice(i - win, i + win + 1))) 
+            lows.push({x: i, y: globalRawData.low[i]});
+    }
+
+    // Alt paneldeki yazıları güncelle
+    document.getElementById('res-list').innerText = highs.slice(-3).map(h => h.y.toFixed(2)).join(' TL, ') + " TL";
+    document.getElementById('sup-list').innerText = lows.slice(-3).map(l => l.y.toFixed(2)).join(' TL, ') + " TL";
+
+    let shapes = [];
+    // Çapraz Trend Çizgileri
+    if (highs.length >= 2) {
+        for (let j = 0; j < highs.length - 1; j++) {
+            shapes.push({
+                type: 'line', xref: 'x', yref: 'y',
+                x0: globalRawData.dates[highs[j].x], y0: highs[j].y,
+                x1: globalRawData.dates[highs[j+1].x], y1: highs[j+1].y,
+                line: { color: '#f85149', width: 2 }
+            });
+        }
+    }
+    if (lows.length >= 2) {
+        for (let k = 0; k < lows.length - 1; k++) {
+            shapes.push({
+                type: 'line', xref: 'x', yref: 'y',
+                x0: globalRawData.dates[lows[k].x], y0: lows[k].y,
+                x1: globalRawData.dates[lows[k+1].x], y1: lows[k+1].y,
+                line: { color: '#3fb950', width: 2 }
+            });
+        }
+    }
+    return shapes;
+}
+
+function drawChart() {
+    const initialShapes = calculateTrends(0, globalRawData.dates.length - 1);
+    
+    const trace = {
+        x: globalRawData.dates, close: globalRawData.close, high: globalRawData.high, 
+        low: globalRawData.low, open: globalRawData.open,
+        type: 'candlestick', name: globalRawData.symbol,
+        increasing: {line: {color: '#3fb950'}}, decreasing: {line: {color: '#f85149'}}
+    };
+
+    const layout = {
+        plot_bgcolor: '#0d1117', paper_bgcolor: '#0d1117', font: { color: '#ccc' },
+        xaxis: { rangeslider: { visible: false }, gridcolor: '#30363d' },
+        yaxis: { gridcolor: '#30363d', side: 'right' },
+        margin: { t: 30, l: 10, r: 60, b: 40 },
+        shapes: initialShapes
+    };
+
+    Plotly.newPlot('chart', [trace], layout).then(gd => {
+        gd.on('plotly_relayout', (eventData) => {
+            let startD = eventData['xaxis.range[0]'] || globalRawData.dates[0];
+            let endD = eventData['xaxis.range[1]'] || globalRawData.dates[globalRawData.dates.length-1];
+            
+            // Tarih string formatına çevirme (Zoom verisi bazen sayı bazen string gelir)
+            startD = typeof startD === 'number' ? new Date(startD).toISOString().split('T')[0] : startD.split(' ')[0];
+            endD = typeof endD === 'number' ? new Date(endD).toISOString().split('T')[0] : endD.split(' ')[0];
+
+            let sIdx = globalRawData.dates.findIndex(d => d >= startD);
+            let eIdx = globalRawData.dates.findLastIndex(d => d <= endD);
+            
+            if(sIdx !== -1 && eIdx !== -1) {
+                const updatedShapes = calculateTrends(sIdx, eIdx);
+                Plotly.relayout(gd, { shapes: updatedShapes });
+            }
+        });
+    });
+}
+
+document.onclick = (e) => { if(e.target !== searchInput) suggestionsBox.style.display = 'none'; };
+</script>
+</body>
+</html>

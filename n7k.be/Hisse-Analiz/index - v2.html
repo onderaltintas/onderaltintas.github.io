@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>BIST Trend ve Teknik Analiz</title>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        header { padding: 10px 25px; background: #161b22; border-bottom: 2px solid #238636; }
+        h2 { margin: 0; font-size: 18px; color: #238636; }
+        .controls { padding: 15px 25px; background: #161b22; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #30363d; position: relative; }
+        input, button { padding: 10px; background: #21262d; color: white; border: 1px solid #30363d; border-radius: 6px; }
+        button { background: #238636; border: none; font-weight: bold; cursor: pointer; }
+        #chart { flex-grow: 1; width: 100%; }
+        .suggestions { position: absolute; top: 60px; left: 115px; background: #161b22; border: 1px solid #30363d; width: 300px; z-index: 1000; display: none; }
+        .suggestion-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #30363d; }
+        .suggestion-item:hover { background: #1f6feb; }
+        .info-panel { padding: 15px; display: flex; gap: 20px; background: #161b22; border-top: 1px solid #30363d; font-size: 13px; }
+        .res { color: #f85149; font-weight: bold; } .sup { color: #3fb950; font-weight: bold; }
+        #status { font-size: 12px; margin-left: 10px; color: #8b949e; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>Borsa İstanbul Otomatik Trend ve Kanal Analizi</h2>
+</header>
+
+<div class="controls">
+    <label id="searchLabel">Hisse Ara:</label>
+    <input type="text" id="search" placeholder="Örn: ASELS, THYAO" autocomplete="off">
+    <div id="suggestions" class="suggestions"></div>
+    <button onclick="runAnalysis()">Analiz Et</button>
+    <span id="status">Sistem Hazır.</span>
+</div>
+
+<div id="chart"></div>
+
+<div class="info-panel">
+    <div style="flex:1"><strong>Direnç Seviyeleri (Son):</strong> <span id="res-list" class="res">-</span></div>
+    <div style="flex:1"><strong>Destek Seviyeleri (Son):</strong> <span id="sup-list" class="sup">-</span></div>
+</div>
+
+<script>
+const searchInput = document.getElementById('search');
+const suggestionsBox = document.getElementById('suggestions');
+const status = document.getElementById('status');
+
+async function smartFetch(url) {
+    const proxies = ["https://api.codetabs.com/v1/proxy?quest=", "https://api.allorigins.win/get?url="];
+    for (let proxy of proxies) {
+        try {
+            const finalUrl = proxy.includes('allorigins') ? proxy + encodeURIComponent(url) : proxy + url;
+            const resp = await fetch(finalUrl);
+            if (!resp.ok) continue;
+            const data = await resp.json();
+            return proxy.includes('allorigins') ? JSON.parse(data.contents) : data;
+        } catch (e) { continue; }
+    }
+    throw new Error("Proxy hatası.");
+}
+
+searchInput.addEventListener('input', async (e) => {
+    const query = e.target.value;
+    if (query.length < 2) { suggestionsBox.style.display = 'none'; return; }
+    try {
+        const data = await smartFetch(`https://query1.finance.yahoo.com/v1/finance/search?q=${query}&quotesCount=5`);
+        const bistQuotes = data.quotes.filter(q => q.symbol && q.symbol.endsWith('.IS'));
+        suggestionsBox.innerHTML = '';
+        bistQuotes.forEach(q => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerText = `${q.symbol.replace('.IS', '')} - ${q.shortname}`;
+            div.onclick = () => { searchInput.value = q.symbol.replace('.IS', ''); suggestionsBox.style.display = 'none'; runAnalysis(); };
+            suggestionsBox.appendChild(div);
+        });
+        suggestionsBox.style.display = bistQuotes.length ? 'block' : 'none';
+    } catch (err) { status.innerText = "Arama başarısız."; }
+});
+
+async function runAnalysis() {
+    const symbol = searchInput.value.toUpperCase();
+    if (!symbol) return;
+    status.innerText = "Trendler hesaplanıyor...";
+
+    try {
+        const data = await smartFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}.IS?range=6mo&interval=1d`);
+        const res = data.chart.result[0];
+        const q = res.indicators.quote[0];
+        const dates = res.timestamp.map(t => new Date(t * 1000).toISOString().split('T')[0]);
+
+        // 1. Tepe ve Dip Noktalarını Bul (Fractal)
+        let highs = [], lows = [];
+        const window = 5;
+        for (let i = window; i < q.high.length - window; i++) {
+            if (q.high[i] === Math.max(...q.high.slice(i - window, i + window + 1))) highs.push({x: i, y: q.high[i]});
+            if (q.low[i] === Math.min(...q.low.slice(i - window, i + window + 1))) lows.push({x: i, y: q.low[i]});
+        }
+
+        // 2. Trend Çizgilerini Oluştur (Son iki tepe ve son iki dip birleştirme)
+        let shapes = [];
+        if (highs.length >= 2) {
+            const p1 = highs[highs.length - 2], p2 = highs[highs.length - 1];
+            shapes.push({
+                type: 'line', xref: 'x', yref: 'y',
+                x0: dates[p1.x], y0: p1.y, x1: dates[dates.length-1], 
+                y1: p2.y + (p2.y - p1.y) * (dates.length - 1 - p2.x) / (p2.x - p1.x),
+                line: { color: '#f85149', width: 2 }
+            });
+        }
+        if (lows.length >= 2) {
+            const p1 = lows[lows.length - 2], p2 = lows[lows.length - 1];
+            shapes.push({
+                type: 'line', xref: 'x', yref: 'y',
+                x0: dates[p1.x], y0: p1.y, x1: dates[dates.length-1], 
+                y1: p2.y + (p2.y - p1.y) * (dates.length - 1 - p2.x) / (p2.x - p1.x),
+                line: { color: '#3fb950', width: 2 }
+            });
+        }
+
+        document.getElementById('res-list').innerText = highs.slice(-2).map(h=>h.y.toFixed(2)).join(' - ') + " TL";
+        document.getElementById('sup-list').innerText = lows.slice(-2).map(l=>l.y.toFixed(2)).join(' - ') + " TL";
+
+        Plotly.newPlot('chart', [{
+            x: dates, close: q.close, high: q.high, low: q.low, open: q.open,
+            type: 'candlestick', name: symbol,
+            increasing: {line: {color: '#3fb950'}}, decreasing: {line: {color: '#f85149'}}
+        }], {
+            plot_bgcolor: '#0d1117', paper_bgcolor: '#0d1117', font: { color: '#ccc' },
+            xaxis: { rangeslider: { visible: false }, gridcolor: '#30363d' },
+            yaxis: { gridcolor: '#30363d', side: 'right' },
+            shapes: shapes,
+            margin: { t: 30, l: 10, r: 60, b: 40 }
+        });
+        status.innerText = "Analiz hazır.";
+    } catch (err) { status.innerText = "Hata oluştu."; }
+}
+document.onclick = (e) => { if(e.target !== searchInput) suggestionsBox.style.display = 'none'; };
+</script>
+</body>
+</html>
