@@ -3,288 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Bitcoin Yeni Ay Etkisi | CoinCap (Ücretsiz, Eski Veri)</title>
-    <!-- ApexCharts Güncel v3.54.0 -->
+    <title>Bitcoin Yeni Ay Etkisi | Binance API (CORS sorunsuz)</title>
+    <!-- ApexCharts Güncel -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.0/dist/apexcharts.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            background: #f4f7fe;
-            padding: 24px 20px;
-            color: #0f172a;
-        }
-
-        .container {
-            max-width: 1500px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 36px;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.08);
-            overflow: hidden;
-            padding: 24px 24px 28px 24px;
-            transition: all 0.2s;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        h1 small {
-            font-size: 0.8rem;
-            font-weight: 400;
-            background: #eef2ff;
-            padding: 5px 12px;
-            border-radius: 40px;
-            color: #1e40af;
-        }
-        .sub {
-            color: #334155;
-            border-left: 4px solid #f59e0b;
-            padding-left: 16px;
-            margin: 12px 0 24px 0;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        .control-bar {
-            background: #f8fafc;
-            border-radius: 28px;
-            padding: 16px 20px;
-            margin-bottom: 28px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: flex-end;
-            gap: 18px;
-            border: 1px solid #e2e8f0;
-        }
-        .date-group, .days-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .date-group label, .days-group label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #475569;
-        }
-        .date-group input, .days-group input {
-            padding: 10px 14px;
-            border-radius: 20px;
-            border: 1px solid #cbd5e1;
-            background: white;
-            font-size: 0.9rem;
-            font-family: monospace;
-            transition: 0.2s;
-        }
-        .date-group input:focus, .days-group input:focus {
-            outline: none;
-            border-color: #f59e0b;
-            box-shadow: 0 0 0 3px rgba(245,158,11,0.2);
-        }
-        .btn-update {
-            background: #0f172a;
-            color: white;
-            border: none;
-            padding: 10px 28px;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.85rem;
-            margin-top: 6px;
-        }
-        .btn-update:hover {
-            background: #f59e0b;
-            color: #0f172a;
-            transform: scale(0.97);
-        }
-        .quick-btns {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-left: auto;
-        }
-        .quick-btn {
-            background: #eef2ff;
-            border: none;
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .quick-btn:hover {
-            background: #cbd5e1;
-        }
-        .chart-wrapper {
-            margin: 16px 0 20px 0;
-        }
-        #btc-chart {
-            width: 100%;
-            height: 500px;
-            border-radius: 24px;
-        }
-        .stats-panel {
-            background: #f1f5f9;
-            border-radius: 28px;
-            padding: 18px 22px;
-            margin: 20px 0 18px 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: flex-start;
-        }
-        .stat-card {
-            flex: 1;
-            min-width: 120px;
-            background: white;
-            border-radius: 24px;
-            padding: 12px 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            border: 1px solid #e2edf7;
-        }
-        .stat-card .label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.4px;
-            color: #5b6e8c;
-        }
-        .stat-card .value {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-top: 6px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f4f7fe; padding: 24px 20px; color: #0f172a; }
+        .container { max-width: 1500px; margin: 0 auto; background: white; border-radius: 36px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.08); padding: 24px; }
+        h1 { font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: space-between; margin-bottom: 8px; }
+        h1 small { font-size: 0.8rem; background: #eef2ff; padding: 5px 12px; border-radius: 40px; color: #1e40af; }
+        .sub { color: #334155; border-left: 4px solid #f59e0b; padding-left: 16px; margin: 12px 0 24px; font-size: 0.9rem; }
+        .control-bar { background: #f8fafc; border-radius: 28px; padding: 16px 20px; margin-bottom: 28px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 18px; border: 1px solid #e2e8f0; }
+        .date-group, .days-group { display: flex; flex-direction: column; gap: 6px; }
+        .date-group label, .days-group label { font-size: 0.75rem; font-weight: 600; color: #475569; }
+        .date-group input, .days-group input { padding: 10px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: white; font-size: 0.9rem; font-family: monospace; }
+        .btn-update { background: #0f172a; color: white; border: none; padding: 10px 28px; border-radius: 40px; font-weight: 600; cursor: pointer; margin-top: 6px; }
+        .btn-update:hover { background: #f59e0b; color: #0f172a; }
+        .quick-btns { display: flex; gap: 12px; margin-left: auto; }
+        .quick-btn { background: #eef2ff; border: none; padding: 6px 18px; border-radius: 30px; font-size: 0.8rem; font-weight: 500; cursor: pointer; }
+        .chart-wrapper { margin: 16px 0; }
+        #btc-chart { width: 100%; height: 500px; border-radius: 24px; }
+        .stats-panel { background: #f1f5f9; border-radius: 28px; padding: 18px 22px; margin: 20px 0; display: flex; flex-wrap: wrap; gap: 16px; }
+        .stat-card { flex: 1; min-width: 120px; background: white; border-radius: 24px; padding: 12px 16px; border: 1px solid #e2edf7; }
+        .stat-card .label { font-size: 0.7rem; font-weight: 600; color: #5b6e8c; }
+        .stat-card .value { font-size: 1.4rem; font-weight: 700; margin-top: 6px; }
         .trend-down { color: #dc2626; }
         .trend-up { color: #10b981; }
-        .events-table {
-            overflow-x: auto;
-            border-radius: 24px;
-            border: 1px solid #ecf3fa;
-            background: white;
-            margin-top: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-        th {
-            text-align: left;
-            padding: 14px 12px;
-            background-color: #fafdff;
-            font-weight: 600;
-            color: #1e293b;
-            border-bottom: 1px solid #e2edf7;
-        }
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #f0f4fa;
-        }
+        .events-table { overflow-x: auto; border-radius: 24px; border: 1px solid #ecf3fa; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; padding: 14px 12px; background: #fafdff; border-bottom: 1px solid #e2edf7; }
+        td { padding: 12px; border-bottom: 1px solid #f0f4fa; }
         .down-percent { color: #dc2626; font-weight: 600; }
         .up-percent { color: #10b981; font-weight: 600; }
-        .badge-moon {
-            background: #fef3c7;
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .footer-note {
-            font-size: 0.7rem;
-            text-align: center;
-            margin-top: 28px;
-            color: #5b6e8c;
-            background: #f1f5f9;
-            padding: 10px;
-            border-radius: 40px;
-        }
-        @media (max-width: 780px) {
-            .control-bar { flex-direction: column; align-items: stretch; }
-            .quick-btns { margin-left: 0; justify-content: space-between; }
-            .stat-card .value { font-size: 1.2rem; }
-        }
-        .info-hint {
-            font-size: 0.7rem;
-            color: #475569;
-            margin-top: 4px;
-        }
+        .badge-moon { background: #fef3c7; padding: 4px 12px; border-radius: 40px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; }
+        .footer-note { font-size: 0.7rem; text-align: center; margin-top: 28px; color: #5b6e8c; background: #f1f5f9; padding: 10px; border-radius: 40px; }
+        @media (max-width: 780px) { .control-bar { flex-direction: column; align-items: stretch; } .quick-btns { margin-left: 0; justify-content: space-between; } }
+        .info-hint { font-size: 0.7rem; color: #475569; margin-top: 4px; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>
-        🌕 Bitcoin · Yeni Ay Sonrası Esnek Gün Analizi
-        <small>CoinCap API · 2013 öncesine kadar veri</small>
-    </h1>
-    <div class="sub">
-        📅 Dikey çizgiler + 🌙 yuvarlağı yeni ay günlerini işaretler. Renkli çizgi: seçtiğiniz günlerden <strong>en büyük gün</strong> için fiyat eğimini gösterir.<br>
-        ⚡ <strong>CoinCap ücretsiz ve anahtar gerektirmez, çok eski tarihleri destekler.</strong> Başlangıç tarihini 2013 öncesine çekebilirsiniz.
-    </div>
+    <h1>🌕 Bitcoin · Yeni Ay Sonrası Analiz <small>Binance API · 2017 öncesi veri</small></h1>
+    <div class="sub">📅 Dikey çizgiler + 🌙 yuvarlağı = yeni ay. Renkli çizgi: seçilen max gün için eğim. Binance CORS hatasız, ücretsiz.</div>
 
     <div class="control-bar">
-        <div class="date-group">
-            <label>📆 Başlangıç Tarihi</label>
-            <input type="date" id="startDate" value="2017-01-01">
-        </div>
-        <div class="date-group">
-            <label>📆 Bitiş Tarihi</label>
-            <input type="date" id="endDate" value="2025-04-01">
-        </div>
-        <div class="days-group">
-            <label>📊 Analiz Edilecek Günler (virgülle)</label>
-            <input type="text" id="daysList" value="2,3,4,5,6,10" placeholder="Örnek: 2,3,4,5,6,10">
-            <div class="info-hint">Yeni aydan sonraki günler: örn: 2,3,4,5,6,10,14</div>
-        </div>
-        <button id="updateBtn" class="btn-update">🔄 Güncelle & Analiz Et</button>
-        <div class="quick-btns">
-            <button class="quick-btn" data-range="90">Son 90 gün</button>
-            <button class="quick-btn" data-range="180">Son 180 gün</button>
-            <button class="quick-btn" data-range="365">Son 365 gün</button>
-            <button class="quick-btn" data-range="all">Maksimum (2013- bugün)</button>
-        </div>
+        <div class="date-group"><label>📆 Başlangıç</label><input type="date" id="startDate" value="2017-01-01"></div>
+        <div class="date-group"><label>📆 Bitiş</label><input type="date" id="endDate" value="2025-04-01"></div>
+        <div class="days-group"><label>📊 Günler (virgülle)</label><input type="text" id="daysList" value="2,3,4,5,6,10"><div class="info-hint">Örn: 2,3,4,5,6,10,14</div></div>
+        <button id="updateBtn" class="btn-update">🔄 Güncelle</button>
+        <div class="quick-btns"><button class="quick-btn" data-range="90">Son 90g</button><button class="quick-btn" data-range="180">Son 180g</button><button class="quick-btn" data-range="365">Son 365g</button><button class="quick-btn" data-range="all">Maksimum (2017)</button></div>
     </div>
 
-    <div class="chart-wrapper">
-        <div id="btc-chart"></div>
-    </div>
-
-    <div class="stats-panel" id="statsPanel">
-        <div class="stat-card"><div class="label">🌙 Yeni Ay Sayısı</div><div class="value" id="moonCount">-</div></div>
-    </div>
-
-    <div class="events-table">
-        <table id="moonTable">
-            <thead id="tableHeader">
-                <tr><th>Yeni Ay Tarihi</th><th>Yükleniyor...</th></tr>
-            </thead>
-            <tbody id="moonTableBody">
-                <tr><td colspan="10">Veri bekleniyor... Tarih aralığı ve günleri seçip güncelleyin</td></tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="footer-note">
-        ✅ Veri: <strong>CoinCap.io</strong> (BTC/USD, günlük kapanış). CoinGecko 401 hatası çözüldü. Yeni aylar astronomik hesapla.
-        Grafikteki renkli ok, seçilen günlerin maksimum değeri için yeni aydan itibaren fiyat eğimini gösterir.
-    </div>
+    <div class="chart-wrapper"><div id="btc-chart"></div></div>
+    <div class="stats-panel" id="statsPanel"><div class="stat-card"><div class="label">🌙 Yeni Ay Sayısı</div><div class="value" id="moonCount">-</div></div></div>
+    <div class="events-table"><table id="moonTable"><thead id="tableHeader"><tr><th>Yeni Ay</th><th>Yükleniyor...</th></tr></thead><tbody id="moonTableBody"><tr><td colspan="10">Veri bekleniyor...</td></tr></tbody></table></div>
+    <div class="footer-note">✅ Binance public API (CORS destekli) · Tarihsel BTC/USDT günlük kapanış. Yeni aylar astronomik hesapla.</div>
 </div>
 
 <script>
@@ -298,16 +71,14 @@
         const statsPanel = document.getElementById('statsPanel');
         const tableHeader = document.getElementById('tableHeader');
         const tableBody = document.getElementById('moonTableBody');
-        
         let currentChart = null;
-        
-        // ---- Yeni Ay Hesaplama (JD tabanlı, güvenilir) ----
+
+        // Yeni ay hesaplama (güvenilir)
         function getNewMoonsBetween(startDateStr, endDateStr) {
             const start = new Date(startDateStr);
             const end = new Date(endDateStr);
             start.setUTCHours(0,0,0,0);
             end.setUTCHours(0,0,0,0);
-            // Referans: 2024-01-11 11:57:59 UTC (kesin yeni ay)
             const refDate = new Date(Date.UTC(2024, 0, 11, 11, 57, 59));
             const refTime = refDate.getTime();
             const lunarCycleMs = 29.53058867 * 86400000;
@@ -315,87 +86,85 @@
             let t = refTime;
             while (t > start.getTime()) t -= lunarCycleMs;
             while (t <= end.getTime()) {
-                if (t >= start.getTime()) {
-                    const moonDate = new Date(t);
-                    const yyyyMmDd = moonDate.toISOString().split('T')[0];
-                    newMoons.push(yyyyMmDd);
-                }
+                if (t >= start.getTime()) newMoons.push(new Date(t).toISOString().split('T')[0]);
                 t += lunarCycleMs;
             }
             return [...new Set(newMoons)].sort();
         }
-        
-        // ---- CoinCap API (tüm tarihsel veriyi çeker, sonra filtreleriz) ----
-        // CoinCap "history" endpoint'i: https://api.coincap.io/v2/assets/bitcoin/history?interval=d1&start=...&end=...
-        // timestamp milisaniye değil, saniye olarak bekliyor.
-        async function fetchBitcoinPriceRange(startDateStr, endDateStr) {
+
+        // Binance Klines (günlük) - CORS sorunsuz, eski veriye kadar
+        async function fetchBinanceDaily(startDateStr, endDateStr) {
             const start = new Date(startDateStr);
             const end = new Date(endDateStr);
-            // CoinCap interval=d1 için start ve end UNIX saniye
-            const startSec = Math.floor(start.getTime() / 1000);
-            const endSec = Math.floor(end.getTime() / 1000);
-            const url = `https://api.coincap.io/v2/assets/bitcoin/history?interval=d1&start=${startSec}&end=${endSec}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`CoinCap API hatası: ${response.status}`);
-            const json = await response.json();
-            if (!json.data || json.data.length === 0) throw new Error("Bu aralıkta veri yok");
-            // json.data: [{priceUsd: "12345.67", time: 1640995200000}, ...] time ms cinsinden
-            const prices = json.data.map(item => ({
-                timestamp: item.time,
-                price: parseFloat(item.priceUsd)
-            }));
-            // artan sırada sırala
-            prices.sort((a,b) => a.timestamp - b.timestamp);
-            return prices;
+            // Binance limit 1000, biz birden fazla istek yaparak tüm aralığı alacağız.
+            // Daha basit: 2017'den bugüne kadar tek seferde 2000 günlük alabiliriz ama aralık çok büyükse parçalayalım.
+            // Pratik: başlangıç ve bitiş arasındaki gün farkını hesapla, eğer 1500'den azsa tek istek yeter.
+            const startMs = start.getTime();
+            const endMs = end.getTime();
+            const daysDiff = Math.ceil((endMs - startMs) / (1000*3600*24));
+            let allKlines = [];
+            const limit = 1000;
+            let currentStart = startMs;
+            while (currentStart < endMs) {
+                const startTime = currentStart;
+                const url = `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=${startTime}&limit=${limit}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Binance API hatası: ${res.status}`);
+                const data = await res.json();
+                if (!data.length) break;
+                for (let k of data) {
+                    const openTime = k[0]; // ms
+                    const closePrice = parseFloat(k[4]); // kapanış fiyatı
+                    allKlines.push({ timestamp: openTime, price: closePrice });
+                }
+                const lastTime = data[data.length-1][0];
+                if (lastTime >= endMs) break;
+                currentStart = lastTime + 1;
+                if (data.length < limit) break;
+                await new Promise(r => setTimeout(r, 200)); // rate limit koruması
+            }
+            // filtrele
+            allKlines = allKlines.filter(k => k.timestamp >= startMs && k.timestamp <= endMs);
+            allKlines.sort((a,b) => a.timestamp - b.timestamp);
+            if (allKlines.length === 0) throw new Error("Binance'den veri alınamadı.");
+            return allKlines;
         }
-        
+
         function parseDaysList(daysStr) {
             let parts = daysStr.split(',').map(s => parseInt(s.trim(), 10));
             parts = parts.filter(n => !isNaN(n) && n > 0);
             if (parts.length === 0) return [2,3,4];
             return [...new Set(parts)].sort((a,b)=>a-b);
         }
-        
+
         async function loadAndRender(startDateStr, endDateStr, daysStr) {
             const start = new Date(startDateStr);
             const end = new Date(endDateStr);
-            if (isNaN(start) || isNaN(end) || start >= end) {
-                alert("Geçerli bir tarih aralığı girin");
-                return;
-            }
+            if (isNaN(start) || isNaN(end) || start >= end) { alert("Geçerli tarih aralığı"); return; }
             const daysArr = parseDaysList(daysStr);
-            if (daysArr.length === 0) {
-                alert("Lütfen en az bir pozitif gün sayısı girin");
-                return;
-            }
-            
-            tableBody.innerHTML = '<tr><td colspan="10">📡 CoinCap üzerinden veri alınıyor... (eski tarihler desteklenir)</td></tr>';
+            if (daysArr.length === 0) { alert("Geçerli günler girin"); return; }
+
+            tableBody.innerHTML = '<tr><td colspan="10">📡 Binance\'den veri alınıyor (CORS destekli)...</td></tr>';
             moonCountSpan.innerText = '...';
             const existingCards = statsPanel.querySelectorAll('.stat-card:not(:first-child)');
-            existingCards.forEach(card => card.remove());
-            
+            existingCards.forEach(c => c.remove());
+
             try {
-                // 1. Fiyat verisini al
-                const priceData = await fetchBitcoinPriceRange(startDateStr, endDateStr);
-                if (priceData.length === 0) throw new Error("Veri aralığı boş");
-                
-                // Tarih string formatı YYYY-MM-DD
+                const priceData = await fetchBinanceDaily(startDateStr, endDateStr);
                 const btcDates = priceData.map(p => new Date(p.timestamp).toISOString().split('T')[0]);
                 const btcPrices = priceData.map(p => p.price);
                 const priceMap = new Map();
                 for (let i=0; i<btcDates.length; i++) priceMap.set(btcDates[i], btcPrices[i]);
-                
-                // 2. Yeni ayları bul (fiyat verisi olan)
+
                 const allNewMoons = getNewMoonsBetween(startDateStr, endDateStr);
                 const moonDates = allNewMoons.filter(m => priceMap.has(m));
                 if (moonDates.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="10">⚠️ Seçilen aralıkta yeni ay gününe denk fiyat verisi yok. Daha geniş aralık deneyin.</td></tr>`;
+                    tableBody.innerHTML = '<tr><td colspan="10">⚠️ Bu aralıkta yeni ay gününe ait fiyat verisi yok. Daha geniş aralık deneyin.</td></tr>';
                     if (currentChart) currentChart.destroy();
                     moonCountSpan.innerText = "0";
                     return;
                 }
-                
-                // 3. Her yeni ay için değişimleri hesapla
+
                 const moonEvents = [];
                 for (let moonDate of moonDates) {
                     const moonIdx = btcDates.findIndex(d => d === moonDate);
@@ -404,39 +173,28 @@
                     const changes = {};
                     for (let day of daysArr) {
                         const targetIdx = moonIdx + day;
-                        if (targetIdx < btcPrices.length) {
-                            const targetPrice = btcPrices[targetIdx];
-                            changes[day] = ((targetPrice - startPrice) / startPrice) * 100;
-                        } else {
-                            changes[day] = null;
-                        }
+                        if (targetIdx < btcPrices.length) changes[day] = ((btcPrices[targetIdx] - startPrice) / startPrice) * 100;
+                        else changes[day] = null;
                     }
                     moonEvents.push({ moonDate, startPrice, changes, moonIdx });
                 }
-                
-                // 4. İstatistikler
-                const stats = {};
+
+                // İstatistikler
                 for (let day of daysArr) {
                     const validChanges = moonEvents.map(ev => ev.changes[day]).filter(v => v !== null);
                     const avg = validChanges.length ? validChanges.reduce((a,b)=>a+b,0)/validChanges.length : null;
-                    stats[day] = { avg, count: validChanges.length };
-                }
-                
-                moonCountSpan.innerText = moonEvents.length;
-                for (let day of daysArr) {
-                    const avgVal = stats[day].avg;
-                    const avgText = (avgVal !== null) ? avgVal.toFixed(2) + '%' : '—';
+                    const avgText = (avg !== null) ? avg.toFixed(2)+'%' : '—';
                     const card = document.createElement('div');
                     card.className = 'stat-card';
-                    card.innerHTML = `<div class="label">📊 Ort. +${day} Gün %</div>
-                                    <div class="value ${(avgVal !== null && avgVal<0) ? 'trend-down' : (avgVal !== null && avgVal>0) ? 'trend-up' : ''}">${avgText}</div>`;
+                    card.innerHTML = `<div class="label">📊 Ort. +${day} Gün</div><div class="value ${avg !== null && avg<0 ? 'trend-down' : (avg !== null && avg>0 ? 'trend-up' : '')}">${avgText}</div>`;
                     statsPanel.appendChild(card);
                 }
-                
-                // 5. Dinamik Tablo
-                let headerHtml = '<tr><th>🌙 Yeni Ay Tarihi</th>';
+                moonCountSpan.innerText = moonEvents.length;
+
+                // Tablo
+                let headerHtml = '<tr><th>🌙 Yeni Ay</th>';
                 for (let day of daysArr) headerHtml += `<th>+${day} Gün %</th>`;
-                headerHtml += '<th>En Uzun Eğim</th></tr>';
+                headerHtml += '<th>Eğim (max gün)</th></tr>';
                 tableHeader.innerHTML = headerHtml;
                 tableBody.innerHTML = '';
                 for (let ev of moonEvents) {
@@ -447,37 +205,31 @@
                     for (let day of daysArr) {
                         const chg = ev.changes[day];
                         const cell = document.createElement('td');
-                        const display = (chg !== null) ? chg.toFixed(2)+'%' : '—';
-                        cell.innerHTML = display;
-                        if (chg !== null) cell.className = (chg < 0) ? 'down-percent' : 'up-percent';
+                        cell.innerHTML = (chg !== null) ? chg.toFixed(2)+'%' : '—';
+                        if (chg !== null) cell.className = chg<0 ? 'down-percent' : 'up-percent';
                         row.appendChild(cell);
                     }
                     const maxDay = Math.max(...daysArr);
                     const maxChg = ev.changes[maxDay];
-                    const trendText = (maxChg !== null) ? (maxChg < 0 ? '📉 düşüş eğimi' : '📈 yükseliş eğimi') : 'veri yok';
+                    const trendText = (maxChg !== null) ? (maxChg<0 ? '📉 düşüş' : '📈 yükseliş') : 'veri yok';
                     const lastCell = document.createElement('td');
                     lastCell.innerHTML = `<span style="font-size:0.75rem;">${trendText}</span>`;
                     row.appendChild(lastCell);
                     tableBody.appendChild(row);
                 }
-                
-                // 6. Grafik (ApexCharts)
-                const chartData = btcDates.map((date, idx) => ({ x: new Date(date).getTime(), y: btcPrices[idx] }));
+
+                // Grafik
+                const chartData = btcDates.map((d,i) => ({ x: new Date(d).getTime(), y: btcPrices[i] }));
                 const maxPrice = Math.max(...btcPrices);
                 const minPrice = Math.min(...btcPrices);
                 const yTopPos = maxPrice + (maxPrice - minPrice) * 0.07;
-                
+
                 let annotations = { xaxis: [], points: [], shapes: [] };
                 for (let ev of moonEvents) {
                     const moonTs = new Date(ev.moonDate).getTime();
                     annotations.xaxis.push({ x: moonTs, borderColor: '#fbbf24', strokeDashArray: 2, borderWidth: 1.8, opacity: 0.7 });
-                    annotations.points.push({
-                        x: moonTs, y: yTopPos,
-                        marker: { size: 11, fillColor: '#f59e0b', strokeColor: '#b45309', strokeWidth: 2, shape: 'circle' },
-                        label: { text: "🌑", offsetY: -2, style: { fontSize: '14px', background: 'transparent' } }
-                    });
+                    annotations.points.push({ x: moonTs, y: yTopPos, marker: { size: 11, fillColor: '#f59e0b', strokeColor: '#b45309', strokeWidth: 2, shape: 'circle' }, label: { text: "🌑", offsetY: -2, style: { fontSize: '14px', background: 'transparent' } } });
                 }
-                
                 const maxSelectedDay = Math.max(...daysArr);
                 for (let ev of moonEvents) {
                     const targetIdx = ev.moonIdx + maxSelectedDay;
@@ -488,68 +240,48 @@
                     const endDate = btcDates[targetIdx];
                     const endX = new Date(endDate).getTime();
                     const lineColor = (endPrice < ev.startPrice) ? '#ef4444' : '#10b981';
-                    annotations.shapes.push({
-                        type: 'line', x1: startX, y1: ev.startPrice, x2: endX, y2: endPrice,
-                        stroke: { color: lineColor, width: 2.8, dashArray: 0, lineCap: 'round' },
-                        tooltip: { text: `${ev.moonDate} ➔ +${maxSelectedDay}gün: ${((endPrice-ev.startPrice)/ev.startPrice*100).toFixed(2)}%` }
-                    });
+                    annotations.shapes.push({ type: 'line', x1: startX, y1: ev.startPrice, x2: endX, y2: endPrice, stroke: { color: lineColor, width: 2.8 }, tooltip: { text: `${ev.moonDate} ➔ +${maxSelectedDay}g: ${((endPrice-ev.startPrice)/ev.startPrice*100).toFixed(2)}%` } });
                 }
-                
+
                 const options = {
                     series: [{ name: "BTC (USD)", data: chartData, type: 'line', color: '#2563eb' }],
                     chart: { type: 'line', height: 500, toolbar: { show: true }, zoom: { enabled: true }, background: '#ffffff' },
-                    title: { text: `${startDateStr} - ${endDateStr} · ${daysArr.join(', ')} günlük analiz (CoinCap)`, align: 'left', style: { fontSize: '12px' } },
+                    title: { text: `${startDateStr} - ${endDateStr} · ${daysArr.join(',')} günlük analiz (Binance)`, align: 'left', style: { fontSize: '12px' } },
                     xaxis: { type: 'datetime', labels: { datetimeUTC: true, format: 'dd MMM yyyy' }, tickAmount: 8 },
                     yaxis: { title: { text: 'Fiyat (USD)' }, labels: { formatter: (v) => '$' + v.toLocaleString() }, min: minPrice * 0.98, max: yTopPos * 1.02 },
                     tooltip: { shared: true, x: { format: 'dd MMM yyyy' }, y: { formatter: (v) => `$${v.toLocaleString()}` } },
                     stroke: { width: 2.5, curve: 'straight' },
                     grid: { borderColor: '#eef2f6' },
                     annotations: annotations,
-                    markers: { size: 0, hover: { size: 5 } }
+                    markers: { size: 0 }
                 };
-                
                 if (currentChart) currentChart.destroy();
                 currentChart = new ApexCharts(document.querySelector("#btc-chart"), options);
                 await currentChart.render();
-                
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="10">❌ Hata: ${err.message}. Lütfen farklı bir aralık veya daha kısa bir zaman dilimi deneyin. (CoinCap bazen yoğun olabilir)</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="10">❌ Hata: ${err.message}. Binance API erişilebilir olmalı, lütfen internet bağlantınızı kontrol edin veya daha kısa aralık deneyin.</td></tr>`;
                 if (currentChart) currentChart.destroy();
             }
         }
-        
+
         function setQuickRange(daysBack) {
-            const end = new Date();
-            end.setHours(0,0,0,0);
+            const end = new Date(); end.setHours(0,0,0,0);
             let start = new Date();
-            if (daysBack === 'all') {
-                start = new Date(2013, 0, 1);  // CoinCap'in en eski verileri 2013 civarı
-            } else {
-                start.setDate(end.getDate() - daysBack);
-            }
+            if (daysBack === 'all') start = new Date(2017, 0, 1);
+            else start.setDate(end.getDate() - daysBack);
             startDateInput.value = start.toISOString().split('T')[0];
             endDateInput.value = end.toISOString().split('T')[0];
             loadAndRender(startDateInput.value, endDateInput.value, daysListInput.value);
         }
-        
-        updateBtn.addEventListener('click', () => {
-            loadAndRender(startDateInput.value, endDateInput.value, daysListInput.value);
-        });
-        quickBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const range = btn.getAttribute('data-range');
-                if (range === 'all') setQuickRange('all');
-                else setQuickRange(parseInt(range));
-            });
-        });
-        
-        // Varsayılan yükleme: 2017-01-01'den bugüne, günler 2,3,4,5,6,10
-        const defaultEnd = new Date();
-        defaultEnd.setHours(0,0,0,0);
-        const defaultStart = new Date(2017, 0, 1);
-        startDateInput.value = defaultStart.toISOString().split('T')[0];
-        endDateInput.value = defaultEnd.toISOString().split('T')[0];
+
+        updateBtn.addEventListener('click', () => loadAndRender(startDateInput.value, endDateInput.value, daysListInput.value));
+        quickBtns.forEach(btn => btn.addEventListener('click', () => { const r = btn.getAttribute('data-range'); setQuickRange(r === 'all' ? 'all' : parseInt(r)); }));
+
+        const defEnd = new Date(); defEnd.setHours(0,0,0,0);
+        const defStart = new Date(2017, 0, 1);
+        startDateInput.value = defStart.toISOString().split('T')[0];
+        endDateInput.value = defEnd.toISOString().split('T')[0];
         daysListInput.value = "2,3,4,5,6,10";
         loadAndRender(startDateInput.value, endDateInput.value, daysListInput.value);
     })();
