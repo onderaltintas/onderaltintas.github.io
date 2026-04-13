@@ -22,77 +22,81 @@
 <div id="chart"></div>
 
 <script>
-    // 1. Chart ve Series Tanımı (v4 Güncel Standart)
+    // 1. Chart Tanımı
     const chart = LightweightCharts.createChart(document.getElementById('chart'), {
         layout: { background: { color: '#0b0e11' }, textColor: '#d1d4dc' },
         grid: { vertLines: { color: '#1f2226' }, horzLines: { color: '#1f2226' } },
         timeScale: { borderColor: '#2b2f36' }
     });
 
-    // v4'te önerilen modern seri ekleme metodu
-    const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+    // HATA ÇÖZÜMÜ: v4 Standalone versiyonunda en garantili seri ekleme metodu budur.
+    const candleSeries = chart.addCandlestickSeries({
         upColor: '#26a69a', downColor: '#ef5350', 
         borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350'
     });
 
     async function runAnalysis() {
-        const startTimestamp = new Date(document.getElementById('start').value).getTime();
+        const startVal = document.getElementById('start').value;
+        const startTimestamp = new Date(startVal).getTime();
         
-        // 2. Gerçek Veri (Binance)
-        const resp = await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=${startTimestamp}&limit=1000`);
-        const candles = await resp.json();
-        const data = candles.map(c => ({
-            time: c[0] / 1000,
-            open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4])
-        }));
-        candleSeries.setData(data);
+        // 2. Binance Verisi
+        try {
+            const resp = await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=${startTimestamp}&limit=1000`);
+            const candles = await resp.json();
+            const data = candles.map(c => ({
+                time: c[0] / 1000,
+                open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4])
+            }));
+            candleSeries.setData(data);
 
-        // 3. Astronomik Hesaplama ve Trend İşaretleme
-        const markers = [];
-        let searchDate = new Date(startTimestamp);
-        const now = new Date();
+            // 3. Astronomik Hesaplama
+            const markers = [];
+            let searchDate = new Date(startTimestamp);
+            const now = new Date();
 
-        while (searchDate < now) {
-            const nm = Astronomy.SearchMoonPhase(Astronomy.Phase.New, searchDate, 35);
-            if (!nm) break;
+            while (searchDate < now) {
+                const nm = Astronomy.SearchMoonPhase(Astronomy.Phase.New, searchDate, 35);
+                if (!nm) break;
 
-            const moonUnix = Math.floor(nm.date.getTime() / 1000);
-            // Veri seti içinde bu tarihe en yakın günü bul
-            const dayIdx = data.findIndex(d => Math.abs(d.time - moonUnix) < 43200);
+                const moonUnix = Math.floor(nm.date.getTime() / 1000);
+                const dayIdx = data.findIndex(d => Math.abs(d.time - moonUnix) < 43200);
 
-            if (dayIdx !== -1) {
-                const startPrice = data[dayIdx].close;
-                let color = "#fcd34d"; // Nötr/Yeni Ay
-                let label = "🌑";
+                if (dayIdx !== -1) {
+                    const startPrice = data[dayIdx].close;
+                    let color = "#fcd34d";
+                    let label = "🌑";
 
-                // 4 günlük eğilim kontrolü
-                if (dayIdx + 4 < data.length) {
-                    const endPrice = data[dayIdx + 4].close;
-                    if (endPrice < startPrice) {
-                        color = "#ef5350"; // Düşüş
-                        label = "🌑 📉";
-                    } else {
-                        color = "#26a69a"; // Yükseliş
-                        label = "🌑 📈";
+                    if (dayIdx + 4 < data.length) {
+                        const endPrice = data[dayIdx + 4].close;
+                        if (endPrice < startPrice) {
+                            color = "#ef5350"; // Düşüş
+                            label = "🌑 📉";
+                        } else {
+                            color = "#26a69a"; // Yükseliş
+                            label = "🌑 📈";
+                        }
                     }
-                }
 
-                markers.push({
-                    time: data[dayIdx].time,
-                    position: 'aboveBar',
-                    color: color,
-                    shape: 'arrowDown',
-                    text: label
-                });
+                    markers.push({
+                        time: data[dayIdx].time,
+                        position: 'aboveBar',
+                        color: color,
+                        shape: 'arrowDown',
+                        text: label
+                    });
+                }
+                searchDate = new Date(nm.date.getTime() + 25 * 24 * 60 * 60 * 1000);
             }
-            searchDate = new Date(nm.date.getTime() + 25 * 24 * 60 * 60 * 1000);
+            candleSeries.setMarkers(markers);
+            chart.timeScale().fitContent();
+
+        } catch (err) {
+            console.error("Veri çekme hatası:", err);
         }
-        candleSeries.setMarkers(markers);
-        chart.timeScale().fitContent();
     }
 
     document.getElementById('run').addEventListener('click', runAnalysis);
-    runAnalysis(); // İlk açılışta çalıştır
+    runAnalysis();
 </script>
 </body>
 </html>
