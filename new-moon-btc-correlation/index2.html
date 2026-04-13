@@ -8,10 +8,12 @@
     <style>
         body { margin: 0; background: #0b0e11; color: #d1d4dc; font-family: sans-serif; padding: 20px; }
         #chart { width: 100%; height: 650px; border: 1px solid #2b2f36; }
-        .ui { margin-bottom: 10px; display: flex; gap: 10px; align-items: center; }
-        input { background: #1e222d; border: 1px solid #363c4e; color: white; padding: 5px; border-radius: 4px; }
+        .ui { margin-bottom: 10px; display: flex; gap: 15px; align-items: center; background: #1e222d; padding: 10px; border-radius: 8px; }
+        input { background: #0b0e11; border: 1px solid #363c4e; color: white; padding: 5px; border-radius: 4px; width: 120px; }
+        .day-input { width: 50px; text-align: center; }
         button { background: #2962ff; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; }
         button:hover { background: #1e4bd8; }
+        label { font-size: 14px; }
     </style>
 </head>
 <body>
@@ -19,12 +21,15 @@
 <div class="ui">
     <label>Başlangıç:</label>
     <input type="date" id="start" value="2024-01-01">
+    
+    <label>Analiz Süreci (Gün):</label>
+    <input type="number" id="checkDays" class="day-input" value="4" min="1" max="30">
+    
     <button id="run">ANALİZ ET</button>
 </div>
 <div id="chart"></div>
 
 <script>
-    // Grafik Kurulumu
     const chart = LightweightCharts.createChart(document.getElementById('chart'), {
         layout: { background: { color: '#0b0e11' }, textColor: '#d1d4dc' },
         grid: { vertLines: { color: '#1f2226' }, horzLines: { color: '#1f2226' } },
@@ -38,10 +43,10 @@
 
     async function runAnalysis() {
         const startVal = document.getElementById('start').value;
+        const checkDays = parseInt(document.getElementById('checkDays').value) || 1;
         const startTimestamp = new Date(startVal).getTime();
         
         try {
-            // 1. Binance Verisi
             const resp = await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=${startTimestamp}&limit=1000`);
             const candles = await resp.json();
             
@@ -53,19 +58,13 @@
             }));
             candleSeries.setData(btcData);
 
-            // 2. Astronomik Hesaplama (Hata Giderilmiş Kısım)
-            // Kütüphanenin global objesini kontrol et ve güvenli şekilde kullan
             const astro = window.Astronomy || Astronomy;
-            if (!astro) throw new Error("Astronomy kütüphanesi yüklenemedi.");
-
             const markers = [];
             let searchDate = new Date(startTimestamp);
             const now = new Date();
 
             while (searchDate < now) {
-                // 'New' özelliğine doğrudan erişmek yerine enum değerini (0) veya nesneyi kontrol ederek kullanıyoruz
-                const nm = astro.SearchMoonPhase(0, searchDate, 40); // 0 = New Moon
-                
+                const nm = astro.SearchMoonPhase(0, searchDate, 40); 
                 if (!nm) break;
 
                 const moonUnix = Math.floor(nm.date.getTime() / 1000);
@@ -76,14 +75,16 @@
                     let color = "#fcd34d";
                     let label = "🌑";
 
-                    if (dayIdx + 4 < btcData.length) {
-                        const endPrice = btcData[dayIdx + 4].close;
+                    // Dinamik gün kontrolü: dayIdx + kullanıcının girdiği gün sayısı
+                    if (dayIdx + checkDays < btcData.length) {
+                        const endPrice = btcData[dayIdx + checkDays].close;
+                        
                         if (endPrice < startPrice) {
-                            color = "#ef5350"; // Düşüş
-                            label = "🌑 📉";
+                            color = "#ef5350"; 
+                            label = `🌑 -${checkDays}g 📉`;
                         } else {
-                            color = "#26a69a"; // Yükseliş
-                            label = "🌑 📈";
+                            color = "#26a69a"; 
+                            label = `🌑 +${checkDays}g 📈`;
                         }
                     }
 
@@ -95,7 +96,6 @@
                         text: label
                     });
                 }
-                // Bir sonraki tarama için tarihi ileri at
                 searchDate = new Date(nm.date.getTime() + 25 * 24 * 60 * 60 * 1000);
             }
 
@@ -109,7 +109,6 @@
     }
 
     document.getElementById('run').addEventListener('click', runAnalysis);
-    // Sayfa yüklendiğinde otomatik çalıştır
     window.onload = runAnalysis;
 </script>
 </body>
