@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>BTC Yeni Ay - Bilimsel Korelasyon Analizi</title>
+    <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+    <style>
+        body { margin: 0; background: #0b0e11; color: #d1d4dc; font-family: sans-serif; padding: 20px; }
+        #chart { width: 100%; height: 550px; border: 1px solid #2b2f36; }
+        .ui { margin-bottom: 10px; display: flex; gap: 15px; align-items: center; background: #1e222d; padding: 15px; border-radius: 8px; }
+        .stats-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; background: #161a1e; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #2962ff; }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-value { font-size: 20px; font-weight: bold; color: white; }
+        .stat-label { font-size: 11px; color: #848e9c; text-transform: uppercase; margin-bottom: 4px; }
+        .correlation-result { margin-top: 10px; padding: 10px; border-radius: 4px; font-weight: bold; font-size: 14px; text-align: center; }
+        .significant { background: rgba(38, 166, 154, 0.2); color: #26a69a; border: 1px solid #26a69a; }
+        .not-significant { background: rgba(239, 83, 80, 0.2); color: #ef5350; border: 1px solid #ef5350; }
+        input { background: #0b0e11; border: 1px solid #363c4e; color: white; padding: 8px; border-radius: 4px; }
+        .day-input { width: 50px; text-align: center; }
+        button { background: #2962ff; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="ui">
+    <label>Başlangıç:</label>
+    <input type="date" id="start" value="2022-01-01">
+    <label>Analiz Süreci (Gün):</label>
+    <input type="number" id="checkDays" class="day-input" value="4">
+    <button id="run">ANALİZİ BAŞLAT</button>
+</div>
+
+<div class="stats-panel">
+    <div class="stat-item"><span class="stat-label">Örneklem (N)</span><span class="stat-value" id="totalCount">-</span></div>
+    <div class="stat-item"><span class="stat-label">Düşüş Sayısı</span><span class="stat-value" id="downCount" style="color: #ef5350;">-</span></div>
+    <div class="stat-item"><span class="stat-label">Düşüş Oranı</span><span class="stat-value" id="ratio">-</span></div>
+    <div class="stat-item"><span class="stat-label">P-Değeri</span><span class="stat-value" id="pvalue">-</span></div>
+</div>
+
+<div id="correlationBox" class="correlation-result" style="display:none;"></div>
+<div id="chart"></div>
+
+<script>
+    // Binom Dağılımı üzerinden P-Değeri hesaplama (Sadece Düşüş Olasılığı için)
+    function calculatePValue(n, k) {
+        if (n === 0) return 1;
+        let p = 0;
+        const prob = 0.5; // Şans eseri (yazı-tura) olasılığı
+        
+        function combinations(n, k) {
+            if (k < 0 || k > n) return 0;
+            if (k === 0 || k === n) return 1;
+            if (k > n / 2) k = n - k;
+            let res = 1;
+            for (let i = 1; i <= k; i++) res = res * (n - i + 1) / i;
+            return res;
+        }
+
+        // Kümülatif Binom Olasılığı (En az k başarı gelme ihtimali)
+        for (let i = k; i <= n; i++) {
+            p += combinations(n, i) * Math.pow(prob, i) * Math.pow(1 - prob, n - i);
+        }
+        return p;
+    }
+
+    const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+        layout: { background: { color: '#0b0e11' }, textColor: '#d1d4dc' },
+        grid: { vertLines: { color: '#1f2226' }, horzLines: { color: '#1f2226' } },
+        timeScale: { borderColor: '#2b2f36', timeVisible: true }
+    });
+    const candleSeries = chart.addCandlestickSeries({ upColor: '#26a69a', downColor: '#ef5350' });
+
+    async function runAnalysis() {
+        const startVal = document.getElementById('start').value;
+        const checkDays = parseInt(document.getElementById('checkDays').value) || 1;
+        const startTimestamp = new Date(startVal).getTime();
+        
+        try {
+            const resp = await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=${startTimestamp}&limit=1000`);
+            const candles = await resp.json();
+            const btcData = candles.map(c => ({
+                time: c[0] / 1000,
+                open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4])
+            }));
+            candleSeries.setData(btcData);
+
+            const astro = window.Astronomy || Astronomy;
+            let total = 0, downs = 0;
+            const markers = [];
+            let searchDate = new Date(startTimestamp);
+
+            while (searchDate < new Date()) {
+                const nm = astro.SearchMoonPhase(0, searchDate, 40); 
+                if (!nm) break;
+                const moonUnix = Math.floor(nm.date.getTime() / 1000);
+                const idx = btcData.findIndex(d => Math.abs(d.time - moonUnix) < 43200);
+
+                if (idx !== -1 && idx + checkDays < btcData.length) {
+                    total++;
+                    const isDown = btcData[idx + checkDays].close < btcData[idx].close;
+                    if (isDown) downs++;
+                    
+                    markers.push({
+                        time: btcData[idx].time,
+                        position: 'aboveBar',
+                        color: isDown ? '#ef5350' : '#26a69a',
+                        shape: 'circle',
+                        text: isDown ? '📉' : '📈'
+                    });
+                }
+                searchDate = new Date(nm.date.getTime() + 25 * 24 * 60 * 60 * 1000);
+            }
+
+            // İstatistiksel Sonuçlandırma
+            const pVal = calculatePValue(total, downs);
+            const ratio = ((downs / total) * 100).toFixed(1);
+            
+            document.getElementById('totalCount').innerText = total;
+            document.getElementById('downCount').innerText = downs;
+            document.getElementById('ratio').innerText = `%${ratio}`;
+            document.getElementById('pvalue').innerText = pVal.toFixed(4);
+
+            const box = document.getElementById('correlationBox');
+            box.style.display = 'block';
+            
+            if (pVal < 0.05) {
+                box.className = 'correlation-result significant';
+                box.innerText = `ANLAMLI KORELASYON: Yeni Ay sonrası ${checkDays} günlük düşüş eğilimi rastlantısal değildir (Güven düzeyi %95+).`;
+            } else {
+                box.className = 'correlation-result not-significant';
+                box.innerText = `ANLAMSIZ KORELASYON: Yeni Ay ve düşüş arasında istatistiksel olarak rastlantıyı aşan bir bağ bulunamadı.`;
+            }
+
+            candleSeries.setMarkers(markers);
+            chart.timeScale().fitContent();
+        } catch (e) { alert("Hata oluştu."); }
+    }
+    document.getElementById('run').addEventListener('click', runAnalysis);
+    window.onload = runAnalysis;
+</script>
+</body>
+</html>
