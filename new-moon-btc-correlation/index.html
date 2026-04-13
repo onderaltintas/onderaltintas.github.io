@@ -7,29 +7,30 @@
     <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
     <style>
         body { margin: 0; background: #0b0e11; color: #d1d4dc; font-family: sans-serif; padding: 20px; }
-        #chart { width: 100%; height: 600px; border: 1px solid #2b2f36; }
-        .ui { margin-bottom: 10px; display: flex; gap: 10px; }
-        input { background: #1e222d; border: 1px solid #363c4e; color: white; padding: 5px; }
-        button { background: #2962ff; color: white; border: none; padding: 6px 12px; cursor: pointer; }
+        #chart { width: 100%; height: 650px; border: 1px solid #2b2f36; }
+        .ui { margin-bottom: 10px; display: flex; gap: 10px; align-items: center; }
+        input { background: #1e222d; border: 1px solid #363c4e; color: white; padding: 5px; border-radius: 4px; }
+        button { background: #2962ff; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #1e4bd8; }
     </style>
 </head>
 <body>
 
 <div class="ui">
+    <label>Başlangıç:</label>
     <input type="date" id="start" value="2024-01-01">
-    <button id="run">Analiz Et</button>
+    <button id="run">ANALİZ ET</button>
 </div>
 <div id="chart"></div>
 
 <script>
-    // 1. Chart Tanımı
+    // Grafik Kurulumu
     const chart = LightweightCharts.createChart(document.getElementById('chart'), {
         layout: { background: { color: '#0b0e11' }, textColor: '#d1d4dc' },
         grid: { vertLines: { color: '#1f2226' }, horzLines: { color: '#1f2226' } },
-        timeScale: { borderColor: '#2b2f36' }
+        timeScale: { borderColor: '#2b2f36', timeVisible: true }
     });
 
-    // HATA ÇÖZÜMÜ: v4 Standalone versiyonunda en garantili seri ekleme metodu budur.
     const candleSeries = chart.addCandlestickSeries({
         upColor: '#26a69a', downColor: '#ef5350', 
         borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350'
@@ -39,35 +40,44 @@
         const startVal = document.getElementById('start').value;
         const startTimestamp = new Date(startVal).getTime();
         
-        // 2. Binance Verisi
         try {
+            // 1. Binance Verisi
             const resp = await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=${startTimestamp}&limit=1000`);
             const candles = await resp.json();
-            const data = candles.map(c => ({
+            
+            if (!Array.isArray(candles)) throw new Error("Veri alınamadı.");
+
+            const btcData = candles.map(c => ({
                 time: c[0] / 1000,
                 open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4])
             }));
-            candleSeries.setData(data);
+            candleSeries.setData(btcData);
 
-            // 3. Astronomik Hesaplama
+            // 2. Astronomik Hesaplama (Hata Giderilmiş Kısım)
+            // Kütüphanenin global objesini kontrol et ve güvenli şekilde kullan
+            const astro = window.Astronomy || Astronomy;
+            if (!astro) throw new Error("Astronomy kütüphanesi yüklenemedi.");
+
             const markers = [];
             let searchDate = new Date(startTimestamp);
             const now = new Date();
 
             while (searchDate < now) {
-                const nm = Astronomy.SearchMoonPhase(Astronomy.Phase.New, searchDate, 35);
+                // 'New' özelliğine doğrudan erişmek yerine enum değerini (0) veya nesneyi kontrol ederek kullanıyoruz
+                const nm = astro.SearchMoonPhase(0, searchDate, 40); // 0 = New Moon
+                
                 if (!nm) break;
 
                 const moonUnix = Math.floor(nm.date.getTime() / 1000);
-                const dayIdx = data.findIndex(d => Math.abs(d.time - moonUnix) < 43200);
+                const dayIdx = btcData.findIndex(d => Math.abs(d.time - moonUnix) < 43200);
 
                 if (dayIdx !== -1) {
-                    const startPrice = data[dayIdx].close;
+                    const startPrice = btcData[dayIdx].close;
                     let color = "#fcd34d";
                     let label = "🌑";
 
-                    if (dayIdx + 4 < data.length) {
-                        const endPrice = data[dayIdx + 4].close;
+                    if (dayIdx + 4 < btcData.length) {
+                        const endPrice = btcData[dayIdx + 4].close;
                         if (endPrice < startPrice) {
                             color = "#ef5350"; // Düşüş
                             label = "🌑 📉";
@@ -78,25 +88,29 @@
                     }
 
                     markers.push({
-                        time: data[dayIdx].time,
+                        time: btcData[dayIdx].time,
                         position: 'aboveBar',
                         color: color,
-                        shape: 'arrowDown',
+                        shape: 'circle',
                         text: label
                     });
                 }
+                // Bir sonraki tarama için tarihi ileri at
                 searchDate = new Date(nm.date.getTime() + 25 * 24 * 60 * 60 * 1000);
             }
+
             candleSeries.setMarkers(markers);
             chart.timeScale().fitContent();
 
         } catch (err) {
-            console.error("Veri çekme hatası:", err);
+            console.error("Hata detayı:", err);
+            alert("Bir hata oluştu: " + err.message);
         }
     }
 
     document.getElementById('run').addEventListener('click', runAnalysis);
-    runAnalysis();
+    // Sayfa yüklendiğinde otomatik çalıştır
+    window.onload = runAnalysis;
 </script>
 </body>
 </html>
