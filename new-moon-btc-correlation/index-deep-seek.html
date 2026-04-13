@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Bitcoin Yeni Ay Etkisi | Esnek Gün Seçimi</title>
+    <title>Bitcoin Yeni Ay Etkisi | CoinCap (Ücretsiz, Eski Veri)</title>
     <!-- ApexCharts Güncel v3.54.0 -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.0/dist/apexcharts.min.js"></script>
     <style>
@@ -59,7 +59,6 @@
             line-height: 1.4;
         }
 
-        /* kontrol paneli */
         .control-bar {
             background: #f8fafc;
             border-radius: 28px;
@@ -141,7 +140,6 @@
             height: 500px;
             border-radius: 24px;
         }
-
         .stats-panel {
             background: #f1f5f9;
             border-radius: 28px;
@@ -174,7 +172,6 @@
         }
         .trend-down { color: #dc2626; }
         .trend-up { color: #10b981; }
-
         .events-table {
             overflow-x: auto;
             border-radius: 24px;
@@ -236,18 +233,17 @@
 <div class="container">
     <h1>
         🌕 Bitcoin · Yeni Ay Sonrası Esnek Gün Analizi
-        <small>Kullanıcı tanımlı günler (2,3,5,10...)</small>
+        <small>CoinCap API · 2013 öncesine kadar veri</small>
     </h1>
     <div class="sub">
         📅 Dikey çizgiler + 🌙 yuvarlağı yeni ay günlerini işaretler. Renkli çizgi: seçtiğiniz günlerden <strong>en büyük gün</strong> için fiyat eğimini gösterir.<br>
-        ⚡ Aşağıdan <strong>başlangıç & bitiş tarihi</strong> ve <strong>analiz edilecek günler</strong> (virgülle ayrılmış) girerek tablo ve istatistikleri özelleştirin.
+        ⚡ <strong>CoinCap ücretsiz ve anahtar gerektirmez, çok eski tarihleri destekler.</strong> Başlangıç tarihini 2013 öncesine çekebilirsiniz.
     </div>
 
-    <!-- Kontroller: tarih aralığı + gün listesi -->
     <div class="control-bar">
         <div class="date-group">
             <label>📆 Başlangıç Tarihi</label>
-            <input type="date" id="startDate" value="2023-01-01">
+            <input type="date" id="startDate" value="2017-01-01">
         </div>
         <div class="date-group">
             <label>📆 Bitiş Tarihi</label>
@@ -263,7 +259,7 @@
             <button class="quick-btn" data-range="90">Son 90 gün</button>
             <button class="quick-btn" data-range="180">Son 180 gün</button>
             <button class="quick-btn" data-range="365">Son 365 gün</button>
-            <button class="quick-btn" data-range="all">Maksimum (2020- bugün)</button>
+            <button class="quick-btn" data-range="all">Maksimum (2013- bugün)</button>
         </div>
     </div>
 
@@ -271,13 +267,10 @@
         <div id="btc-chart"></div>
     </div>
 
-    <!-- Dinamik istatistik paneli (her seçilen gün için ortalama) -->
     <div class="stats-panel" id="statsPanel">
         <div class="stat-card"><div class="label">🌙 Yeni Ay Sayısı</div><div class="value" id="moonCount">-</div></div>
-        <!-- Diğer istatistikler JS ile doldurulacak -->
     </div>
 
-    <!-- Dinamik tablo (sütunlar seçilen günlere göre) -->
     <div class="events-table">
         <table id="moonTable">
             <thead id="tableHeader">
@@ -289,14 +282,13 @@
         </table>
     </div>
     <div class="footer-note">
-        ⚡ Veri: CoinGecko API (BTC/USD günlük kapanış). Yeni aylar astronomik referansla hesaplanır. 
-        Grafikteki renkli ok, seçilen günlerin maksimum değeri için yeni aydan itibaren fiyat eğimini gösterir (kırmızı=düşüş, yeşil=yükseliş).
+        ✅ Veri: <strong>CoinCap.io</strong> (BTC/USD, günlük kapanış). CoinGecko 401 hatası çözüldü. Yeni aylar astronomik hesapla.
+        Grafikteki renkli ok, seçilen günlerin maksimum değeri için yeni aydan itibaren fiyat eğimini gösterir.
     </div>
 </div>
 
 <script>
     (function() {
-        // DOM referansları
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
         const daysListInput = document.getElementById('daysList');
@@ -309,12 +301,13 @@
         
         let currentChart = null;
         
-        // ---- yeni ay hesaplama (JD tabanlı) ----
+        // ---- Yeni Ay Hesaplama (JD tabanlı, güvenilir) ----
         function getNewMoonsBetween(startDateStr, endDateStr) {
             const start = new Date(startDateStr);
             const end = new Date(endDateStr);
             start.setUTCHours(0,0,0,0);
             end.setUTCHours(0,0,0,0);
+            // Referans: 2024-01-11 11:57:59 UTC (kesin yeni ay)
             const refDate = new Date(Date.UTC(2024, 0, 11, 11, 57, 59));
             const refTime = refDate.getTime();
             const lunarCycleMs = 29.53058867 * 86400000;
@@ -332,67 +325,77 @@
             return [...new Set(newMoons)].sort();
         }
         
-        // API'den fiyat verisi çek (range)
-        async function fetchBitcoinRange(startTimestamp, endTimestamp) {
-            const url = `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${startTimestamp}&to=${endTimestamp}`;
+        // ---- CoinCap API (tüm tarihsel veriyi çeker, sonra filtreleriz) ----
+        // CoinCap "history" endpoint'i: https://api.coincap.io/v2/assets/bitcoin/history?interval=d1&start=...&end=...
+        // timestamp milisaniye değil, saniye olarak bekliyor.
+        async function fetchBitcoinPriceRange(startDateStr, endDateStr) {
+            const start = new Date(startDateStr);
+            const end = new Date(endDateStr);
+            // CoinCap interval=d1 için start ve end UNIX saniye
+            const startSec = Math.floor(start.getTime() / 1000);
+            const endSec = Math.floor(end.getTime() / 1000);
+            const url = `https://api.coincap.io/v2/assets/bitcoin/history?interval=d1&start=${startSec}&end=${endSec}`;
             const response = await fetch(url);
-            if (!response.ok) throw new Error(`CoinGecko API hatası: ${response.status}`);
+            if (!response.ok) throw new Error(`CoinCap API hatası: ${response.status}`);
             const json = await response.json();
-            if (!json.prices || json.prices.length === 0) throw new Error("Bu aralıkta fiyat verisi yok");
-            return json.prices.map(item => ({ timestamp: item[0], price: item[1] }));
+            if (!json.data || json.data.length === 0) throw new Error("Bu aralıkta veri yok");
+            // json.data: [{priceUsd: "12345.67", time: 1640995200000}, ...] time ms cinsinden
+            const prices = json.data.map(item => ({
+                timestamp: item.time,
+                price: parseFloat(item.priceUsd)
+            }));
+            // artan sırada sırala
+            prices.sort((a,b) => a.timestamp - b.timestamp);
+            return prices;
         }
         
-        // Virgülle ayrılmış günleri parse et, sırala, pozitif tamsayılar
         function parseDaysList(daysStr) {
             let parts = daysStr.split(',').map(s => parseInt(s.trim(), 10));
             parts = parts.filter(n => !isNaN(n) && n > 0);
-            if (parts.length === 0) return [2,3,4]; // varsayılan
+            if (parts.length === 0) return [2,3,4];
             return [...new Set(parts)].sort((a,b)=>a-b);
         }
         
-        // Ana işlev
         async function loadAndRender(startDateStr, endDateStr, daysStr) {
             const start = new Date(startDateStr);
             const end = new Date(endDateStr);
             if (isNaN(start) || isNaN(end) || start >= end) {
-                alert("Geçerli bir tarih aralığı girin (başlangıç bitişten önce)");
+                alert("Geçerli bir tarih aralığı girin");
                 return;
             }
             const daysArr = parseDaysList(daysStr);
             if (daysArr.length === 0) {
-                alert("Lütfen en az bir pozitif gün sayısı girin (örnek: 2,3,5)");
+                alert("Lütfen en az bir pozitif gün sayısı girin");
                 return;
             }
             
-            const startTs = Math.floor(start.getTime() / 1000);
-            const endTs = Math.floor(end.getTime() / 1000);
-            
-            // UI hazırlığı
-            tableBody.innerHTML = '<tr><td colspan="10">📡 Veri yükleniyor...</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="10">📡 CoinCap üzerinden veri alınıyor... (eski tarihler desteklenir)</td></tr>';
             moonCountSpan.innerText = '...';
-            // statsPanel içindeki eski kartları temizle (moonCount hariç)
             const existingCards = statsPanel.querySelectorAll('.stat-card:not(:first-child)');
             existingCards.forEach(card => card.remove());
             
             try {
-                // 1. fiyat verisi
-                const priceData = await fetchBitcoinRange(startTs, endTs);
+                // 1. Fiyat verisini al
+                const priceData = await fetchBitcoinPriceRange(startDateStr, endDateStr);
+                if (priceData.length === 0) throw new Error("Veri aralığı boş");
+                
+                // Tarih string formatı YYYY-MM-DD
                 const btcDates = priceData.map(p => new Date(p.timestamp).toISOString().split('T')[0]);
                 const btcPrices = priceData.map(p => p.price);
                 const priceMap = new Map();
                 for (let i=0; i<btcDates.length; i++) priceMap.set(btcDates[i], btcPrices[i]);
                 
-                // 2. yeni ayları bul (fiyat verisi olan)
+                // 2. Yeni ayları bul (fiyat verisi olan)
                 const allNewMoons = getNewMoonsBetween(startDateStr, endDateStr);
                 const moonDates = allNewMoons.filter(m => priceMap.has(m));
                 if (moonDates.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="10">⚠️ Seçilen aralıkta yeni ay gününe denk fiyat verisi yok. Daha geniş aralık deneyin.</td></tr>';
+                    tableBody.innerHTML = `<tr><td colspan="10">⚠️ Seçilen aralıkta yeni ay gününe denk fiyat verisi yok. Daha geniş aralık deneyin.</td></tr>`;
                     if (currentChart) currentChart.destroy();
                     moonCountSpan.innerText = "0";
                     return;
                 }
                 
-                // 3. Her yeni ay için seçilen günlerdeki fiyat değişimlerini hesapla
+                // 3. Her yeni ay için değişimleri hesapla
                 const moonEvents = [];
                 for (let moonDate of moonDates) {
                     const moonIdx = btcDates.findIndex(d => d === moonDate);
@@ -408,15 +411,10 @@
                             changes[day] = null;
                         }
                     }
-                    moonEvents.push({
-                        moonDate,
-                        startPrice,
-                        changes,
-                        moonIdx
-                    });
+                    moonEvents.push({ moonDate, startPrice, changes, moonIdx });
                 }
                 
-                // 4. İstatistikler: her gün için ortalama değişim
+                // 4. İstatistikler
                 const stats = {};
                 for (let day of daysArr) {
                     const validChanges = moonEvents.map(ev => ev.changes[day]).filter(v => v !== null);
@@ -424,10 +422,7 @@
                     stats[day] = { avg, count: validChanges.length };
                 }
                 
-                // Güncelle: yeni ay sayısı
                 moonCountSpan.innerText = moonEvents.length;
-                
-                // İstatistik kartlarını oluştur
                 for (let day of daysArr) {
                     const avgVal = stats[day].avg;
                     const avgText = (avgVal !== null) ? avgVal.toFixed(2) + '%' : '—';
@@ -438,36 +433,25 @@
                     statsPanel.appendChild(card);
                 }
                 
-                // 5. Dinamik tablo oluştur (başlıklar ve satırlar)
-                // Başlık
+                // 5. Dinamik Tablo
                 let headerHtml = '<tr><th>🌙 Yeni Ay Tarihi</th>';
-                for (let day of daysArr) {
-                    headerHtml += `<th>+${day} Gün %</th>`;
-                }
+                for (let day of daysArr) headerHtml += `<th>+${day} Gün %</th>`;
                 headerHtml += '<th>En Uzun Eğim</th></tr>';
                 tableHeader.innerHTML = headerHtml;
-                
-                // Tablo gövdesi
                 tableBody.innerHTML = '';
                 for (let ev of moonEvents) {
                     const row = document.createElement('tr');
-                    // Tarih hücresi
                     const dateCell = document.createElement('td');
                     dateCell.innerHTML = `<span class="badge-moon">🌙 ${ev.moonDate}</span>`;
                     row.appendChild(dateCell);
-                    
-                    // Her gün için değişim yüzdesi
                     for (let day of daysArr) {
                         const chg = ev.changes[day];
                         const cell = document.createElement('td');
                         const display = (chg !== null) ? chg.toFixed(2)+'%' : '—';
                         cell.innerHTML = display;
-                        if (chg !== null) {
-                            cell.className = (chg < 0) ? 'down-percent' : 'up-percent';
-                        }
+                        if (chg !== null) cell.className = (chg < 0) ? 'down-percent' : 'up-percent';
                         row.appendChild(cell);
                     }
-                    // son sütun: en büyük gün için eğim yönü (bilgi)
                     const maxDay = Math.max(...daysArr);
                     const maxChg = ev.changes[maxDay];
                     const trendText = (maxChg !== null) ? (maxChg < 0 ? '📉 düşüş eğimi' : '📈 yükseliş eğimi') : 'veri yok';
@@ -477,15 +461,13 @@
                     tableBody.appendChild(row);
                 }
                 
-                // 6. Grafik oluştur / güncelle (ApexCharts)
+                // 6. Grafik (ApexCharts)
                 const chartData = btcDates.map((date, idx) => ({ x: new Date(date).getTime(), y: btcPrices[idx] }));
                 const maxPrice = Math.max(...btcPrices);
                 const minPrice = Math.min(...btcPrices);
                 const yTopPos = maxPrice + (maxPrice - minPrice) * 0.07;
                 
-                // annotations
                 let annotations = { xaxis: [], points: [], shapes: [] };
-                // yeni ay dikey çizgiler + ay sembolleri
                 for (let ev of moonEvents) {
                     const moonTs = new Date(ev.moonDate).getTime();
                     annotations.xaxis.push({ x: moonTs, borderColor: '#fbbf24', strokeDashArray: 2, borderWidth: 1.8, opacity: 0.7 });
@@ -496,7 +478,6 @@
                     });
                 }
                 
-                // Eğim çizgisi: seçilen günlerin maksimumu için (varsa)
                 const maxSelectedDay = Math.max(...daysArr);
                 for (let ev of moonEvents) {
                     const targetIdx = ev.moonIdx + maxSelectedDay;
@@ -517,8 +498,8 @@
                 const options = {
                     series: [{ name: "BTC (USD)", data: chartData, type: 'line', color: '#2563eb' }],
                     chart: { type: 'line', height: 500, toolbar: { show: true }, zoom: { enabled: true }, background: '#ffffff' },
-                    title: { text: `${startDateStr} - ${endDateStr} arası · ${daysArr.join(', ')} günlük analiz`, align: 'left', style: { fontSize: '12px' } },
-                    xaxis: { type: 'datetime', labels: { datetimeUTC: true, format: 'dd MMM' }, tickAmount: 8 },
+                    title: { text: `${startDateStr} - ${endDateStr} · ${daysArr.join(', ')} günlük analiz (CoinCap)`, align: 'left', style: { fontSize: '12px' } },
+                    xaxis: { type: 'datetime', labels: { datetimeUTC: true, format: 'dd MMM yyyy' }, tickAmount: 8 },
                     yaxis: { title: { text: 'Fiyat (USD)' }, labels: { formatter: (v) => '$' + v.toLocaleString() }, min: minPrice * 0.98, max: yTopPos * 1.02 },
                     tooltip: { shared: true, x: { format: 'dd MMM yyyy' }, y: { formatter: (v) => `$${v.toLocaleString()}` } },
                     stroke: { width: 2.5, curve: 'straight' },
@@ -533,18 +514,17 @@
                 
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="10">❌ Hata: ${err.message}. Lütfen farklı aralık veya günler deneyin.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="10">❌ Hata: ${err.message}. Lütfen farklı bir aralık veya daha kısa bir zaman dilimi deneyin. (CoinCap bazen yoğun olabilir)</td></tr>`;
                 if (currentChart) currentChart.destroy();
             }
         }
         
-        // yardımcı: quick range ayarla
         function setQuickRange(daysBack) {
             const end = new Date();
             end.setHours(0,0,0,0);
             let start = new Date();
             if (daysBack === 'all') {
-                start = new Date(2020, 0, 1);
+                start = new Date(2013, 0, 1);  // CoinCap'in en eski verileri 2013 civarı
             } else {
                 start.setDate(end.getDate() - daysBack);
             }
@@ -553,7 +533,6 @@
             loadAndRender(startDateInput.value, endDateInput.value, daysListInput.value);
         }
         
-        // event listeners
         updateBtn.addEventListener('click', () => {
             loadAndRender(startDateInput.value, endDateInput.value, daysListInput.value);
         });
@@ -565,11 +544,10 @@
             });
         });
         
-        // Varsayılan yükleme (son 540 gün, günler 2,3,4,5,6,10)
+        // Varsayılan yükleme: 2017-01-01'den bugüne, günler 2,3,4,5,6,10
         const defaultEnd = new Date();
         defaultEnd.setHours(0,0,0,0);
-        const defaultStart = new Date();
-        defaultStart.setDate(defaultEnd.getDate() - 540);
+        const defaultStart = new Date(2017, 0, 1);
         startDateInput.value = defaultStart.toISOString().split('T')[0];
         endDateInput.value = defaultEnd.toISOString().split('T')[0];
         daysListInput.value = "2,3,4,5,6,10";
