@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Bitcoin Yeni Ay Etkisi | Esnek Tarih Aralığı</title>
-    <!-- ApexCharts Güncel (v3.54.0) -->
+    <title>Bitcoin Yeni Ay Etkisi | Esnek Gün Seçimi</title>
+    <!-- ApexCharts Güncel v3.54.0 -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.0/dist/apexcharts.min.js"></script>
     <style>
         * {
@@ -21,7 +21,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1500px;
             margin: 0 auto;
             background: white;
             border-radius: 36px;
@@ -71,19 +71,19 @@
             gap: 18px;
             border: 1px solid #e2e8f0;
         }
-        .date-group {
+        .date-group, .days-group {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
-        .date-group label {
+        .date-group label, .days-group label {
             font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #475569;
         }
-        .date-group input {
+        .date-group input, .days-group input {
             padding: 10px 14px;
             border-radius: 20px;
             border: 1px solid #cbd5e1;
@@ -92,7 +92,7 @@
             font-family: monospace;
             transition: 0.2s;
         }
-        .date-group input:focus {
+        .date-group input:focus, .days-group input:focus {
             outline: none;
             border-color: #f59e0b;
             box-shadow: 0 0 0 3px rgba(245,158,11,0.2);
@@ -133,7 +133,6 @@
         .quick-btn:hover {
             background: #cbd5e1;
         }
-
         .chart-wrapper {
             margin: 16px 0 20px 0;
         }
@@ -150,12 +149,12 @@
             margin: 20px 0 18px 0;
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
             gap: 16px;
+            justify-content: flex-start;
         }
         .stat-card {
             flex: 1;
-            min-width: 130px;
+            min-width: 120px;
             background: white;
             border-radius: 24px;
             padding: 12px 16px;
@@ -169,7 +168,7 @@
             color: #5b6e8c;
         }
         .stat-card .value {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             font-weight: 700;
             margin-top: 6px;
         }
@@ -224,22 +223,27 @@
         @media (max-width: 780px) {
             .control-bar { flex-direction: column; align-items: stretch; }
             .quick-btns { margin-left: 0; justify-content: space-between; }
-            .stat-card .value { font-size: 1.3rem; }
+            .stat-card .value { font-size: 1.2rem; }
+        }
+        .info-hint {
+            font-size: 0.7rem;
+            color: #475569;
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>
-        🌕 Bitcoin · Yeni Ay Sonrası Eğilim
-        <small>2, 3 ve 4 günlük düşüş/yükseliş analizi</small>
+        🌕 Bitcoin · Yeni Ay Sonrası Esnek Gün Analizi
+        <small>Kullanıcı tanımlı günler (2,3,5,10...)</small>
     </h1>
     <div class="sub">
-        📅 Dikey çizgiler + 🌙 yuvarlağı yeni ay günlerini işaretler. Renkli çizgiler: yeni aydan +4. güne kadar fiyat eğimi (kırmızı=düşüş, yeşil=yükseliş).<br>
-        ⚡ Aşağıdan <strong>başlangıç & bitiş tarihi</strong> seçerek analiz aralığını belirleyin.
+        📅 Dikey çizgiler + 🌙 yuvarlağı yeni ay günlerini işaretler. Renkli çizgi: seçtiğiniz günlerden <strong>en büyük gün</strong> için fiyat eğimini gösterir.<br>
+        ⚡ Aşağıdan <strong>başlangıç & bitiş tarihi</strong> ve <strong>analiz edilecek günler</strong> (virgülle ayrılmış) girerek tablo ve istatistikleri özelleştirin.
     </div>
 
-    <!-- Kontroller: tarih aralığı seçimi -->
+    <!-- Kontroller: tarih aralığı + gün listesi -->
     <div class="control-bar">
         <div class="date-group">
             <label>📆 Başlangıç Tarihi</label>
@@ -248,6 +252,11 @@
         <div class="date-group">
             <label>📆 Bitiş Tarihi</label>
             <input type="date" id="endDate" value="2025-04-01">
+        </div>
+        <div class="days-group">
+            <label>📊 Analiz Edilecek Günler (virgülle)</label>
+            <input type="text" id="daysList" value="2,3,4,5,6,10" placeholder="Örnek: 2,3,4,5,6,10">
+            <div class="info-hint">Yeni aydan sonraki günler: örn: 2,3,4,5,6,10,14</div>
         </div>
         <button id="updateBtn" class="btn-update">🔄 Güncelle & Analiz Et</button>
         <div class="quick-btns">
@@ -262,51 +271,55 @@
         <div id="btc-chart"></div>
     </div>
 
-    <!-- İstatistik özeti -->
+    <!-- Dinamik istatistik paneli (her seçilen gün için ortalama) -->
     <div class="stats-panel" id="statsPanel">
         <div class="stat-card"><div class="label">🌙 Yeni Ay Sayısı</div><div class="value" id="moonCount">-</div></div>
-        <div class="stat-card"><div class="label">📉 Ort. 2 Günlük %</div><div class="value" id="avg2d">-</div></div>
-        <div class="stat-card"><div class="label">📉 Ort. 3 Günlük %</div><div class="value" id="avg3d">-</div></div>
-        <div class="stat-card"><div class="label">📉 Ort. 4 Günlük %</div><div class="value" id="avg4d">-</div></div>
-        <div class="stat-card"><div class="label">📊 Genel Eğilim (4G)</div><div class="value" id="trendConclusion">-</div></div>
+        <!-- Diğer istatistikler JS ile doldurulacak -->
     </div>
 
-    <!-- Detay tablosu -->
+    <!-- Dinamik tablo (sütunlar seçilen günlere göre) -->
     <div class="events-table">
         <table id="moonTable">
-            <thead><tr><th>Yeni Ay Tarihi</th><th>+2 Gün %</th><th>+3 Gün %</th><th>+4 Gün %</th><th>4G Eğim Çizgisi</th></tr></thead>
-            <tbody id="moonTableBody"><tr><td colspan="5">Veri bekleniyor... Tarih aralığı seçip güncelleyin</td></tr></tbody>
+            <thead id="tableHeader">
+                <tr><th>Yeni Ay Tarihi</th><th>Yükleniyor...</th></tr>
+            </thead>
+            <tbody id="moonTableBody">
+                <tr><td colspan="10">Veri bekleniyor... Tarih aralığı ve günleri seçip güncelleyin</td></tr>
+            </tbody>
         </table>
     </div>
     <div class="footer-note">
         ⚡ Veri: CoinGecko API (BTC/USD günlük kapanış). Yeni aylar astronomik referansla hesaplanır. 
-        Grafikteki renkli oklar yeni aydan itibaren 4 günlük fiyat eğimini temsil eder. Kırmızı = düşüş eğilimi.
+        Grafikteki renkli ok, seçilen günlerin maksimum değeri için yeni aydan itibaren fiyat eğimini gösterir (kırmızı=düşüş, yeşil=yükseliş).
     </div>
 </div>
 
 <script>
     (function() {
-        // DOM elementleri
+        // DOM referansları
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
+        const daysListInput = document.getElementById('daysList');
         const updateBtn = document.getElementById('updateBtn');
         const quickBtns = document.querySelectorAll('.quick-btn');
+        const moonCountSpan = document.getElementById('moonCount');
+        const statsPanel = document.getElementById('statsPanel');
+        const tableHeader = document.getElementById('tableHeader');
+        const tableBody = document.getElementById('moonTableBody');
         
-        let currentChart = null;   // ApexCharts instance
+        let currentChart = null;
         
-        // ---- yardımcı: Yeni ay hesaplama (JD tabanlı) ----
+        // ---- yeni ay hesaplama (JD tabanlı) ----
         function getNewMoonsBetween(startDateStr, endDateStr) {
             const start = new Date(startDateStr);
             const end = new Date(endDateStr);
             start.setUTCHours(0,0,0,0);
             end.setUTCHours(0,0,0,0);
-            // referans yeni ay: 11 Ocak 2024 11:57:59 UTC
             const refDate = new Date(Date.UTC(2024, 0, 11, 11, 57, 59));
             const refTime = refDate.getTime();
             const lunarCycleMs = 29.53058867 * 86400000;
             let newMoons = [];
             let t = refTime;
-            // geriye git
             while (t > start.getTime()) t -= lunarCycleMs;
             while (t <= end.getTime()) {
                 if (t >= start.getTime()) {
@@ -319,126 +332,160 @@
             return [...new Set(newMoons)].sort();
         }
         
-        // ---- API'den fiyat verisi çek (range endpoint) ----
+        // API'den fiyat verisi çek (range)
         async function fetchBitcoinRange(startTimestamp, endTimestamp) {
             const url = `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${startTimestamp}&to=${endTimestamp}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`CoinGecko API hatası: ${response.status}`);
             const json = await response.json();
             if (!json.prices || json.prices.length === 0) throw new Error("Bu aralıkta fiyat verisi yok");
-            // dizi: [[timestamp, price]]
             return json.prices.map(item => ({ timestamp: item[0], price: item[1] }));
         }
         
-        // Ana işlev: tarih aralığı seçilip grafik+tablo yenilenir
-        async function loadAndRender(startDateStr, endDateStr) {
+        // Virgülle ayrılmış günleri parse et, sırala, pozitif tamsayılar
+        function parseDaysList(daysStr) {
+            let parts = daysStr.split(',').map(s => parseInt(s.trim(), 10));
+            parts = parts.filter(n => !isNaN(n) && n > 0);
+            if (parts.length === 0) return [2,3,4]; // varsayılan
+            return [...new Set(parts)].sort((a,b)=>a-b);
+        }
+        
+        // Ana işlev
+        async function loadAndRender(startDateStr, endDateStr, daysStr) {
             const start = new Date(startDateStr);
             const end = new Date(endDateStr);
             if (isNaN(start) || isNaN(end) || start >= end) {
-                alert("Lütfen geçerli bir tarih aralığı girin (başlangıç bitişten önce olmalı)");
+                alert("Geçerli bir tarih aralığı girin (başlangıç bitişten önce)");
                 return;
             }
-            // timestamp (saniye)
+            const daysArr = parseDaysList(daysStr);
+            if (daysArr.length === 0) {
+                alert("Lütfen en az bir pozitif gün sayısı girin (örnek: 2,3,5)");
+                return;
+            }
+            
             const startTs = Math.floor(start.getTime() / 1000);
             const endTs = Math.floor(end.getTime() / 1000);
             
-            // loading durumu
-            document.getElementById("moonTableBody").innerHTML = '<tr><td colspan="5">📡 Veri yükleniyor...</td></tr>';
-            document.getElementById("moonCount").innerText = '...';
+            // UI hazırlığı
+            tableBody.innerHTML = '<tr><td colspan="10">📡 Veri yükleniyor...</td></tr>';
+            moonCountSpan.innerText = '...';
+            // statsPanel içindeki eski kartları temizle (moonCount hariç)
+            const existingCards = statsPanel.querySelectorAll('.stat-card:not(:first-child)');
+            existingCards.forEach(card => card.remove());
             
             try {
-                // 1. fiyat verisini al
+                // 1. fiyat verisi
                 const priceData = await fetchBitcoinRange(startTs, endTs);
                 const btcDates = priceData.map(p => new Date(p.timestamp).toISOString().split('T')[0]);
                 const btcPrices = priceData.map(p => p.price);
                 const priceMap = new Map();
                 for (let i=0; i<btcDates.length; i++) priceMap.set(btcDates[i], btcPrices[i]);
                 
-                // 2. yeni ay tarihlerini bul (veri aralığı içindeki)
+                // 2. yeni ayları bul (fiyat verisi olan)
                 const allNewMoons = getNewMoonsBetween(startDateStr, endDateStr);
-                // sadece fiyat verisi olan günlerle eşleşen yeni aylar
-                const moonDatesRaw = allNewMoons.filter(m => priceMap.has(m));
-                if (moonDatesRaw.length === 0) {
-                    document.getElementById("moonTableBody").innerHTML = '<tr><td colspan="5">⚠️ Seçilen tarih aralığında yeni ay gününe denk günlük fiyat verisi yok. Daha geniş aralık deneyin.</td></tr>';
+                const moonDates = allNewMoons.filter(m => priceMap.has(m));
+                if (moonDates.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="10">⚠️ Seçilen aralıkta yeni ay gününe denk fiyat verisi yok. Daha geniş aralık deneyin.</td></tr>';
                     if (currentChart) currentChart.destroy();
-                    document.getElementById("moonCount").innerText = "0";
-                    document.getElementById("avg2d").innerHTML = "—";
-                    document.getElementById("avg3d").innerHTML = "—";
-                    document.getElementById("avg4d").innerHTML = "—";
-                    document.getElementById("trendConclusion").innerHTML = "Veri yok";
+                    moonCountSpan.innerText = "0";
                     return;
                 }
                 
-                // 3. her yeni ay için 2,3,4 gün sonrasını hesapla
+                // 3. Her yeni ay için seçilen günlerdeki fiyat değişimlerini hesapla
                 const moonEvents = [];
-                for (let moonDate of moonDatesRaw) {
+                for (let moonDate of moonDates) {
                     const moonIdx = btcDates.findIndex(d => d === moonDate);
                     if (moonIdx === -1) continue;
                     const startPrice = btcPrices[moonIdx];
-                    const getPrice = (days) => {
-                        const idx = moonIdx + days;
-                        if (idx < btcPrices.length) return btcPrices[idx];
-                        return null;
-                    };
-                    const price2 = getPrice(2);
-                    const price3 = getPrice(3);
-                    const price4 = getPrice(4);
-                    const chg = (p, base) => (p && base) ? ((p - base)/base)*100 : null;
+                    const changes = {};
+                    for (let day of daysArr) {
+                        const targetIdx = moonIdx + day;
+                        if (targetIdx < btcPrices.length) {
+                            const targetPrice = btcPrices[targetIdx];
+                            changes[day] = ((targetPrice - startPrice) / startPrice) * 100;
+                        } else {
+                            changes[day] = null;
+                        }
+                    }
                     moonEvents.push({
                         moonDate,
                         startPrice,
-                        change2d: chg(price2, startPrice),
-                        change3d: chg(price3, startPrice),
-                        change4d: chg(price4, startPrice),
-                        price2, price3, price4,
+                        changes,
                         moonIdx
                     });
                 }
                 
-                // 4. istatistikler
-                const changes2d = moonEvents.map(e => e.change2d).filter(v => v !== null);
-                const changes3d = moonEvents.map(e => e.change3d).filter(v => v !== null);
-                const changes4d = moonEvents.map(e => e.change4d).filter(v => v !== null);
-                const avg2 = changes2d.length ? changes2d.reduce((a,b)=>a+b,0)/changes2d.length : 0;
-                const avg3 = changes3d.length ? changes3d.reduce((a,b)=>a+b,0)/changes3d.length : 0;
-                const avg4 = changes4d.length ? changes4d.reduce((a,b)=>a+b,0)/changes4d.length : 0;
-                
-                document.getElementById("moonCount").innerText = moonEvents.length;
-                const avg2El = document.getElementById("avg2d");
-                const avg3El = document.getElementById("avg3d");
-                const avg4El = document.getElementById("avg4d");
-                avg2El.innerHTML = avg2.toFixed(2)+'%'; avg2El.className = `value ${avg2<0 ? 'trend-down' : 'trend-up'}`;
-                avg3El.innerHTML = avg3.toFixed(2)+'%'; avg3El.className = `value ${avg3<0 ? 'trend-down' : 'trend-up'}`;
-                avg4El.innerHTML = avg4.toFixed(2)+'%'; avg4El.className = `value ${avg4<0 ? 'trend-down' : 'trend-up'}`;
-                const trendMsg = avg4 < -0.2 ? "🔻 Düşüş eğilimi" : (avg4 > 0.2 ? "🟢 Yükseliş eğilimi" : "⚖️ Nötr / Karışık");
-                document.getElementById("trendConclusion").innerHTML = trendMsg;
-                
-                // tabloyu doldur
-                const tbody = document.getElementById("moonTableBody");
-                tbody.innerHTML = "";
-                for (let ev of moonEvents) {
-                    const row = tbody.insertRow();
-                    row.insertCell(0).innerHTML = `<span class="badge-moon">🌙 ${ev.moonDate}</span>`;
-                    const format = (val) => val !== null ? val.toFixed(2)+'%' : '—';
-                    const cell2 = row.insertCell(1); cell2.innerHTML = format(ev.change2d);
-                    if(ev.change2d !== null) cell2.className = ev.change2d<0 ? 'down-percent' : 'up-percent';
-                    const cell3 = row.insertCell(2); cell3.innerHTML = format(ev.change3d);
-                    if(ev.change3d !== null) cell3.className = ev.change3d<0 ? 'down-percent' : 'up-percent';
-                    const cell4 = row.insertCell(3); cell4.innerHTML = format(ev.change4d);
-                    if(ev.change4d !== null) cell4.className = ev.change4d<0 ? 'down-percent' : 'up-percent';
-                    const direction = (ev.change4d !== null) ? (ev.change4d < 0 ? "📉 düşüş eğimi" : "📈 yükseliş eğimi") : "veri yok";
-                    row.insertCell(4).innerHTML = `<span style="font-size:0.75rem;">${direction}</span>`;
+                // 4. İstatistikler: her gün için ortalama değişim
+                const stats = {};
+                for (let day of daysArr) {
+                    const validChanges = moonEvents.map(ev => ev.changes[day]).filter(v => v !== null);
+                    const avg = validChanges.length ? validChanges.reduce((a,b)=>a+b,0)/validChanges.length : null;
+                    stats[day] = { avg, count: validChanges.length };
                 }
                 
-                // 5. Grafik oluştur / güncelle (ApexCharts annotations ile)
+                // Güncelle: yeni ay sayısı
+                moonCountSpan.innerText = moonEvents.length;
+                
+                // İstatistik kartlarını oluştur
+                for (let day of daysArr) {
+                    const avgVal = stats[day].avg;
+                    const avgText = (avgVal !== null) ? avgVal.toFixed(2) + '%' : '—';
+                    const card = document.createElement('div');
+                    card.className = 'stat-card';
+                    card.innerHTML = `<div class="label">📊 Ort. +${day} Gün %</div>
+                                    <div class="value ${(avgVal !== null && avgVal<0) ? 'trend-down' : (avgVal !== null && avgVal>0) ? 'trend-up' : ''}">${avgText}</div>`;
+                    statsPanel.appendChild(card);
+                }
+                
+                // 5. Dinamik tablo oluştur (başlıklar ve satırlar)
+                // Başlık
+                let headerHtml = '<tr><th>🌙 Yeni Ay Tarihi</th>';
+                for (let day of daysArr) {
+                    headerHtml += `<th>+${day} Gün %</th>`;
+                }
+                headerHtml += '<th>En Uzun Eğim</th></tr>';
+                tableHeader.innerHTML = headerHtml;
+                
+                // Tablo gövdesi
+                tableBody.innerHTML = '';
+                for (let ev of moonEvents) {
+                    const row = document.createElement('tr');
+                    // Tarih hücresi
+                    const dateCell = document.createElement('td');
+                    dateCell.innerHTML = `<span class="badge-moon">🌙 ${ev.moonDate}</span>`;
+                    row.appendChild(dateCell);
+                    
+                    // Her gün için değişim yüzdesi
+                    for (let day of daysArr) {
+                        const chg = ev.changes[day];
+                        const cell = document.createElement('td');
+                        const display = (chg !== null) ? chg.toFixed(2)+'%' : '—';
+                        cell.innerHTML = display;
+                        if (chg !== null) {
+                            cell.className = (chg < 0) ? 'down-percent' : 'up-percent';
+                        }
+                        row.appendChild(cell);
+                    }
+                    // son sütun: en büyük gün için eğim yönü (bilgi)
+                    const maxDay = Math.max(...daysArr);
+                    const maxChg = ev.changes[maxDay];
+                    const trendText = (maxChg !== null) ? (maxChg < 0 ? '📉 düşüş eğimi' : '📈 yükseliş eğimi') : 'veri yok';
+                    const lastCell = document.createElement('td');
+                    lastCell.innerHTML = `<span style="font-size:0.75rem;">${trendText}</span>`;
+                    row.appendChild(lastCell);
+                    tableBody.appendChild(row);
+                }
+                
+                // 6. Grafik oluştur / güncelle (ApexCharts)
                 const chartData = btcDates.map((date, idx) => ({ x: new Date(date).getTime(), y: btcPrices[idx] }));
                 const maxPrice = Math.max(...btcPrices);
                 const minPrice = Math.min(...btcPrices);
                 const yTopPos = maxPrice + (maxPrice - minPrice) * 0.07;
                 
-                // annotations hazırlığı
+                // annotations
                 let annotations = { xaxis: [], points: [], shapes: [] };
-                // yeni ay dikey çizgiler + ay sembolü
+                // yeni ay dikey çizgiler + ay sembolleri
                 for (let ev of moonEvents) {
                     const moonTs = new Date(ev.moonDate).getTime();
                     annotations.xaxis.push({ x: moonTs, borderColor: '#fbbf24', strokeDashArray: 2, borderWidth: 1.8, opacity: 0.7 });
@@ -448,26 +495,29 @@
                         label: { text: "🌑", offsetY: -2, style: { fontSize: '14px', background: 'transparent' } }
                     });
                 }
-                // eğim çizgileri (4 günlük)
+                
+                // Eğim çizgisi: seçilen günlerin maksimumu için (varsa)
+                const maxSelectedDay = Math.max(...daysArr);
                 for (let ev of moonEvents) {
-                    if (ev.price4 === null) continue;
+                    const targetIdx = ev.moonIdx + maxSelectedDay;
+                    if (targetIdx >= btcDates.length) continue;
+                    const endPrice = btcPrices[targetIdx];
+                    if (!endPrice) continue;
                     const startX = new Date(ev.moonDate).getTime();
-                    const endIdx = ev.moonIdx + 4;
-                    if (endIdx >= btcDates.length) continue;
-                    const endDate = btcDates[endIdx];
+                    const endDate = btcDates[targetIdx];
                     const endX = new Date(endDate).getTime();
-                    const lineColor = (ev.price4 < ev.startPrice) ? '#ef4444' : '#10b981';
+                    const lineColor = (endPrice < ev.startPrice) ? '#ef4444' : '#10b981';
                     annotations.shapes.push({
-                        type: 'line', x1: startX, y1: ev.startPrice, x2: endX, y2: ev.price4,
+                        type: 'line', x1: startX, y1: ev.startPrice, x2: endX, y2: endPrice,
                         stroke: { color: lineColor, width: 2.8, dashArray: 0, lineCap: 'round' },
-                        tooltip: { text: `${ev.moonDate} ➔ +4gün: ${((ev.price4-ev.startPrice)/ev.startPrice*100).toFixed(2)}%` }
+                        tooltip: { text: `${ev.moonDate} ➔ +${maxSelectedDay}gün: ${((endPrice-ev.startPrice)/ev.startPrice*100).toFixed(2)}%` }
                     });
                 }
                 
                 const options = {
                     series: [{ name: "BTC (USD)", data: chartData, type: 'line', color: '#2563eb' }],
                     chart: { type: 'line', height: 500, toolbar: { show: true }, zoom: { enabled: true }, background: '#ffffff' },
-                    title: { text: `${startDateStr} - ${endDateStr} arası BTC & Yeni Ay Eğimleri`, align: 'left', style: { fontSize: '13px' } },
+                    title: { text: `${startDateStr} - ${endDateStr} arası · ${daysArr.join(', ')} günlük analiz`, align: 'left', style: { fontSize: '12px' } },
                     xaxis: { type: 'datetime', labels: { datetimeUTC: true, format: 'dd MMM' }, tickAmount: 8 },
                     yaxis: { title: { text: 'Fiyat (USD)' }, labels: { formatter: (v) => '$' + v.toLocaleString() }, min: minPrice * 0.98, max: yTopPos * 1.02 },
                     tooltip: { shared: true, x: { format: 'dd MMM yyyy' }, y: { formatter: (v) => `$${v.toLocaleString()}` } },
@@ -483,7 +533,7 @@
                 
             } catch (err) {
                 console.error(err);
-                document.getElementById("moonTableBody").innerHTML = `<tr><td colspan="5">❌ Hata: ${err.message}. Lütfen daha dar veya farklı bir aralık deneyin.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="10">❌ Hata: ${err.message}. Lütfen farklı aralık veya günler deneyin.</td></tr>`;
                 if (currentChart) currentChart.destroy();
             }
         }
@@ -500,12 +550,12 @@
             }
             startDateInput.value = start.toISOString().split('T')[0];
             endDateInput.value = end.toISOString().split('T')[0];
-            loadAndRender(startDateInput.value, endDateInput.value);
+            loadAndRender(startDateInput.value, endDateInput.value, daysListInput.value);
         }
         
         // event listeners
         updateBtn.addEventListener('click', () => {
-            loadAndRender(startDateInput.value, endDateInput.value);
+            loadAndRender(startDateInput.value, endDateInput.value, daysListInput.value);
         });
         quickBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -515,14 +565,15 @@
             });
         });
         
-        // varsayılan: son 180 gün gibi mantıklı bir aralık göster (2023-01-01 -> bugün)
+        // Varsayılan yükleme (son 540 gün, günler 2,3,4,5,6,10)
         const defaultEnd = new Date();
         defaultEnd.setHours(0,0,0,0);
         const defaultStart = new Date();
-        defaultStart.setDate(defaultEnd.getDate() - 540); // ~1.5 yıl
+        defaultStart.setDate(defaultEnd.getDate() - 540);
         startDateInput.value = defaultStart.toISOString().split('T')[0];
         endDateInput.value = defaultEnd.toISOString().split('T')[0];
-        loadAndRender(startDateInput.value, endDateInput.value);
+        daysListInput.value = "2,3,4,5,6,10";
+        loadAndRender(startDateInput.value, endDateInput.value, daysListInput.value);
     })();
 </script>
 </body>
