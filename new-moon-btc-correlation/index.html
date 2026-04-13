@@ -2,62 +2,96 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>BTC Yeni Ay Analizi</title>
+    <title>BTC & Yeni Ay Analizi (Tam Dinamik)</title>
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
     <style>
-        body { margin: 0; padding: 20px; font-family: sans-serif; background: #f4f7f6; }
-        #chart-container { width: 100%; height: 500px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h2 { color: #333; text-align: center; }
+        body { margin: 0; padding: 20px; font-family: sans-serif; background: #131722; color: #d1d4dc; }
+        #chart { width: 100%; height: 600px; }
+        .controls { margin-bottom: 20px; display: flex; gap: 15px; background: #1e222d; padding: 15px; border-radius: 8px; }
+        input { background: #2a2e39; border: 1px solid #363c4e; color: white; padding: 5px; border-radius: 4px; }
+        button { background: #2962ff; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-<h2>Bitcoin Fiyatı ve Yeni Ay Etkisi (Analiz)</h2>
-<div id="chart-container"></div>
+<div class="controls">
+    <label>Başlangıç: <input type="date" id="startDate" value="2023-01-01"></label>
+    <button onclick="updateAnalysis()">Analiz Et</button>
+</div>
+<div id="chart"></div>
 
 <script>
-    const chart = LightweightCharts.createChart(document.getElementById('chart-container'), {
-        layout: { background: { color: '#ffffff' }, textColor: '#333' },
-        grid: { vertLines: { color: '#f0f0f0' }, horzLines: { color: '#f0f0f0' } },
-        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-        timeScale: { borderColor: '#cccccc' },
+    const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+        layout: { background: { color: '#131722' }, textColor: '#d1d4dc' },
+        grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
+        timeScale: { borderColor: '#363c4e' }
     });
+    const candleSeries = chart.addCandlestickSeries();
 
-    const lineSeries = chart.addLineSeries({
-        color: '#2962FF',
-        lineWidth: 2,
-    });
+    async function updateAnalysis() {
+        const startStr = document.getElementById('startDate').value;
+        const startTime = new Date(startStr).getTime();
+        
+        // 1. Binance API'den gerçek BTC verisi çek (Günlük)
+        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=${startTime}&limit=1000`);
+        const rawData = await response.json();
+        const btcData = rawData.map(d => ({
+            time: d[0] / 1000,
+            open: parseFloat(d[1]), high: parseFloat(d[2]), low: parseFloat(d[3]), close: parseFloat(d[4])
+        }));
+        candleSeries.setData(btcData);
 
-    // Örnek BTC Verisi (Zaman damgası: YYYY-MM-DD)
-    const data = [
-        { time: '2026-03-01', value: 65000 }, { time: '2026-03-02', value: 66000 },
-        { time: '2026-03-03', value: 64500 }, { time: '2026-03-04', value: 63000 },
-        { time: '2026-03-05', value: 62000 }, { time: '2026-03-10', value: 68000 },
-        { time: '2026-03-15', value: 70000 }, { time: '2026-03-18', value: 72000 },
-        { time: '2026-03-25', value: 69000 }, { time: '2026-03-29', value: 67000 },
-        { time: '2026-03-30', value: 66500 }, { time: '2026-04-05', value: 71000 }
-    ];
-    lineSeries.setData(data);
+        // 2. Astronomik Yeni Ay Hesaplama
+        const markers = [];
+        let datePtr = new Date(startStr);
+        const endPtr = new Date();
 
-    // Yeni Ay Tarihleri ve İşaretleyiciler
-    const markers = [
-        { time: '2026-03-03', position: 'aboveBar', color: '#000', shape: 'circle', text: '🌑 New Moon' },
-        { time: '2026-03-29', position: 'aboveBar', color: '#000', shape: 'circle', text: '🌑 New Moon' }
-    ];
-    lineSeries.setMarkers(markers);
+        while (datePtr < endPtr) {
+            // Astronomy Engine ile en yakın yeni ayı bul
+            const nm = Astronomy.SearchMoonPhase(Astronomy.Phase.New, datePtr, 40);
+            if (nm) {
+                const moonDate = nm.date;
+                const timeStamp = Math.floor(moonDate.getTime() / 1000);
+                
+                // Sadece verimizde olan tarihler için işaret koy
+                const candle = btcData.find(d => Math.abs(d.time - timeStamp) < 43200); // 12 saat tolerans
+                
+                if (candle) {
+                    // Yeni Ay Sonrası 4 Günlük Eğimi Hesapla
+                    const candleIndex = btcData.indexOf(candle);
+                    let trendEmoji = "🌑";
+                    let trendColor = "#fcd34d";
 
-    // Yeni Ay sonrası 4 günlük trendi göstermek için PriceLine kullanımı
-    // Mart Ayı Örneği: 3 Mart'tan sonraki düşüş eğilimi çizgisi
-    lineSeries.createPriceLine({
-        price: 64500,
-        color: 'red',
-        lineWidth: 2,
-        lineStyle: LightweightCharts.LineStyle.Dashed,
-        axisLabelVisible: true,
-        title: 'Trend Start',
-    });
+                    if (candleIndex + 4 < btcData.length) {
+                        const priceThen = btcData[candleIndex + 4].close;
+                        if (priceThen < candle.close) {
+                            trendEmoji = "🌑 📉"; // Düşüş
+                            trendColor = "#ff5252";
+                        } else {
+                            trendEmoji = "🌑 📈"; // Yükseliş
+                            trendColor = "#00e676";
+                        }
+                    }
 
-    chart.timeScale().fitContent();
+                    markers.push({
+                        time: candle.time,
+                        position: 'aboveBar',
+                        color: trendColor,
+                        shape: 'arrowDown',
+                        text: trendEmoji
+                    });
+                }
+                // Bir sonraki ay döngüsüne atla
+                datePtr = new Date(moonDate.getTime() + 25 * 24 * 60 * 60 * 1000);
+            } else { break; }
+        }
+        candleSeries.setMarkers(markers);
+        chart.timeScale().fitContent();
+    }
+
+    // İlk yükleme
+    updateAnalysis();
 </script>
 </body>
 </html>
