@@ -6,11 +6,11 @@
     <title>Pokemon Champions Battle Advisor</title>
     <style>
         :root { --bg: #0b0f1a; --card: #161d2f; --accent: #f59e0b; --blue: #3b82f6; --red: #ef4444; --green: #10b981; --text: #f8fafc; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         nav { background: var(--card); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); flex-shrink: 0; }
         .tabs { display: flex; background: #000; padding: 4px; gap: 4px; flex-shrink: 0; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: #242f45; color: #94a3b8; cursor: pointer; font-weight: 600; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: #242f45; color: #94a3b8; cursor: pointer; font-weight: 600; text-transform: uppercase; }
         .tab-btn.active { background: var(--accent); color: var(--bg); }
 
         .content { flex: 1; overflow-y: auto; padding: 15px; display: none; }
@@ -18,43 +18,42 @@
 
         .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #2d3748; }
         
-        /* Grid & Item Fixes */
-        .poke-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
-        .poke-item { background: #1f2937; border-radius: 8px; padding: 8px; text-align: center; border: 2px solid transparent; cursor: pointer; position: relative; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .poke-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px; width: 100%; box-sizing: border-box; }
+        .poke-item { background: #1f2937; border-radius: 8px; padding: 8px; text-align: center; border: 2px solid transparent; cursor: pointer; position: relative; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .poke-item img { width: 64px; height: 64px; object-fit: contain; }
-        .poke-item .name { font-size: 10px; font-weight: bold; text-transform: uppercase; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+        .poke-item .name { font-size: 10px; font-weight: bold; text-transform: uppercase; margin-top: 5px; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         
-        /* Filters */
-        .filter-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .filter-row input, .filter-row select { flex: 1; min-width: 120px; background: #1f2937; border: 1px solid #374151; color: white; padding: 10px; border-radius: 6px; }
         
-        /* Battle Specific */
         .battle-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .battle-slot { border: 2px solid #334155; border-radius: 10px; padding: 10px; background: #0003; }
-        .active-sel { border-color: var(--green) !important; background: #10b98122; }
-        .enemy-sel { border-color: var(--red) !important; background: #ef444422; }
-        .faint { filter: grayscale(1) brightness(0.5); }
-        .faint::after { content: 'DEAD'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); color: var(--red); font-weight: bold; border: 2px solid var(--red); padding: 2px; font-size: 10px; }
+        .battle-slot { border: 2px solid #334155; border-radius: 10px; padding: 10px; background: #0003; min-height: 200px; }
+        .active-sel { border-color: var(--green) !important; background: rgba(16, 185, 129, 0.1); }
+        .enemy-sel { border-color: var(--red) !important; background: rgba(239, 68, 68, 0.1); }
+        .faint { filter: grayscale(1) brightness(0.4); pointer-events: none; }
+        .faint::before { content: 'DEAD'; position: absolute; top: 40%; color: var(--red); font-weight: 900; z-index: 10; border: 2px solid var(--red); padding: 2px 4px; border-radius: 4px; transform: rotate(-15deg); }
 
         .advisor-bar { background: var(--accent); color: #000; padding: 15px; border-radius: 8px; font-weight: 800; text-align: center; margin-top: 15px; font-size: 1.1rem; }
         
-        input, select { background: #1f2937; border: 1px solid #374151; color: white; padding: 8px; border-radius: 6px; width: 100%; }
-        .btn { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.2s; }
         .btn-blue { background: var(--blue); color: white; }
         .btn-green { background: var(--green); color: white; }
         .btn-red { background: var(--red); color: white; }
         
-        #loader { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #loader { position: fixed; inset: 0; background: var(--bg); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { border: 4px solid #1f2937; border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div id="loader">
-    <div style="border: 4px solid #1f2937; border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
-    <p>Database Loading...</p>
+    <div class="spinner"></div>
+    <p id="loading-txt" style="margin-top:10px;">Pokémon Database Synchronizing...</p>
 </div>
 
 <nav>
-    <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent);">POKEMON CHAMPIONS BATTLE ADVISOR</div>
+    <div style="font-size: 1rem; font-weight: 800; color: var(--accent);">POKEMON CHAMPIONS BATTLE ADVISOR</div>
     <div style="display: flex; gap: 5px;">
         <button onclick="setLang('tr')" style="background:#2d3748; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">TR</button>
         <button onclick="setLang('en')" style="background:#2d3748; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">EN</button>
@@ -67,298 +66,369 @@
     <button class="tab-btn" onclick="showTab('battle', this)">BATTLE</button>
 </div>
 
-<div id="box" class="content active">
+<div id="box" class="content active" onscroll="handleInfiniteScroll(this)">
     <div class="card">
         <div class="filter-row">
-            <input type="text" id="box-q" placeholder="Search..." oninput="renderMaster()">
-            <select id="box-t" onchange="renderMaster()">
+            <input type="text" id="box-q" placeholder="Search by name..." oninput="resetAndRender()">
+            <select id="box-t" onchange="resetAndRender()">
                 <option value="">All Types</option>
-                <option value="fire">Fire</option><option value="water">Water</option><option value="grass">Grass</option>
-                <option value="electric">Electric</option><option value="psychic">Psychic</option><option value="ice">Ice</option>
-                <option value="dragon">Dragon</option><option value="fairy">Fairy</option>
+                <option value="normal">Normal</option><option value="fire">Fire</option><option value="water">Water</option>
+                <option value="grass">Grass</option><option value="electric">Electric</option><option value="ice">Ice</option>
+                <option value="fighting">Fighting</option><option value="poison">Poison</option><option value="ground">Ground</option>
+                <option value="flying">Flying</option><option value="psychic">Psychic</option><option value="bug">Bug</option>
+                <option value="rock">Rock</option><option value="ghost">Ghost</option><option value="dragon">Dragon</option>
+                <option value="dark">Dark</option><option value="steel">Steel</option><option value="fairy">Fairy</option>
             </select>
-            <select id="box-r" onchange="renderMaster()">
+            <select id="box-r" onchange="resetAndRender()">
                 <option value="0">All Regions</option>
-                <option value="1">Kanto</option><option value="2">Johto</option><option value="3">Hoenn</option>
-                <option value="4">Sinnoh</option><option value="9">Paldea</option>
+                <option value="1">Kanto (Gen 1)</option><option value="2">Johto (Gen 2)</option>
+                <option value="3">Hoenn (Gen 3)</option><option value="4">Sinnoh (Gen 4)</option>
+                <option value="5">Unova (Gen 5)</option><option value="6">Kalos (Gen 6)</option>
+                <option value="7">Alola (Gen 7)</option><option value="8">Galar (Gen 8)</option>
+                <option value="9">Paldea (Gen 9)</option>
             </select>
         </div>
-        <div class="poke-grid" id="master-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #334155; padding: 10px;"></div>
+        <div class="poke-grid" id="master-grid"></div>
+        <div id="scroll-anchor" style="height: 20px; text-align: center; font-size: 12px; color: #444;">Loading more...</div>
     </div>
     <div class="card">
-        <h3 id="ui-my-title">My Collection</h3>
+        <h3 id="ui-my-box-title">My Collection</h3>
         <div class="poke-grid" id="my-box-grid"></div>
     </div>
 </div>
 
 <div id="teams" class="content">
     <div class="card">
-        <h3 id="ui-sel-title">Select from Box</h3>
+        <h3 id="ui-sel-box-title">Select from My Box</h3>
         <div class="poke-grid" id="team-selector-grid"></div>
     </div>
     <div class="card">
         <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <input type="text" id="t-name" placeholder="Team Name">
-            <button onclick="autoSuggestTeam()" class="btn btn-blue" id="ui-auto">Suggest</button>
+            <input type="text" id="team-name-in" placeholder="Team Name">
+            <button onclick="autoFillTeam()" class="btn btn-blue" id="ui-suggest-btn">Auto Suggest</button>
         </div>
-        <div id="team-zone" style="display:flex; gap:8px; flex-wrap:wrap; min-height:110px; border:2px dashed #444; padding:10px; border-radius:8px;"></div>
-        <button onclick="saveTeam()" class="btn btn-green" style="width:100%; margin-top:10px;" id="ui-save">Save Team</button>
+        <div id="team-build-zone" class="poke-grid" style="min-height: 120px; border: 2px dashed #374151; padding: 10px; border-radius: 8px;"></div>
+        <button onclick="saveTeam()" class="btn btn-green" style="margin-top:10px;" id="ui-save-team-btn">Save Team</button>
     </div>
-    <div id="saved-teams"></div>
+    <div id="saved-teams-list"></div>
 </div>
 
 <div id="battle" class="content">
     <div class="card">
-        <select id="battle-team-sel" onchange="prepBattle()"></select>
-    </div>
-    
-    <div id="battle-prep" class="card">
-        <h3 id="ui-pick-3">Pick 3 Pokemon for Match</h3>
-        <div class="poke-grid" id="prep-grid"></div>
-        <button onclick="suggest3()" class="btn btn-blue" style="width:100%; margin-top:10px;">Suggest 3</button>
-        <button onclick="startMatch()" class="btn btn-green" style="width:100%; margin-top:10px;" id="ui-start">Start Match</button>
+        <select id="battle-team-select" onchange="prepareBattleSession()"></select>
     </div>
 
-    <div id="battle-active" class="hidden" style="display:none;">
+    <div id="battle-prep-zone" class="card">
+        <h3 id="ui-pick-3-title">Pick 3 for Match</h3>
+        <div class="poke-grid" id="prep-team-grid"></div>
+        <button onclick="suggestMatchTrio()" class="btn btn-blue" style="margin-top:10px;">Suggest 3</button>
+        <button onclick="startActiveBattle()" class="btn btn-green" style="margin-top:10px;" id="ui-start-battle-btn">Start Match</button>
+    </div>
+
+    <div id="battle-arena" style="display:none;">
         <div class="battle-layout">
             <div class="battle-slot">
-                <h4 style="color:var(--blue); margin:0 0 10px 0;">MY MATCH TRIO</h4>
-                <div id="active-my-grid" class="poke-grid" style="grid-template-columns: 1fr;"></div>
+                <h4 style="color:var(--blue); margin:0 0 10px 0;">MY TRIO</h4>
+                <div id="battle-my-trio" class="poke-grid" style="grid-template-columns: 1fr;"></div>
             </div>
             <div class="battle-slot">
                 <h4 style="color:var(--red); margin:0 0 10px 0;">ENEMIES (MAX 6)</h4>
-                <input type="text" id="opp-in" list="p-data" placeholder="Add enemy..." onchange="addOpp(this.value)">
-                <div id="active-opp-grid" class="poke-grid" style="grid-template-columns: 1fr; margin-top:10px;"></div>
+                <input type="text" id="enemy-search" list="all-pokes-list" placeholder="Add opponent..." onchange="addEnemyToBattle(this.value)">
+                <div id="battle-opp-team" class="poke-grid" style="grid-template-columns: 1fr; margin-top:10px;"></div>
             </div>
         </div>
-        <div class="advisor-bar" id="adv-msg">Select enemy to start!</div>
-        <button onclick="resetBattle()" class="btn btn-red" style="width:100%; margin-top:15px;">Reset Battle</button>
+        <div id="battle-advisor-msg" class="advisor-bar">Select enemy!</div>
+        <button onclick="resetBattle()" class="btn btn-red" style="margin-top:15px;">Reset Battle</button>
     </div>
 </div>
 
-<datalist id="p-data"></datalist>
+<datalist id="all-pokes-list"></datalist>
 
 <script>
-    let ALL_P = [];
-    let myBox = JSON.parse(localStorage.getItem('p_box')) || [];
-    let savedTeams = JSON.parse(localStorage.getItem('p_teams')) || [];
-    let currentT = [];
+    let ALL_POKEMON = [];
+    let myBox = JSON.parse(localStorage.getItem('p_advisor_box')) || [];
+    let savedTeams = JSON.parse(localStorage.getItem('p_advisor_teams')) || [];
+    let currentTeamBuild = [];
     let lang = 'tr';
     
-    // Battle State
-    let bPool = []; // 6 from team
-    let bTrio = []; // 3 for match
-    let bEnemies = []; // up to 6
-    let bMyIdx = null;
-    let bOppIdx = null;
+    // Pagination state
+    let displayLimit = 50;
+    let filteredList = [];
 
-    const tMap = {
-        tr: { my: "Koleksiyonum", sel: "Kutumdan Seç", auto: "Tavsiye Et", save: "Takımı Kaydet", pick3: "Maç İçin 3 Pokemon Seç", start: "Savaşı Başlat", adv: "Rakibi seç, analiz edeyim.", keep: "Avantajlısın, kal!", swap: "Şuna geç: " },
-        en: { my: "My Collection", sel: "Select from Box", auto: "Suggest", save: "Save Team", pick3: "Pick 3 Pokemon for Match", start: "Start Match", adv: "Select enemy to analyze.", keep: "Advantage! Keep active.", swap: "Swap to: " }
+    // Battle state
+    let matchTrio = [];
+    let matchEnemies = [];
+    let activeMyIdx = null;
+    let activeOppIdx = null;
+
+    const UI_STRINGS = {
+        tr: { myBox: "Koleksiyonum", selBox: "Kutumdan Seç", suggest: "Tavsiye Et", save: "Takımı Kaydet", pick3: "Maç İçin 3 Pokemon Seç", start: "Savaşı Başlat", adv: "Rakibi seç, analiz edeyim.", keep: "Avantajlısın, kal!", swap: "Şuna geç: " },
+        en: { myBox: "My Collection", selBox: "Select from Box", suggest: "Auto Suggest", save: "Save Team", pick3: "Pick 3 for Match", start: "Start Match", adv: "Select enemy to analyze.", keep: "Advantage! Keep active.", swap: "Swap to: " }
     };
 
+    // Region Mapping
+    const REGIONS = [
+        {id: 1, start: 1, end: 151},    {id: 2, start: 152, end: 251},
+        {id: 3, start: 252, end: 386},  {id: 4, start: 387, end: 493},
+        {id: 5, start: 494, end: 649},  {id: 6, start: 650, end: 721},
+        {id: 7, start: 722, end: 809},  {id: 8, start: 810, end: 905},
+        {id: 9, start: 906, end: 1025}
+    ];
+
     async function init() {
-        try {
+        const cache = localStorage.getItem('p_db_cache');
+        if(cache) {
+            ALL_POKEMON = JSON.parse(cache);
+        } else {
             const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
             const data = await res.json();
-            // Not: Types için her pokemonu tek tek çekmek ağır olduğundan isim tabanlı basit bir mock filter yaptık.
-            // Gerçek projede data bir kerede JSON olarak sunucudan gelmelidir.
-            ALL_P = data.results.map((p, i) => ({
+            // Not: API'den tüm detayları (tipler vb.) bir kerede çekmek yasak/yavaş olduğu için 
+            // isim tabanlı dinamik eşleştirme yapıyoruz.
+            ALL_POKEMON = data.results.map((p, i) => ({
                 id: i + 1,
                 name: p.name,
                 sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png`,
-                region: Math.ceil((i+1)/151) 
+                region: REGIONS.find(r => (i+1) >= r.start && (i+1) <= r.end)?.id || 1
             }));
-            document.getElementById('p-data').innerHTML = ALL_P.map(p => `<option value="${p.name}">`).join('');
-            document.getElementById('loader').style.display = 'none';
-            renderMaster(); renderMy(); renderSaved(); updateUI(); updateBattleSel();
-        } catch(e) { console.error(e); }
+            localStorage.setItem('p_db_cache', JSON.stringify(ALL_POKEMON));
+        }
+        document.getElementById('all-pokes-list').innerHTML = ALL_POKEMON.map(p => `<option value="${p.name}">`).join('');
+        document.getElementById('loader').style.display = 'none';
+        
+        resetAndRender();
+        renderMyBox();
+        renderSavedTeams();
+        updateBattleSelectors();
+        updateTranslations();
     }
 
-    function renderMaster() {
+    // --- BOX LOGIC (INFINITE SCROLL) ---
+    function resetAndRender() {
         const q = document.getElementById('box-q').value.toLowerCase();
         const r = document.getElementById('box-r').value;
-        let filtered = ALL_P.filter(p => p.name.includes(q));
-        if(r > 0) filtered = filtered.filter(p => p.region == r);
         
-        document.getElementById('master-list').innerHTML = filtered.slice(0, 50).map(p => `
-            <div class="poke-item" onclick="toMy(${p.id})">
-                <img src="${p.sprite}">
-                <div class="name">${p.name}</div>
-            </div>
-        `).join('');
+        filteredList = ALL_POKEMON.filter(p => p.name.includes(q));
+        if(r != "0") filteredList = filteredList.filter(p => p.region == r);
+        
+        displayLimit = 50;
+        document.getElementById('master-grid').innerHTML = "";
+        renderBatch();
     }
 
-    function toMy(id) {
+    function renderBatch() {
+        const grid = document.getElementById('master-grid');
+        const batch = filteredList.slice(displayLimit - 50, displayLimit);
+        
+        batch.forEach(p => {
+            const el = document.createElement('div');
+            el.className = 'poke-item';
+            el.onclick = () => addToMyBox(p.id);
+            el.innerHTML = `<img src="${p.sprite}" loading="lazy"><div class="name">${p.name}</div>`;
+            grid.appendChild(el);
+        });
+    }
+
+    function handleInfiniteScroll(container) {
+        if (container.scrollTop + container.clientHeight >= container.scrollHeight - 100) {
+            if (displayLimit < filteredList.length) {
+                displayLimit += 50;
+                renderBatch();
+            }
+        }
+    }
+
+    function addToMyBox(id) {
         if(!myBox.find(x => x.id === id)) {
-            myBox.push(ALL_P.find(x => x.id === id));
-            save(); renderMy(); renderTeamSel();
+            myBox.push(ALL_POKEMON.find(p => p.id === id));
+            saveData();
+            renderMyBox();
+            if(document.getElementById('teams').classList.contains('active')) renderTeamSelector();
         }
     }
 
-    function renderMy() {
-        document.getElementById('my-box-grid').innerHTML = myBox.map((p, i) => `
-            <div class="poke-item" onclick="myBox.splice(${i},1); save(); renderMy(); renderTeamSel();">
+    function renderMyBox() {
+        const grid = document.getElementById('my-box-grid');
+        grid.innerHTML = myBox.map((p, i) => `
+            <div class="poke-item" onclick="removeFromMyBox(${i})">
                 <img src="${p.sprite}">
                 <div class="name">${p.name}</div>
             </div>
         `).join('');
     }
 
-    function renderTeamSel() {
+    function removeFromMyBox(i) { myBox.splice(i, 1); saveData(); renderMyBox(); renderTeamSelector(); }
+
+    // --- TEAM LOGIC ---
+    function renderTeamSelector() {
         document.getElementById('team-selector-grid').innerHTML = myBox.map(p => `
-            <div class="poke-item" onclick="addToT(${p.id})">
+            <div class="poke-item" onclick="addToBuild(${p.id})">
                 <img src="${p.sprite}">
                 <div class="name">${p.name}</div>
             </div>
         `).join('');
     }
 
-    function addToT(id) {
-        if(currentT.length < 6) {
-            currentT.push({...myBox.find(x => x.id === id), uid: Date.now()});
-            renderTZone();
+    function addToBuild(id) {
+        if(currentTeamBuild.length < 6) {
+            currentTeamBuild.push({...myBox.find(x => x.id === id), uid: Date.now()});
+            renderBuildZone();
         }
     }
 
-    function renderTZone() {
-        document.getElementById('team-zone').innerHTML = currentT.map((p, i) => `
-            <div class="poke-item" onclick="currentT.splice(${i},1); renderTZone();">
+    function renderBuildZone() {
+        document.getElementById('team-build-zone').innerHTML = currentTeamBuild.map((p, i) => `
+            <div class="poke-item" onclick="currentTeamBuild.splice(${i},1); renderBuildZone();">
                 <img src="${p.sprite}">
                 <div class="name">${p.name}</div>
             </div>
         `).join('');
     }
 
-    function autoSuggestTeam() {
-        if(myBox.length < 6) return;
-        currentT = [...myBox].sort(() => 0.5 - Math.random()).slice(0,6);
-        renderTZone();
+    function autoFillTeam() {
+        if(myBox.length < 6) return alert("Box'ta en az 6 Pokemon olmalı!");
+        currentTeamBuild = [...myBox].sort(() => 0.5 - Math.random()).slice(0, 6);
+        renderBuildZone();
     }
 
     function saveTeam() {
-        if(currentT.length < 6) return;
-        savedTeams.push({ name: document.getElementById('t-name').value || `Team ${savedTeams.length+1}`, pokes: [...currentT] });
-        currentT = []; save(); renderSaved(); renderTZone(); updateBattleSel();
+        if(currentTeamBuild.length < 6) return alert("6 Pokemon seçmelisiniz!");
+        const name = document.getElementById('team-name-in').value || `Team ${savedTeams.length + 1}`;
+        savedTeams.push({ name, pokes: [...currentTeamBuild] });
+        currentTeamBuild = []; saveData(); renderSavedTeams(); renderBuildZone(); updateBattleSelectors();
     }
 
-    function renderSaved() {
-        document.getElementById('saved-teams').innerHTML = savedTeams.map((t, i) => `
+    function renderSavedTeams() {
+        document.getElementById('saved-teams-list').innerHTML = savedTeams.map((t, i) => `
             <div class="card">
-                <b>${t.name}</b> <button onclick="savedTeams.splice(${i},1); save(); renderSaved(); updateBattleSel();" style="float:right; color:red; background:none; border:none; cursor:pointer;">DEL</button>
-                <div class="poke-grid" style="margin-top:5px;">${t.pokes.map(p => `<img src="${p.sprite}" width="30">`).join('')}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b>${t.name}</b>
+                    <button class="btn-red" onclick="deleteTeam(${i})" style="width:50px; padding:2px; font-size:10px;">DEL</button>
+                </div>
+                <div class="poke-grid" style="margin-top:10px;">
+                    ${t.pokes.map(p => `<img src="${p.sprite}" width="35">`).join('')}
+                </div>
             </div>
         `).join('');
     }
 
-    // Battle Logic
-    function updateBattleSel() {
-        const s = document.getElementById('battle-team-sel');
-        s.innerHTML = savedTeams.map((t, i) => `<option value="${i}">${t.name}</option>`).join('');
-        prepBattle();
+    function deleteTeam(i) { savedTeams.splice(i, 1); saveData(); renderSavedTeams(); updateBattleSelectors(); }
+
+    // --- BATTLE LOGIC ---
+    function updateBattleSelectors() {
+        const sel = document.getElementById('battle-team-select');
+        sel.innerHTML = savedTeams.map((t, i) => `<option value="${i}">${t.name}</option>`).join('');
+        prepareBattleSession();
     }
 
-    function prepBattle() {
-        const idx = document.getElementById('battle-team-sel').value;
+    function prepareBattleSession() {
+        const idx = document.getElementById('battle-team-select').value;
         if(!savedTeams[idx]) return;
-        bPool = savedTeams[idx].pokes.map(p => ({...p, dead: false, selected: false}));
-        bTrio = []; bEnemies = []; bMyIdx = null; bOppIdx = null;
-        document.getElementById('battle-prep').style.display = 'block';
-        document.getElementById('battle-active').style.display = 'none';
-        renderPrep();
+        matchTrio = savedTeams[idx].pokes.map(p => ({...p, selected: false, dead: false}));
+        matchEnemies = []; activeMyIdx = null; activeOppIdx = null;
+        document.getElementById('battle-prep-zone').style.display = 'block';
+        document.getElementById('battle-arena').style.display = 'none';
+        renderPrepGrid();
     }
 
-    function renderPrep() {
-        document.getElementById('prep-grid').innerHTML = bPool.map((p, i) => `
-            <div class="poke-item ${p.selected ? 'active-sel' : ''}" onclick="togglePrep(${i})">
+    function renderPrepGrid() {
+        document.getElementById('prep-team-grid').innerHTML = matchTrio.map((p, i) => `
+            <div class="poke-item ${p.selected ? 'active-sel' : ''}" onclick="toggleTrioSelect(${i})">
                 <img src="${p.sprite}">
                 <div class="name">${p.name}</div>
             </div>
         `).join('');
     }
 
-    function togglePrep(i) {
-        const selCount = bPool.filter(x => x.selected).length;
-        if(!bPool[i].selected && selCount >= 3) return;
-        bPool[i].selected = !bPool[i].selected;
-        renderPrep();
+    function toggleTrioSelect(i) {
+        const currentCount = matchTrio.filter(p => p.selected).length;
+        if(!matchTrio[i].selected && currentCount >= 3) return;
+        matchTrio[i].selected = !matchTrio[i].selected;
+        renderPrepGrid();
     }
 
-    function suggest3() {
-        bPool.forEach(p => p.selected = false);
-        bPool.slice(0,3).forEach(p => p.selected = true);
-        renderPrep();
+    function suggestMatchTrio() {
+        matchTrio.forEach(p => p.selected = false);
+        matchTrio.slice(0, 3).forEach(p => p.selected = true);
+        renderPrepGrid();
     }
 
-    function startMatch() {
-        bTrio = bPool.filter(p => p.selected).map(p => ({...p, dead: false}));
-        if(bTrio.length < 3) return;
-        document.getElementById('battle-prep').style.display = 'none';
-        document.getElementById('battle-active').style.display = 'block';
-        renderActiveBattle();
+    function startActiveBattle() {
+        const selected = matchTrio.filter(p => p.selected);
+        if(selected.length < 3) return alert("3 Pokemon seçmelisin!");
+        matchTrio = selected.map(p => ({...p, dead: false}));
+        document.getElementById('battle-prep-zone').style.display = 'none';
+        document.getElementById('battle-arena').style.display = 'block';
+        renderArena();
     }
 
-    function addOpp(name) {
-        if(bEnemies.length >= 6) return;
-        const p = ALL_P.find(x => x.name === name.toLowerCase());
+    function addEnemyToBattle(name) {
+        if(matchEnemies.length >= 6) return;
+        const p = ALL_POKEMON.find(x => x.name === name.toLowerCase());
         if(p) {
-            bEnemies.push({...p, dead: false});
-            document.getElementById('opp-in').value = "";
-            renderActiveBattle();
+            matchEnemies.push({...p, dead: false});
+            document.getElementById('enemy-search').value = "";
+            renderArena();
         }
     }
 
-    function renderActiveBattle() {
-        document.getElementById('active-my-grid').innerHTML = bTrio.map((p, i) => `
-            <div class="poke-item ${bMyIdx === i ? 'active-sel' : ''} ${p.dead ? 'faint' : ''}" onclick="if(!${p.dead}) { bMyIdx=${i}; renderActiveBattle(); }">
+    function renderArena() {
+        document.getElementById('battle-my-trio').innerHTML = matchTrio.map((p, i) => `
+            <div class="poke-item ${p.dead ? 'faint' : ''} ${activeMyIdx === i ? 'active-sel' : ''}" onclick="if(!${p.dead}) { activeMyIdx=${i}; renderArena(); }">
                 <img src="${p.sprite}">
                 <div class="name">${p.name}</div>
-                <button onclick="event.stopPropagation(); bTrio[${i}].dead=true; if(bMyIdx==${i}) bMyIdx=null; renderActiveBattle();" style="font-size:8px; background:red; color:white; border:none; margin-top:2px;">KILL</button>
+                <button onclick="event.stopPropagation(); matchTrio[${i}].dead=true; if(activeMyIdx==${i}) activeMyIdx=null; renderArena();" class="btn-red" style="font-size:8px; padding:2px; margin-top:4px;">KILL</button>
             </div>
         `).join('');
 
-        document.getElementById('active-opp-grid').innerHTML = bEnemies.map((p, i) => `
-            <div class="poke-item ${bOppIdx === i ? 'enemy-sel' : ''} ${p.dead ? 'faint' : ''}" onclick="if(!${p.dead}) { bOppIdx=${i}; renderActiveBattle(); }">
+        document.getElementById('battle-opp-team').innerHTML = matchEnemies.map((p, i) => `
+            <div class="poke-item ${p.dead ? 'faint' : ''} ${activeOppIdx === i ? 'enemy-sel' : ''}" onclick="if(!${p.dead}) { activeOppIdx=${i}; renderArena(); }">
                 <img src="${p.sprite}">
                 <div class="name">${p.name}</div>
-                <button onclick="event.stopPropagation(); bEnemies[${i}].dead=true; if(bOppIdx==${i}) bOppIdx=null; renderActiveBattle();" style="font-size:8px; background:red; color:white; border:none; margin-top:2px;">KILL</button>
+                <button onclick="event.stopPropagation(); matchEnemies[${i}].dead=true; if(activeOppIdx==${i}) activeOppIdx=null; renderArena();" class="btn-red" style="font-size:8px; padding:2px; margin-top:4px;">KILL</button>
             </div>
         `).join('');
-        runAdvise();
+        runAdvisorAnalysis();
     }
 
-    function runAdvise() {
-        const bar = document.getElementById('adv-msg');
-        if(bOppIdx === null) { bar.innerText = tMap[lang].adv; return; }
-        const alive = bTrio.filter(p => !p.dead);
-        if(bMyIdx === null) {
-            bar.innerText = tMap[lang].swap + (alive[0] ? alive[0].name.toUpperCase() : "GAMEOVER");
+    function runAdvisorAnalysis() {
+        const msg = document.getElementById('battle-advisor-msg');
+        if(activeOppIdx === null) { msg.innerText = UI_STRINGS[lang].adv; return; }
+        
+        const alive = matchTrio.filter(p => !p.dead);
+        if(activeMyIdx === null) {
+            msg.innerText = UI_STRINGS[lang].swap + (alive[0] ? alive[0].name.toUpperCase() : "LOST");
         } else {
-            bar.innerText = tMap[lang].keep;
+            msg.innerText = UI_STRINGS[lang].keep;
         }
     }
 
-    function resetBattle() { bTrio = []; bEnemies = []; prepBattle(); }
+    function resetBattle() { matchTrio = []; matchEnemies = []; prepareBattleSession(); }
 
-    function showTab(t, b) {
+    // --- SYSTEM ---
+    function showTab(id, btn) {
         document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
-        document.getElementById(t).classList.add('active');
-        b.classList.add('active');
-        if(t === 'teams') renderTeamSel();
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+        if(id === 'teams') renderTeamSelector();
     }
 
-    function save() { localStorage.setItem('p_box', JSON.stringify(myBox)); localStorage.setItem('p_teams', JSON.stringify(savedTeams)); }
-    function setLang(l) { lang = l; updateUI(); }
-    function updateUI() {
-        const t = tMap[lang];
-        document.getElementById('ui-my-title').innerText = t.my;
-        document.getElementById('ui-sel-title').innerText = t.sel;
-        document.getElementById('ui-auto').innerText = t.auto;
-        document.getElementById('ui-save').innerText = t.save;
-        document.getElementById('ui-pick-3').innerText = t.pick3;
-        document.getElementById('ui-start').innerText = t.start;
-        runAdvise();
+    function setLang(l) { lang = l; updateTranslations(); }
+    
+    function updateTranslations() {
+        const t = UI_STRINGS[lang];
+        document.getElementById('ui-my-box-title').innerText = t.myBox;
+        document.getElementById('ui-sel-box-title').innerText = t.selBox;
+        document.getElementById('ui-suggest-btn').innerText = t.suggest;
+        document.getElementById('ui-save-team-btn').innerText = t.save;
+        document.getElementById('ui-pick-3-title').innerText = t.pick3;
+        document.getElementById('ui-start-battle-btn').innerText = t.start;
+        runAdvisorAnalysis();
+    }
+
+    function saveData() {
+        localStorage.setItem('p_advisor_box', JSON.stringify(myBox));
+        localStorage.setItem('p_advisor_teams', JSON.stringify(savedTeams));
     }
 
     window.onload = init;
