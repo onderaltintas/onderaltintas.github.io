@@ -3,198 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokeChampions Advisor v2</title>
+    <title>Champions Pro Advisor</title>
     <style>
-        body { background-color: #0f172a; color: white; font-family: sans-serif; margin: 0; padding-bottom: 5rem; }
-        nav { background-color: #1e293b; padding: 1rem; position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .container { max-width: 450px; margin: 0 auto; padding: 1rem; }
-        .card { background-color: #1e293b; padding: 1rem; border-radius: 0.75rem; border: 1px solid #334155; margin-bottom: 1.5rem; }
-        .input-group { display: flex; gap: 0.5rem; margin-bottom: 1rem; position: relative; }
-        input, select { flex: 1; padding: 0.6rem; border-radius: 0.25rem; background-color: #334155; border: 1px solid #475569; color: white; font-size: 0.875rem; }
-        button { cursor: pointer; border: none; border-radius: 0.25rem; font-weight: bold; }
-        .btn-yellow { background-color: #eab308; color: #0f172a; padding: 0.5rem 1rem; }
-        .btn-red { background-color: #dc2626; color: white; width: 100%; padding: 0.75rem; text-transform: uppercase; margin-top: 10px; }
-        .btn-blue { background-color: #3b82f6; color: white; width: 100%; padding: 0.75rem; text-transform: uppercase; margin-bottom: 1rem; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-        .pokemon-item { background-color: #334155; padding: 0.5rem; border-radius: 0.25rem; position: relative; display: flex; align-items: center; gap: 0.5rem; border: 1px solid #475569; }
-        .pokemon-item img { width: 35px; height: 35px; }
-        .remove-btn { position: absolute; top: -5px; right: -5px; background-color: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-        .active-lang { border: 2px solid #eab308 !important; background-color: #475569 !important; }
-        .hidden { display: none; }
-        .team-display { background: #0f172a; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed #eab308; }
-        .text-gray { color: #94a3b8; font-size: 12px; }
+        :root { --bg: #0f172a; --card: #1e293b; --accent: #eab308; --red: #ef4444; --blue: #3b82f6; --green: #22c55e; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding-bottom: 50px; }
+        nav { background: var(--card); padding: 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); sticky: top; z-index: 100; }
+        .tab-bar { display: flex; background: #000; padding: 5px; gap: 5px; }
+        .tab-btn { flex: 1; padding: 10px; background: #334155; border: none; color: white; cursor: pointer; font-weight: bold; }
+        .tab-btn.active { background: var(--accent); color: var(--bg); }
+        .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
+        
+        /* Box & Team Styling */
+        .poke-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .poke-slot { background: #334155; border-radius: 8px; padding: 5px; text-align: center; position: relative; border: 1px solid transparent; cursor: pointer; }
+        .poke-slot.selected { border-color: var(--accent); background: #475569; }
+        .poke-slot img { width: 100%; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+        .poke-name { font-size: 9px; font-weight: bold; text-transform: uppercase; display: block; overflow: hidden; white-space: nowrap; }
+        .faint { filter: grayscale(1) opacity(0.5) !important; }
+        .faint-mark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--red); font-size: 40px; font-weight: bold; pointer-events: none; }
+
+        /* Battle UI */
+        .battle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .battle-side { background: #000; padding: 10px; border-radius: 8px; border: 1px solid #444; }
+        .status-msg { background: var(--accent); color: var(--bg); padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; margin-top: 10px; min-height: 40px; }
+        
+        input, button { width: 100%; box-sizing: border-box; }
+        .btn { border: none; border-radius: 6px; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-add { background: var(--accent); color: var(--bg); }
+        .btn-action { background: var(--blue); color: white; margin-top: 10px; }
+        .btn-kill { background: var(--red); color: white; margin-top: 5px; font-size: 10px; padding: 5px; }
     </style>
 </head>
 <body>
 
-    <nav>
-        <h1 id="ui-title" style="margin:0; font-size: 1.1rem; color: #eab308;">CHAMPIONS ADVISOR</h1>
-        <div>
-            <button id="btn-tr" style="padding: 4px 8px; font-size: 12px; background: #334155; color:white;">TR</button>
-            <button id="btn-en" style="padding: 4px 8px; font-size: 12px; background: #334155; color:white;">EN</button>
-        </div>
-    </nav>
+<nav>
+    <div id="ui-title" style="font-weight: bold; font-size: 1.2rem;">CHAMPIONS PRO</div>
+    <div>
+        <button onclick="setLang('tr')" style="background:none; border:1px solid #555; color:white; cursor:pointer;">TR</button>
+        <button onclick="setLang('en')" style="background:none; border:1px solid #555; color:white; cursor:pointer;">EN</button>
+    </div>
+</nav>
 
-    <div class="container">
+<div class="tab-bar">
+    <button class="tab-btn active" onclick="showSection('box', this)">BOX</button>
+    <button class="tab-btn" onclick="showSection('teams', this)">TEAMS</button>
+    <button class="tab-btn" onclick="showSection('battle', this)">BATTLE</button>
+</div>
+
+<div class="container">
+    <div id="box" class="section active">
         <div class="card">
-            <h2 id="ui-my-box-title" style="margin: 0 0 10px 0; font-size: 1rem; border-bottom: 1px solid #334155;"></h2>
-            <div class="input-group">
-                <input id="search-input" type="text" list="poke-list">
-                <datalist id="poke-list">
-                    <option value="pikachu"><option value="charizard"><option value="bulbasaur">
-                    <option value="squirtle"><option value="mewtwo"><option value="lucario">
-                    <option value="gengar"><option value="eevee"><option value="dragonite">
-                </datalist>
-                <button id="ui-add-btn" class="btn-yellow"></button>
+            <h3 id="ui-box-h">Koleksiyonum</h3>
+            <div style="display:flex; gap:5px; margin-bottom:15px;">
+                <input id="box-in" type="text" list="p-list" style="padding:10px; border-radius:6px; background:#334155; border:1px solid #555; color:white;">
+                <button onclick="addToBox()" class="btn btn-add" style="width:80px;">EKLE</button>
             </div>
-            <div id="my-box-list" class="grid"></div>
-        </div>
-
-        <div class="card">
-            <h2 id="ui-team-title" style="margin: 0 0 5px 0; color: #3b82f6;">TAKIM KURUCU</h2>
-            <p id="ui-team-desc" class="text-gray" style="margin-bottom: 10px;"></p>
-            <button id="ui-gen-team-btn" class="btn-blue">YENİ TAKIM ÖNER</button>
-            <div id="team-output"></div>
-        </div>
-
-        <div class="card">
-            <h2 id="ui-battle-title" style="margin: 0 0 5px 0; color: #f87171;">SAVAŞ MODU</h2>
-            <div id="opp-grid" class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px;">
-                <input type="text" class="opp-in" list="poke-list" placeholder="R1">
-                <input type="text" class="opp-in" list="poke-list" placeholder="R2">
-                <input type="text" class="opp-in" list="poke-list" placeholder="R3">
-                <input type="text" class="opp-in" list="poke-list" placeholder="R4">
-                <input type="text" class="opp-in" list="poke-list" placeholder="R5">
-                <input type="text" class="opp-in" list="poke-list" placeholder="R6">
-            </div>
-            <button id="ui-analyze-btn" class="btn-red"></button>
-            <div id="battle-result" class="hidden"></div>
+            <div id="box-grid" class="poke-grid"></div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const translations = {
-                tr: {
-                    title: "CHAMPIONS REHBERİ",
-                    myBox: "Benim Kutum",
-                    searchPlaceholder: "Pokemon ismi...",
-                    addBtn: "EKLE",
-                    teamTitle: "TAKIMLARIM",
-                    teamDesc: "Kutundakilere göre en iyi 6'lıyı kur.",
-                    genTeam: "TAKIM ÖNERİSİ AL",
-                    battleTitle: "SAVAŞ ANALİZİ",
-                    analyzeBtn: "EN İYİ 3'LÜYÜ SEÇ",
-                    advantage: "AVANTAJLI",
-                    suggestedItem: "Önerilen Eşya: ",
-                    errorMinBox: "Takım için kutuda en az 6 Pokemon olmalı!"
-                },
-                en: {
-                    title: "CHAMPIONS ADVISOR",
-                    myBox: "My Box",
-                    searchPlaceholder: "Pokemon name...",
-                    addBtn: "ADD",
-                    teamTitle: "MY TEAMS",
-                    teamDesc: "Best 6-man team from your box.",
-                    genTeam: "GET TEAM SUGGESTION",
-                    battleTitle: "BATTLE ANALYZER",
-                    analyzeBtn: "PICK BEST 3",
-                    advantage: "ADVANTAGE",
-                    suggestedItem: "Suggested Item: ",
-                    errorMinBox: "Need at least 6 Pokemon in box!"
-                }
-            };
+    <div id="teams" class="section">
+        <div class="card">
+            <h3 id="ui-team-h">Takım Oluştur</h3>
+            <p style="font-size:11px; color:#94a3b8;">Box'tan 6 Pokemon seçip takım kaydet.</p>
+            <div id="team-builder-slots" class="poke-grid" style="margin-bottom:15px; border:1px dashed var(--accent); padding:10px;"></div>
+            <button onclick="saveCurrentTeam()" class="btn btn-action" id="ui-save-team">Takımı Kaydet</button>
+        </div>
+        <div id="saved-teams-list"></div>
+    </div>
 
-            let currentLang = localStorage.getItem('lang') || 'tr';
-            let myBox = JSON.parse(localStorage.getItem('myBox')) || [];
-            let savedTeams = [];
-
-            const setLanguage = (lang) => {
-                currentLang = lang;
-                localStorage.setItem('lang', lang);
-                updateUI();
-            };
-
-            function updateUI() {
-                const t = translations[currentLang];
-                document.getElementById('ui-title').innerText = t.title;
-                document.getElementById('ui-my-box-title').innerText = t.myBox;
-                document.getElementById('search-input').placeholder = t.searchPlaceholder;
-                document.getElementById('ui-add-btn').innerText = t.addBtn;
-                document.getElementById('ui-team-title').innerText = t.teamTitle;
-                document.getElementById('ui-team-desc').innerText = t.teamDesc;
-                document.getElementById('ui-gen-team-btn').innerText = t.genTeam;
-                document.getElementById('ui-battle-title').innerText = t.battleTitle;
-                document.getElementById('ui-analyze-btn').innerText = t.analyzeBtn;
-                document.getElementById('btn-tr').className = currentLang === 'tr' ? 'active-lang' : '';
-                document.getElementById('btn-en').className = currentLang === 'en' ? 'active-lang' : '';
-            }
-
-            window.searchPokemon = async () => {
-                const name = document.getElementById('search-input').value.toLowerCase().trim();
-                if (!name) return;
-                try {
-                    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-                    const data = await res.json();
-                    myBox.push({ name: data.name, sprite: data.sprites.front_default, types: data.types.map(t => t.type.name) });
-                    localStorage.setItem('myBox', JSON.stringify(myBox));
-                    renderBox();
-                    document.getElementById('search-input').value = '';
-                } catch (e) { alert("Hata!"); }
-            };
-
-            window.renderBox = () => {
-                const list = document.getElementById('my-box-list');
-                list.innerHTML = myBox.map((p, i) => `
-                    <div class="pokemon-item">
-                        <img src="${p.sprite}">
-                        <span style="font-size:10px;">${p.name.toUpperCase()}</span>
-                        <button onclick="removeP(${i})" class="remove-btn">×</button>
-                    </div>
-                `).join('');
-            };
-
-            window.removeP = (i) => { myBox.splice(i, 1); localStorage.setItem('myBox', JSON.stringify(myBox)); renderBox(); };
-
-            // TAKIM KURMA MANTIĞI
-            document.getElementById('ui-gen-team-btn').addEventListener('click', () => {
-                if (myBox.length < 6) { alert(translations[currentLang].errorMinBox); return; }
-                
-                // Basit algoritma: Rastgele olmayan, tip çeşitliliği yüksek 6'lı seç
-                let team = [...myBox].sort(() => 0.5 - Math.random()).slice(0, 6);
-                const out = document.getElementById('team-output');
-                out.innerHTML = `<div class="team-display">
-                    ${team.map(p => `
-                        <div style="display:flex; align-items:center; font-size:11px; margin-bottom:4px;">
-                            <img src="${p.sprite}" width="25">
-                            <b>${p.name.toUpperCase()}</b> 
-                            <i style="margin-left:10px; color:#4ade80;">${translations[currentLang].suggestedItem} Leftovers</i>
-                        </div>
-                    `).join('')}
-                </div>`;
-            });
-
-            // SAVAŞ ANALİZİ
-            document.getElementById('ui-analyze-btn').addEventListener('click', () => {
-                const res = document.getElementById('battle-result');
-                res.classList.remove('hidden');
-                let picks = myBox.slice(0, 3); // Analiz placeholder
-                res.innerHTML = picks.map((p, i) => `
-                    <div style="background:#1e293b; padding:10px; margin-top:5px; border-left:4px solid red; display:flex; align-items:center;">
-                        <span style="color:red; font-weight:bold; margin-right:10px;">${i+1}</span>
-                        <img src="${p.sprite}" width="30">
-                        <span style="flex:1; font-size:12px;">${p.name.toUpperCase()}</span>
-                    </div>
-                `).join('');
-            });
-
-            document.getElementById('btn-tr').addEventListener('click', () => setLanguage('tr'));
-            document.getElementById('btn-en').addEventListener('click', () => setLanguage('en'));
-            document.getElementById('ui-add-btn').addEventListener('click', searchPokemon);
+    <div id="battle" class="section">
+        <div class="card">
+            <select id="team-selector" onchange="loadBattleTeam()" style="padding:10px; margin-bottom:10px; background:#334155; color:white; border:none;"></select>
             
-            updateUI();
-            renderBox();
+            <div class="battle-row">
+                <div class="battle-side">
+                    <h4 style="margin:0 0 10px 0; font-size:12px; color:var(--blue);">MYSIDE</h4>
+                    <div id="battle-my-slots" class="poke-grid" style="grid-template-columns: repeat(2, 1fr);"></div>
+                </div>
+                <div class="battle-side">
+                    <h4 style="margin:0 0 10px 0; font-size:12px; color:var(--red);">ENEMY</h4>
+                    <input type="text" id="enemy-in" list="p-list" onchange="addEnemy()" placeholder="Add Enemy" style="font-size:10px; padding:5px; margin-bottom:5px;">
+                    <div id="battle-enemy-slots" class="poke-grid" style="grid-template-columns: repeat(2, 1fr);"></div>
+                </div>
+            </div>
+
+            <div id="battle-advisor" class="status-msg">Hazır. Maç başlayınca rakip Pokemonu seç.</div>
+        </div>
+    </div>
+</div>
+
+<datalist id="p-list">
+    <option value="pikachu"><option value="charizard"><option value="mewtwo"><option value="bulbasaur"><option value="squirtle">
+    <option value="gengar"><option value="lucario"><option value="dragonite"><option value="eevee">
+</datalist>
+
+<script>
+    let box = JSON.parse(localStorage.getItem('box')) || [];
+    let teams = JSON.parse(localStorage.getItem('teams')) || [];
+    let currentTeamBuild = [];
+    let battleMyTeam = [];
+    let battleEnemyTeam = [];
+    let myActiveIdx = null;
+    let enemyActiveIdx = null;
+
+    const texts = {
+        tr: { boxH: "Koleksiyonum", teamH: "Takım Oluştur", saveTeam: "Takımı Kaydet", advStart: "Rakibi seç, tavsiye vereyim.", advKeep: "Avantajlısın, kal!", advSwap: "Tehlike! Şuna geç: " },
+        en: { boxH: "My Collection", teamH: "Team Builder", saveTeam: "Save Team", advStart: "Select enemy to get advice.", advKeep: "Good match, keep!", advSwap: "Danger! Swap to: " }
+    };
+    let lang = 'tr';
+
+    function showSection(id, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    async function addToBox() {
+        const name = document.getElementById('box-in').value.toLowerCase();
+        if (!name) return;
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+        const data = await res.json();
+        box.push({ name: data.name, sprite: data.sprites.front_default, types: data.types.map(t => t.type.name) });
+        save(); renderBox();
+    }
+
+    function renderBox() {
+        const grid = document.getElementById('box-grid');
+        grid.innerHTML = box.map((p, i) => `
+            <div class="poke-slot" onclick="toggleToTeam(${i})">
+                <img src="${p.sprite}">
+                <span class="poke-name">${p.name}</span>
+            </div>
+        `).join('');
+    }
+
+    function toggleToTeam(idx) {
+        if(currentTeamBuild.length < 6) {
+            currentTeamBuild.push(box[idx]);
+            renderTeamBuilder();
+        }
+    }
+
+    function renderTeamBuilder() {
+        const area = document.getElementById('team-builder-slots');
+        area.innerHTML = currentTeamBuild.map((p, i) => `
+            <div class="poke-slot" onclick="currentTeamBuild.splice(${i},1); renderTeamBuilder();">
+                <img src="${p.sprite}">
+                <span class="poke-name">${p.name}</span>
+            </div>
+        `).join('');
+    }
+
+    function saveCurrentTeam() {
+        if(currentTeamBuild.length === 6) {
+            teams.push([...currentTeamBuild]);
+            currentTeamBuild = [];
+            save(); renderTeamsList(); renderTeamBuilder();
+            loadTeamSelectors();
+        }
+    }
+
+    function renderTeamsList() {
+        const list = document.getElementById('saved-teams-list');
+        list.innerHTML = teams.map((t, i) => `
+            <div class="card">
+                <b>Takım #${i+1}</b>
+                <div class="poke-grid">${t.map(p => `<img src="${p.sprite}" width="30">`).join('')}</div>
+            </div>
+        `).join('');
+    }
+
+    function loadTeamSelectors() {
+        const sel = document.getElementById('team-selector');
+        sel.innerHTML = teams.map((t, i) => `<option value="${i}">Takım #${i+1}</option>`).join('');
+    }
+
+    function loadBattleTeam() {
+        const idx = document.getElementById('team-selector').value;
+        battleMyTeam = teams[idx].map(p => ({...p, dead: false}));
+        renderBattleSlots();
+    }
+
+    async function addEnemy() {
+        const name = document.getElementById('enemy-in').value.toLowerCase();
+        if(!name) return;
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+        const data = await res.json();
+        battleEnemyTeam.push({ name: data.name, sprite: data.sprites.front_default, types: data.types.map(t => t.type.name), dead: false });
+        document.getElementById('enemy-in').value = "";
+        renderBattleSlots();
+    }
+
+    function renderBattleSlots() {
+        document.getElementById('battle-my-slots').innerHTML = battleMyTeam.map((p, i) => `
+            <div class="poke-slot ${myActiveIdx == i ? 'selected' : ''} ${p.dead ? 'faint' : ''}" onclick="selectMyActive(${i})">
+                <img src="${p.sprite}">
+                <button class="btn-kill" onclick="event.stopPropagation(); battleMyTeam[${i}].dead=true; renderBattleSlots();">DEAD</button>
+                ${p.dead ? '<div class="faint-mark">X</div>' : ''}
+            </div>
+        `).join('');
+
+        document.getElementById('battle-enemy-slots').innerHTML = battleEnemyTeam.map((p, i) => `
+            <div class="poke-slot ${enemyActiveIdx == i ? 'selected' : ''} ${p.dead ? 'faint' : ''}" onclick="selectEnemyActive(${i})">
+                <img src="${p.sprite}">
+                <button class="btn-kill" onclick="event.stopPropagation(); battleEnemyTeam[${i}].dead=true; renderBattleSlots();">DEAD</button>
+                ${p.dead ? '<div class="faint-mark">X</div>' : ''}
+            </div>
+        `).join('');
+        
+        analyzeBattle();
+    }
+
+    function selectMyActive(i) { if(!battleMyTeam[i].dead) { myActiveIdx = i; renderBattleSlots(); } }
+    function selectEnemyActive(i) { if(!battleEnemyTeam[i].dead) { enemyActiveIdx = i; renderBattleSlots(); } }
+
+    function analyzeBattle() {
+        if(enemyActiveIdx === null) return;
+        const enemy = battleEnemyTeam[enemyActiveIdx];
+        const adv = document.getElementById('battle-advisor');
+        
+        // Basit tip analizi (Placeholder)
+        let bestP = null;
+        battleMyTeam.forEach((p, idx) => {
+            if(!p.dead) {
+                if(!bestP) bestP = p;
+            }
         });
-    </script>
+
+        if(myActiveIdx !== null && !battleMyTeam[myActiveIdx].dead) {
+             adv.innerText = texts[lang].advKeep;
+        } else {
+             adv.innerText = texts[lang].advSwap + (bestP ? bestP.name : "N/A");
+        }
+    }
+
+    function save() { 
+        localStorage.setItem('box', JSON.stringify(box)); 
+        localStorage.setItem('teams', JSON.stringify(teams));
+    }
+
+    function setLang(l) { lang = l; document.getElementById('ui-box-h').innerText = texts[l].boxH; }
+
+    // Init
+    renderBox();
+    renderTeamsList();
+    loadTeamSelectors();
+</script>
 </body>
 </html>
