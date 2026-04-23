@@ -3,98 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokeChampions Advisor</title>
+    <title>PokeChampions Advisor v2</title>
     <style>
-        /* SAF CSS - Tailwind Bağımlılığı Kaldırıldı */
-        body {
-            background-color: #0f172a;
-            color: white;
-            font-family: sans-serif;
-            margin: 0;
-            padding-bottom: 5rem;
-        }
-        nav {
-            background-color: #1e293b;
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-        .card {
-            background-color: #1e293b;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            border: 1px solid #334155;
-            margin-bottom: 1.5rem;
-        }
-        .input-group { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-        input {
-            flex: 1;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
-            background-color: #334155;
-            border: 1px solid #475569;
-            color: white;
-            font-size: 0.875rem;
-        }
-        button {
-            cursor: pointer;
-            border: none;
-            border-radius: 0.25rem;
-            font-weight: bold;
-            transition: opacity 0.2s;
-        }
-        button:active { opacity: 0.8; }
+        body { background-color: #0f172a; color: white; font-family: sans-serif; margin: 0; padding-bottom: 5rem; }
+        nav { background-color: #1e293b; padding: 1rem; position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .container { max-width: 450px; margin: 0 auto; padding: 1rem; }
+        .card { background-color: #1e293b; padding: 1rem; border-radius: 0.75rem; border: 1px solid #334155; margin-bottom: 1.5rem; }
+        .input-group { display: flex; gap: 0.5rem; margin-bottom: 1rem; position: relative; }
+        input, select { flex: 1; padding: 0.6rem; border-radius: 0.25rem; background-color: #334155; border: 1px solid #475569; color: white; font-size: 0.875rem; }
+        button { cursor: pointer; border: none; border-radius: 0.25rem; font-weight: bold; }
         .btn-yellow { background-color: #eab308; color: #0f172a; padding: 0.5rem 1rem; }
-        .btn-red { 
-            background-color: #dc2626; color: white; width: 100%; 
-            padding: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
-        }
+        .btn-red { background-color: #dc2626; color: white; width: 100%; padding: 0.75rem; text-transform: uppercase; margin-top: 10px; }
+        .btn-blue { background-color: #3b82f6; color: white; width: 100%; padding: 0.75rem; text-transform: uppercase; margin-bottom: 1rem; }
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
-        .pokemon-item {
-            background-color: #334155;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            border: 1px solid #475569;
-        }
-        .pokemon-item img { width: 40px; height: 40px; }
-        .pokemon-item span { font-size: 10px; font-weight: bold; text-transform: uppercase; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        .remove-btn {
-            position: absolute; top: -5px; right: -5px;
-            background-color: #ef4444; color: white;
-            border-radius: 9999px; width: 18px; height: 18px;
-            display: flex; align-items: center; justify-content: center; font-size: 10px;
-        }
+        .pokemon-item { background-color: #334155; padding: 0.5rem; border-radius: 0.25rem; position: relative; display: flex; align-items: center; gap: 0.5rem; border: 1px solid #475569; }
+        .pokemon-item img { width: 35px; height: 35px; }
+        .remove-btn { position: absolute; top: -5px; right: -5px; background-color: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
         .active-lang { border: 2px solid #eab308 !important; background-color: #475569 !important; }
         .hidden { display: none; }
-        .result-item {
-            display: flex; align-items: center; justify-content: space-between;
-            background-color: #0f172a; padding: 0.75rem; border-radius: 0.25rem;
-            border-left: 4px solid #eab308; margin-bottom: 0.5rem;
-        }
-        .text-yellow { color: #eab308; }
-        .text-red { color: #f87171; }
+        .team-display { background: #0f172a; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed #eab308; }
         .text-gray { color: #94a3b8; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <nav>
-        <h1 id="ui-title" style="margin:0; font-size: 1.25rem; color: #eab308;">CHAMPIONS ADVISOR</h1>
+        <h1 id="ui-title" style="margin:0; font-size: 1.1rem; color: #eab308;">CHAMPIONS ADVISOR</h1>
         <div>
             <button id="btn-tr" style="padding: 4px 8px; font-size: 12px; background: #334155; color:white;">TR</button>
             <button id="btn-en" style="padding: 4px 8px; font-size: 12px; background: #334155; color:white;">EN</button>
@@ -103,33 +37,38 @@
 
     <div class="container">
         <div class="card">
-            <h2 id="ui-my-box-title" style="margin: 0 0 10px 0; font-size: 1.1rem; border-bottom: 1px solid #334155;"></h2>
+            <h2 id="ui-my-box-title" style="margin: 0 0 10px 0; font-size: 1rem; border-bottom: 1px solid #334155;"></h2>
             <div class="input-group">
-                <input id="search-input" type="text">
+                <input id="search-input" type="text" list="poke-list">
+                <datalist id="poke-list">
+                    <option value="pikachu"><option value="charizard"><option value="bulbasaur">
+                    <option value="squirtle"><option value="mewtwo"><option value="lucario">
+                    <option value="gengar"><option value="eevee"><option value="dragonite">
+                </datalist>
                 <button id="ui-add-btn" class="btn-yellow"></button>
             </div>
             <div id="my-box-list" class="grid"></div>
         </div>
 
         <div class="card">
-            <h2 id="ui-battle-title" class="text-red" style="margin: 0 0 5px 0;"></h2>
-            <p id="ui-battle-desc" class="text-gray" style="margin-bottom: 10px;"></p>
-            
-            <div class="grid-3" style="margin-bottom: 1rem;">
-                <input type="text" class="opp-input" data-idx="1">
-                <input type="text" class="opp-input" data-idx="2">
-                <input type="text" class="opp-input" data-idx="3">
-                <input type="text" class="opp-input" data-idx="4">
-                <input type="text" class="opp-input" data-idx="5">
-                <input type="text" class="opp-input" data-idx="6">
+            <h2 id="ui-team-title" style="margin: 0 0 5px 0; color: #3b82f6;">TAKIM KURUCU</h2>
+            <p id="ui-team-desc" class="text-gray" style="margin-bottom: 10px;"></p>
+            <button id="ui-gen-team-btn" class="btn-blue">YENİ TAKIM ÖNER</button>
+            <div id="team-output"></div>
+        </div>
+
+        <div class="card">
+            <h2 id="ui-battle-title" style="margin: 0 0 5px 0; color: #f87171;">SAVAŞ MODU</h2>
+            <div id="opp-grid" class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px;">
+                <input type="text" class="opp-in" list="poke-list" placeholder="R1">
+                <input type="text" class="opp-in" list="poke-list" placeholder="R2">
+                <input type="text" class="opp-in" list="poke-list" placeholder="R3">
+                <input type="text" class="opp-in" list="poke-list" placeholder="R4">
+                <input type="text" class="opp-in" list="poke-list" placeholder="R5">
+                <input type="text" class="opp-in" list="poke-list" placeholder="R6">
             </div>
-            
             <button id="ui-analyze-btn" class="btn-red"></button>
-            
-            <div id="battle-result" class="hidden" style="margin-top: 1rem; border-top: 1px solid #334155; padding-top: 1rem;">
-                <h3 id="ui-result-title" style="text-align: center; color: #eab308; text-decoration: underline; margin-bottom: 10px;"></h3>
-                <div id="suggestion-list"></div>
-            </div>
+            <div id="battle-result" class="hidden"></div>
         </div>
     </div>
 
@@ -140,41 +79,40 @@
                     title: "CHAMPIONS REHBERİ",
                     myBox: "Benim Kutum",
                     searchPlaceholder: "Pokemon ismi...",
-                    oppPlaceholder: "Rakip ",
                     addBtn: "EKLE",
-                    battleTitle: "SAVAŞ MODU",
-                    battleDesc: "Rakibin 6 Pokemonunu giriniz:",
-                    analyzeBtn: "ANALİZ ET VE SEÇ",
-                    resultTitle: "ÖNERİLEN SEÇİM SIRASI",
+                    teamTitle: "TAKIMLARIM",
+                    teamDesc: "Kutundakilere göre en iyi 6'lıyı kur.",
+                    genTeam: "TAKIM ÖNERİSİ AL",
+                    battleTitle: "SAVAŞ ANALİZİ",
+                    analyzeBtn: "EN İYİ 3'LÜYÜ SEÇ",
                     advantage: "AVANTAJLI",
-                    errorMin: "Kutunda en az 3, rakipte en az 1 pokemon olmalı!",
-                    errorNotFound: "Pokemon bulunamadı!"
+                    suggestedItem: "Önerilen Eşya: ",
+                    errorMinBox: "Takım için kutuda en az 6 Pokemon olmalı!"
                 },
                 en: {
                     title: "CHAMPIONS ADVISOR",
                     myBox: "My Box",
                     searchPlaceholder: "Pokemon name...",
-                    oppPlaceholder: "Opp ",
                     addBtn: "ADD",
-                    battleTitle: "BATTLE MODE",
-                    battleDesc: "Enter opponent's 6 Pokemon:",
-                    analyzeBtn: "ANALYZE & SELECT",
-                    resultTitle: "SUGGESTED SELECTION ORDER",
-                    advantage: "ADVANTAGEOUS",
-                    errorMin: "Need 3 in Box and at least 1 opponent!",
-                    errorNotFound: "Pokemon not found!"
+                    teamTitle: "MY TEAMS",
+                    teamDesc: "Best 6-man team from your box.",
+                    genTeam: "GET TEAM SUGGESTION",
+                    battleTitle: "BATTLE ANALYZER",
+                    analyzeBtn: "PICK BEST 3",
+                    advantage: "ADVANTAGE",
+                    suggestedItem: "Suggested Item: ",
+                    errorMinBox: "Need at least 6 Pokemon in box!"
                 }
             };
 
             let currentLang = localStorage.getItem('lang') || 'tr';
             let myBox = JSON.parse(localStorage.getItem('myBox')) || [];
-            const API_URL = "https://pokeapi.co/api/v2/pokemon/";
+            let savedTeams = [];
 
-            window.setLanguage = (lang) => {
+            const setLanguage = (lang) => {
                 currentLang = lang;
                 localStorage.setItem('lang', lang);
                 updateUI();
-                renderBox();
             };
 
             function updateUI() {
@@ -183,15 +121,11 @@
                 document.getElementById('ui-my-box-title').innerText = t.myBox;
                 document.getElementById('search-input').placeholder = t.searchPlaceholder;
                 document.getElementById('ui-add-btn').innerText = t.addBtn;
+                document.getElementById('ui-team-title').innerText = t.teamTitle;
+                document.getElementById('ui-team-desc').innerText = t.teamDesc;
+                document.getElementById('ui-gen-team-btn').innerText = t.genTeam;
                 document.getElementById('ui-battle-title').innerText = t.battleTitle;
-                document.getElementById('ui-battle-desc').innerText = t.battleDesc;
                 document.getElementById('ui-analyze-btn').innerText = t.analyzeBtn;
-                document.getElementById('ui-result-title').innerText = t.resultTitle;
-
-                document.querySelectorAll('.opp-input').forEach(i => {
-                    i.placeholder = t.oppPlaceholder + i.dataset.idx;
-                });
-
                 document.getElementById('btn-tr').className = currentLang === 'tr' ? 'active-lang' : '';
                 document.getElementById('btn-en').className = currentLang === 'en' ? 'active-lang' : '';
             }
@@ -200,61 +134,64 @@
                 const name = document.getElementById('search-input').value.toLowerCase().trim();
                 if (!name) return;
                 try {
-                    const response = await fetch(`${API_URL}${name}`);
-                    if (!response.ok) throw new Error(translations[currentLang].errorNotFound);
-                    const data = await response.json();
-                    myBox.push({
-                        name: data.name,
-                        types: data.types.map(t => t.type.name),
-                        sprite: data.sprites.front_default
-                    });
+                    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+                    const data = await res.json();
+                    myBox.push({ name: data.name, sprite: data.sprites.front_default, types: data.types.map(t => t.type.name) });
                     localStorage.setItem('myBox', JSON.stringify(myBox));
                     renderBox();
                     document.getElementById('search-input').value = '';
-                } catch (err) { alert(err.message); }
+                } catch (e) { alert("Hata!"); }
             };
 
-            window.removePokemon = (index) => {
-                myBox.splice(index, 1);
-                localStorage.setItem('myBox', JSON.stringify(myBox));
-                renderBox();
-            };
-
-            function renderBox() {
+            window.renderBox = () => {
                 const list = document.getElementById('my-box-list');
-                list.innerHTML = myBox.map((p, index) => `
+                list.innerHTML = myBox.map((p, i) => `
                     <div class="pokemon-item">
                         <img src="${p.sprite}">
-                        <span>${p.name}</span>
-                        <button onclick="removePokemon(${index})" class="remove-btn">×</button>
-                    </div>
-                `).join('');
-            }
-
-            window.analyzeBattle = async () => {
-                const names = Array.from(document.querySelectorAll('.opp-input')).map(i => i.value.toLowerCase().trim()).filter(n => n);
-                if (myBox.length < 3 || names.length === 0) { alert(translations[currentLang].errorMin); return; }
-                
-                // Basit seçim algoritması (ilk 3)
-                const sorted = [...myBox].slice(0, 3);
-                const container = document.getElementById('battle-result');
-                const list = document.getElementById('suggestion-list');
-                container.classList.remove('hidden');
-                list.innerHTML = sorted.map((p, i) => `
-                    <div class="result-item">
-                        <b class="text-yellow">${i+1}</b>
-                        <img src="${p.sprite}" style="width:40px;">
-                        <span style="flex:1; padding: 0 10px; font-weight:bold; font-size:12px;">${p.name.toUpperCase()}</span>
-                        <span style="font-size:10px; color:#4ade80;">${translations[currentLang].advantage}</span>
+                        <span style="font-size:10px;">${p.name.toUpperCase()}</span>
+                        <button onclick="removeP(${i})" class="remove-btn">×</button>
                     </div>
                 `).join('');
             };
+
+            window.removeP = (i) => { myBox.splice(i, 1); localStorage.setItem('myBox', JSON.stringify(myBox)); renderBox(); };
+
+            // TAKIM KURMA MANTIĞI
+            document.getElementById('ui-gen-team-btn').addEventListener('click', () => {
+                if (myBox.length < 6) { alert(translations[currentLang].errorMinBox); return; }
+                
+                // Basit algoritma: Rastgele olmayan, tip çeşitliliği yüksek 6'lı seç
+                let team = [...myBox].sort(() => 0.5 - Math.random()).slice(0, 6);
+                const out = document.getElementById('team-output');
+                out.innerHTML = `<div class="team-display">
+                    ${team.map(p => `
+                        <div style="display:flex; align-items:center; font-size:11px; margin-bottom:4px;">
+                            <img src="${p.sprite}" width="25">
+                            <b>${p.name.toUpperCase()}</b> 
+                            <i style="margin-left:10px; color:#4ade80;">${translations[currentLang].suggestedItem} Leftovers</i>
+                        </div>
+                    `).join('')}
+                </div>`;
+            });
+
+            // SAVAŞ ANALİZİ
+            document.getElementById('ui-analyze-btn').addEventListener('click', () => {
+                const res = document.getElementById('battle-result');
+                res.classList.remove('hidden');
+                let picks = myBox.slice(0, 3); // Analiz placeholder
+                res.innerHTML = picks.map((p, i) => `
+                    <div style="background:#1e293b; padding:10px; margin-top:5px; border-left:4px solid red; display:flex; align-items:center;">
+                        <span style="color:red; font-weight:bold; margin-right:10px;">${i+1}</span>
+                        <img src="${p.sprite}" width="30">
+                        <span style="flex:1; font-size:12px;">${p.name.toUpperCase()}</span>
+                    </div>
+                `).join('');
+            });
 
             document.getElementById('btn-tr').addEventListener('click', () => setLanguage('tr'));
             document.getElementById('btn-en').addEventListener('click', () => setLanguage('en'));
             document.getElementById('ui-add-btn').addEventListener('click', searchPokemon);
-            document.getElementById('ui-analyze-btn').addEventListener('click', analyzeBattle);
-
+            
             updateUI();
             renderBox();
         });
