@@ -7,27 +7,39 @@
     <style>
         :root { --bg: #0b0f1a; --card: #161d2f; --accent: #f59e0b; --blue: #3b82f6; --red: #ef4444; --green: #10b981; --text: #f8fafc; }
         * { box-sizing: border-box; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* Sayfanın taşmasını engelle, scroll sadece içerde olacak */
+        body, html { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; height: 100vh; overflow: hidden; }
 
-        header { background: var(--card); border-bottom: 2px solid var(--accent); flex-shrink: 0; }
+        header { background: var(--card); border-bottom: 2px solid var(--accent); flex-shrink: 0; z-index: 10; }
         nav { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
         .tabs { display: flex; background: #000; padding: 2px; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: #242f45; color: #94a3b8; cursor: pointer; font-weight: bold; text-transform: uppercase; }
         .tab-btn.active { background: var(--accent); color: #000; }
 
-        .content { flex: 1; display: none; overflow: hidden; }
+        /* Ana içerik alanı tüm boşluğu kaplar */
+        .content { flex: 1; display: none; overflow: hidden; height: 100%; }
         .content.active { display: flex; }
         
-        .split-view { display: flex; flex: 1; width: 100%; overflow: hidden; }
+        .split-view { display: flex; flex: 1; width: 100%; height: 100%; overflow: hidden; }
         @media (max-width: 900px) { .split-view { flex-direction: column; } }
 
-        .side-panel { width: 320px; border-right: 1px solid #2d3748; padding: 15px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; background: rgba(0,0,0,0.1); }
+        .side-panel { 
+            width: 320px; border-right: 1px solid #2d3748; padding: 15px; 
+            display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; 
+            background: rgba(0,0,0,0.1); height: 100%; overflow: hidden;
+        }
         @media (max-width: 900px) { .side-panel { width: 100%; height: 35%; border-right: none; border-bottom: 1px solid #2d3748; } }
 
-        .main-scroll { flex: 1; padding: 15px; overflow-y: auto; height: 100%; }
+        /* DESKTOP SCROLL FIX: overflow-y ve min-height/flex tanımları */
+        .main-scroll { 
+            flex: 1; padding: 15px; overflow-y: auto; overflow-x: hidden; 
+            height: 100%; position: relative;
+            -webkit-overflow-scrolling: touch; 
+        }
         
         .poke-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-        .poke-item { background: #1f2937; border-radius: 8px; padding: 10px; text-align: center; border: 2px solid transparent; cursor: pointer; position: relative; }
+        .poke-item { background: #1f2937; border-radius: 8px; padding: 10px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.1s; }
         .poke-item:hover { border-color: var(--accent); }
         .poke-item img { width: 64px; height: 64px; object-fit: contain; }
         .poke-item .name { font-size: 10px; font-weight: bold; text-transform: uppercase; margin-top: 5px; display: block; }
@@ -41,6 +53,9 @@
         .btn-red { background: var(--red); }
 
         #loader { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        
+        /* Koleksiyonum listesi için kendi içinde scroll */
+        #my-box-list, #team-picker { flex: 1; overflow-y: auto; padding-right: 5px; }
     </style>
 </head>
 <body>
@@ -84,11 +99,11 @@
                 <option value="9">Paldea (906-1025)</option>
             </select>
             <h4 id="ui-my">Koleksiyonum</h4>
-            <div id="my-box-list" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); overflow-y:auto;"></div>
+            <div id="my-box-list" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));"></div>
         </div>
         <div class="main-scroll" id="box-scroll">
             <div class="poke-grid" id="master-grid"></div>
-            <div id="sentinel" style="height:50px;"></div>
+            <div id="sentinel" style="height:100px; display:flex; align-items:center; justify-content:center; color:#444;">Yükleniyor...</div>
         </div>
     </div>
 </div>
@@ -97,7 +112,7 @@
     <div class="split-view">
         <div class="side-panel">
             <h4 id="ui-sel">Kutudan Seç</h4>
-            <div id="team-picker" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); overflow-y:auto;"></div>
+            <div id="team-picker" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));"></div>
         </div>
         <div class="main-scroll">
             <input type="text" id="team-name" placeholder="Takım Adı">
@@ -119,7 +134,7 @@
         <div id="active-battle" style="display:none; margin-top:20px;">
             <div class="split-view" style="flex-direction:row; gap:20px;">
                 <div style="flex:1;"><h4>MY TRIO</h4><div id="arena-my" class="poke-grid" style="grid-template-columns:1fr;"></div></div>
-                <div style="flex:1;"><h4>ENEMIES</h4><input type="text" list="p-list" id="enemy-in" onchange="addE(this.value)"><div id="arena-opp" class="poke-grid" style="grid-template-columns:1fr; margin-top:10px;"></div></div>
+                <div style="flex:1;"><h4>ENEMIES</h4><input type="text" list="p-list" id="enemy-in" onchange="addE(this.value)" placeholder="+ Enemy Name"><div id="arena-opp" class="poke-grid" style="grid-template-columns:1fr; margin-top:10px;"></div></div>
             </div>
             <div id="adv-msg" style="background:var(--accent); color:#000; padding:20px; text-align:center; font-weight:bold; margin-top:20px; border-radius:8px;">---</div>
             <button onclick="resetMatch()" class="btn btn-red" style="margin-top:20px;">RESET</button>
@@ -151,7 +166,12 @@
         });
         document.getElementById('p-list').innerHTML = ALL.map(p => `<option value="${p.name}">`).join('');
         
-        const obs = new IntersectionObserver((e) => { if(e[0].isIntersecting && limit < filtered.length) { limit += 40; renderBatch(); } }, { root: document.getElementById('box-scroll'), threshold: 0.1 });
+        // Observer root elemanını net olarak belirledik
+        const obs = new IntersectionObserver((e) => { 
+            if(e[0].isIntersecting && limit < filtered.length) { 
+                limit += 40; renderBatch(); 
+            } 
+        }, { root: document.getElementById('box-scroll'), threshold: 0.1 });
         obs.observe(document.getElementById('sentinel'));
 
         filter(); renderMyBox(); renderTeams(); updateBattleSel();
@@ -175,6 +195,7 @@
         }
         filtered = resList; limit = 40;
         document.getElementById('master-grid').innerHTML = "";
+        document.getElementById('box-scroll').scrollTop = 0;
         renderBatch();
     }
 
@@ -191,10 +212,8 @@
     function renderMyBox() {
         const h = myBox.map((p, i) => `<div class="poke-item" onclick="myBox.splice(${i},1); save(); renderMyBox();"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
         document.getElementById('my-box-list').innerHTML = h;
-        document.getElementById('team-picker').innerHTML = h.replace(/myBox.splice/g, 'addToBuild');
+        document.getElementById('team-picker').innerHTML = myBox.map((p, i) => `<div class="poke-item" onclick="if(build.length<6){build.push(myBox[${i}]); renderBuild();}"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
     }
-
-    function addToBuild(idx) { if(build.length < 6) { build.push(myBox[idx]); renderBuild(); } }
 
     function renderBuild() {
         document.getElementById('build-zone').innerHTML = build.map((p, i) => `<div class="poke-item" onclick="build.splice(${i},1); renderBuild();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
@@ -229,7 +248,10 @@
     function startBattle() {
         const s = bTrio.filter(x => x.sel);
         if(s.length !== 3) return;
-        bTrio = s; document.getElementById('prep-area').style.display = 'none'; document.getElementById('active-battle').style.display = 'block'; renderArena();
+        bTrio = s; 
+        document.getElementById('prep-area').style.display = 'none'; 
+        document.getElementById('active-battle').style.display = 'block'; 
+        renderArena();
     }
 
     function addE(n) { const p = ALL.find(x => x.name === n.toLowerCase()); if(p && bOpp.length<6) { bOpp.push(p); renderArena(); } document.getElementById('enemy-in').value = ""; }
@@ -245,7 +267,8 @@
     function showTab(id, btn) {
         document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active'); btn.classList.add('active');
+        document.getElementById(id).classList.add('active'); 
+        btn.classList.add('active');
     }
 
     function save() { localStorage.setItem('p_cba_box', JSON.stringify(myBox)); localStorage.setItem('p_cba_teams', JSON.stringify(teams)); }
@@ -255,6 +278,8 @@
         document.getElementById('t-box').innerText = t.box; document.getElementById('t-teams').innerText = t.teams; document.getElementById('t-battle').innerText = t.battle;
         document.getElementById('ui-my').innerText = t.my; document.getElementById('ui-sel').innerText = t.sel; document.getElementById('ui-save').innerText = t.save;
         document.getElementById('ui-pick3').innerText = t.pick3; document.getElementById('ui-start').innerText = t.start;
+        document.getElementById('reg-sel').options[0].text = (l === 'tr' ? "Tüm Bölgeler" : "All Regions");
+        document.getElementById('type-sel').options[0].text = (l === 'tr' ? "Tüm Tipler" : "All Types");
     }
 
     window.onload = init;
