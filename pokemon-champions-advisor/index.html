@@ -3,205 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemon Advisor Pro</title>
+    <title>Pokemon Advisor Fix</title>
     <style>
-        :root { --bg: #0b0f1a; --card: #161d2f; --accent: #f59e0b; --blue: #3b82f6; --red: #ef4444; --text: #f8fafc; }
+        :root { --bg: #0b0f1a; --card: #161d2f; --accent: #f59e0b; --blue: #3b82f6; --red: #ef4444; --green: #10b981; --text: #f8fafc; }
         * { box-sizing: border-box; }
-        
-        body { 
-            background: var(--bg); color: var(--text); 
-            font-family: sans-serif; margin: 0; 
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
-        }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
         header { background: var(--card); border-bottom: 2px solid var(--accent); flex-shrink: 0; }
         nav { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
         .tabs { display: flex; background: #000; padding: 2px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: #242f45; color: #94a3b8; cursor: pointer; font-weight: bold; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: #242f45; color: #94a3b8; cursor: pointer; font-weight: bold; text-transform: uppercase; }
         .tab-btn.active { background: var(--accent); color: #000; }
 
         .content { flex: 1; display: none; overflow: hidden; }
-        .content.active { display: flex; flex-direction: row; }
+        .content.active { display: flex; }
+        
+        .split-view { display: flex; flex: 1; width: 100%; overflow: hidden; }
+        @media (max-width: 900px) { .split-view { flex-direction: column; } }
 
-        @media (max-width: 900px) { .content.active { flex-direction: column; } }
-
-        /* SOL PANEL */
-        .side-panel { 
-            width: 320px; border-right: 1px solid #2d3748; padding: 15px; 
-            display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;
-            background: rgba(0,0,0,0.1);
-        }
+        .side-panel { width: 320px; border-right: 1px solid #2d3748; padding: 15px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; background: rgba(0,0,0,0.1); }
         @media (max-width: 900px) { .side-panel { width: 100%; height: 35%; border-right: none; border-bottom: 1px solid #2d3748; } }
 
-        /* SAĞ PANEL - ASIL SCROLL BURADA */
-        .main-list-area { 
-            flex: 1; padding: 20px; 
-            overflow-y: auto; /* Kaydırma çubuğunun çıkmasını sağlar */
-            height: calc(100vh - 130px); /* Üst menüden kalan alanı hesaplar */
-        }
+        .main-scroll { flex: 1; padding: 15px; overflow-y: auto; height: 100%; }
+        
+        .poke-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .poke-item { background: #1f2937; border-radius: 8px; padding: 10px; text-align: center; border: 2px solid transparent; cursor: pointer; position: relative; }
+        .poke-item:hover { border-color: var(--accent); }
+        .poke-item img { width: 64px; height: 64px; object-fit: contain; }
+        .poke-item .name { font-size: 10px; font-weight: bold; text-transform: uppercase; margin-top: 5px; display: block; }
+        
+        .active-sel { border-color: var(--green) !important; background: rgba(16, 185, 129, 0.1) !important; }
+        .enemy-sel { border-color: var(--red) !important; background: rgba(239, 68, 68, 0.1) !important; }
 
-        .poke-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-            gap: 12px; 
-        }
-
-        .poke-item { 
-            background: #1f2937; border-radius: 8px; padding: 10px; 
-            text-align: center; border: 2px solid transparent; cursor: pointer;
-            transition: 0.15s; position: relative;
-        }
-        .poke-item:hover { border-color: var(--accent); transform: scale(1.02); }
-        .poke-item img { width: 70px; height: 70px; object-fit: contain; }
-        .poke-item .name { font-size: 10px; font-weight: bold; text-transform: uppercase; margin-top: 8px; display: block; }
-
-        /* Koleksiyonum Scroll */
-        #my-box-list { flex: 1; overflow-y: auto; background: #0004; border-radius: 8px; padding: 5px; }
-
-        input, select { background: #1f2937; border: 1px solid #374151; color: white; padding: 10px; border-radius: 6px; width: 100%; font-size: 13px; }
+        input, select, .btn { background: #1f2937; border: 1px solid #374151; color: white; padding: 10px; border-radius: 6px; width: 100%; font-size: 13px; }
+        .btn { cursor: pointer; font-weight: bold; border: none; text-transform: uppercase; margin-top: 5px; }
+        .btn-green { background: var(--green); }
+        .btn-red { background: var(--red); }
 
         #loader { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .spinner { border: 4px solid #1f2937; border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div id="loader"><div class="spinner"></div></div>
+<div id="loader"><b>Yükleniyor...</b></div>
 
 <header>
     <nav>
         <div style="font-weight: 900; color: var(--accent);">POKEMON ADVISOR</div>
         <div style="display: flex; gap: 5px;">
-            <button onclick="setLang('tr')">TR</button>
-            <button onclick="setLang('en')">EN</button>
+            <button class="btn" style="width:auto; padding:5px 10px;" onclick="setLang('tr')">TR</button>
+            <button class="btn" style="width:auto; padding:5px 10px;" onclick="setLang('en')">EN</button>
         </div>
     </nav>
     <div class="tabs">
-        <button class="tab-btn active" onclick="showTab('box', this)">BOX</button>
-        <button class="tab-btn" onclick="showTab('teams', this)">TEAMS</button>
-        <button class="tab-btn" onclick="showTab('battle', this)">BATTLE</button>
+        <button class="tab-btn active" id="t-box" onclick="showTab('box', this)">BOX</button>
+        <button class="tab-btn" id="t-teams" onclick="showTab('teams', this)">TEAMS</button>
+        <button class="tab-btn" id="t-battle" onclick="showTab('battle', this)">BATTLE</button>
     </div>
 </header>
 
 <div id="box" class="content active">
-    <div class="side-panel">
-        <input type="text" id="q" placeholder="Pokémon Ara..." oninput="filter()">
-        <select id="t" onchange="filter()">
-            <option value="">Tüm Tipler</option>
-            <option value="normal">Normal</option><option value="fire">Fire</option>
-            <option value="water">Water</option><option value="grass">Grass</option>
-            <option value="electric">Electric</option><option value="ice">Ice</option>
-            <option value="fighting">Fighting</option><option value="poison">Poison</option>
-            <option value="ground">Ground</option><option value="flying">Flying</option>
-            <option value="psychic">Psychic</option><option value="bug">Bug</option>
-            <option value="rock">Rock</option><option value="ghost">Ghost</option>
-            <option value="dragon">Dragon</option><option value="dark">Dark</option>
-            <option value="steel">Steel</option><option value="fairy">Fairy</option>
-        </select>
-        <select id="r" onchange="filter()">
-            <option value="0">Tüm Bölgeler</option>
-            <option value="1">Kanto</option><option value="2">Johto</option>
-            <option value="3">Hoenn</option><option value="4">Sinnoh</option>
-            <option value="5">Unova</option><option value="6">Kalos</option>
-            <option value="7">Alola</option><option value="8">Galar</option>
-            <option value="9">Paldea</option>
-        </select>
-        <h4 id="ui-my-title" style="margin: 10px 0 5px 0; color: var(--accent);">Koleksiyonum</h4>
-        <div id="my-box-list" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));"></div>
-    </div>
-
-    <div class="main-list-area" id="scroll-box">
-        <div class="poke-grid" id="master-grid"></div>
-        <div id="sentinel" style="height: 80px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #555;">Daha fazla yükleniyor...</div>
+    <div class="split-view">
+        <div class="side-panel">
+            <input type="text" id="q" placeholder="Ara..." oninput="filter()">
+            <select id="type-sel" onchange="filter()">
+                <option value="">Tüm Tipler</option>
+                <option value="fire">Fire</option><option value="water">Water</option><option value="grass">Grass</option>
+                <option value="electric">Electric</option><option value="ice">Ice</option><option value="fighting">Fighting</option>
+                <option value="poison">Poison</option><option value="ground">Ground</option><option value="flying">Flying</option>
+                <option value="psychic">Psychic</option><option value="bug">Bug</option><option value="rock">Rock</option>
+                <option value="ghost">Ghost</option><option value="dragon">Dragon</option><option value="dark">Dark</option>
+                <option value="steel">Steel</option><option value="fairy">Fairy</option><option value="normal">Normal</option>
+            </select>
+            <h4 id="ui-my">Koleksiyonum</h4>
+            <div id="my-box-list" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); overflow-y:auto;"></div>
+        </div>
+        <div class="main-scroll" id="box-scroll">
+            <div class="poke-grid" id="master-grid"></div>
+            <div id="sentinel" style="height:50px;"></div>
+        </div>
     </div>
 </div>
 
+<div id="teams" class="content">
+    <div class="split-view">
+        <div class="side-panel">
+            <h4 id="ui-sel">Kutudan Seç</h4>
+            <div id="team-picker" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); overflow-y:auto;"></div>
+        </div>
+        <div class="main-scroll">
+            <input type="text" id="team-name" placeholder="Takım Adı">
+            <div id="build-zone" class="poke-grid" style="min-height:140px; border:2px dashed #444; margin:10px 0; padding:10px;"></div>
+            <button onclick="saveTeam()" class="btn btn-green" id="ui-save">Takımı Kaydet</button>
+            <div id="saved-list" style="margin-top:20px;"></div>
+        </div>
+    </div>
+</div>
+
+<div id="battle" class="content">
+    <div class="main-scroll">
+        <select id="battle-sel" onchange="prepMatch()"></select>
+        <div id="prep-area" style="margin-top:20px;">
+            <h3 id="ui-pick3">Maç İçin 3 Seç</h3>
+            <div id="prep-grid" class="poke-grid"></div>
+            <button onclick="startBattle()" class="btn btn-green" style="margin-top:20px;" id="ui-start">Savaşı Başlat</button>
+        </div>
+        <div id="active-battle" style="display:none; margin-top:20px;">
+            <div class="split-view" style="flex-direction:row; gap:20px;">
+                <div style="flex:1;"><h4>MY TRIO</h4><div id="arena-my" class="poke-grid" style="grid-template-columns:1fr;"></div></div>
+                <div style="flex:1;"><h4>ENEMIES</h4><input type="text" list="p-list" id="enemy-in" onchange="addE(this.value)"><div id="arena-opp" class="poke-grid" style="grid-template-columns:1fr; margin-top:10px;"></div></div>
+            </div>
+            <div id="adv-msg" style="background:var(--accent); color:#000; padding:20px; text-align:center; font-weight:bold; margin-top:20px; border-radius:8px;">---</div>
+            <button onclick="resetMatch()" class="btn btn-red" style="margin-top:20px;">RESET</button>
+        </div>
+    </div>
+</div>
+
+<datalist id="p-list"></datalist>
+
 <script>
-    let ALL = [];
-    let myBox = JSON.parse(localStorage.getItem('p_cba_box')) || [];
-    let limit = 40;
-    let filtered = [];
+    let ALL = [], myBox = JSON.parse(localStorage.getItem('p_cba_box')) || [], teams = JSON.parse(localStorage.getItem('p_cba_teams')) || [];
+    let filtered = [], limit = 40, build = [], lang = 'tr';
+    let bTrio = [], bOpp = [], bMyIdx = null, bOppIdx = null;
+
+    const TXT = {
+        tr: { box: "BOX", teams: "TAKIMLAR", battle: "SAVAŞ", my: "Koleksiyonum", sel: "Kutudan Seç", save: "Takımı Kaydet", pick3: "Maç İçin 3 Seç", start: "Savaşı Başlat", adv: "Rakibi seç!", keep: "Avantajlı!" },
+        en: { box: "BOX", teams: "TEAMS", battle: "BATTLE", my: "My Collection", sel: "Select from Box", save: "Save Team", pick3: "Pick 3 for Match", start: "Start Battle", adv: "Pick enemy!", keep: "Advantage!" }
+    };
 
     async function init() {
-        // Not: Tip verisi için normalde her pokemona istek atılır ancak performansı bozmamak için 
-        // burada temel bir simülasyon yapıyoruz. Gerçek projede tam veritabanı JSON olarak çekilmelidir.
         const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
         const data = await res.json();
-        ALL = data.results.map((p, i) => ({
-            id: i + 1,
-            name: p.name,
-            img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png`,
-            reg: Math.ceil((i+1)/151),
-            type: "" // API'den çekilebilir veya statik eklenebilir
-        }));
+        ALL = data.results.map((p, i) => ({ id: i+1, name: p.name, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png`, reg: Math.ceil((i+1)/151) }));
+        document.getElementById('p-list').innerHTML = ALL.map(p => `<option value="${p.name}">`).join('');
         
-        setupObserver();
-        filter();
-        renderMyBox();
+        const obs = new IntersectionObserver((e) => { if(e[0].isIntersecting && limit < filtered.length) { limit += 40; renderBatch(); } }, { root: document.getElementById('box-scroll'), threshold: 0.1 });
+        obs.observe(document.getElementById('sentinel'));
+
+        filter(); renderMyBox(); renderTeams(); updateBattleSel();
         document.getElementById('loader').style.display = 'none';
+        setLang('tr');
     }
 
-    function setupObserver() {
-        const options = {
-            root: document.getElementById('scroll-box'),
-            threshold: 0.1
-        };
-        const observer = new IntersectionObserver((entries) => {
-            if(entries[0].isIntersecting && limit < filtered.length) {
-                limit += 40;
-                renderBatch();
-            }
-        }, options);
-        observer.observe(document.getElementById('sentinel'));
-    }
-
-    function filter() {
+    async function filter() {
         const q = document.getElementById('q').value.toLowerCase();
-        const r = document.getElementById('r').value;
-        // Tip filtresi için ALL içindeki verilerin önceden çekilmiş olması gerekir.
-        filtered = ALL.filter(p => p.name.includes(q));
-        if(r != "0") filtered = filtered.filter(p => p.reg == r);
-        
-        limit = 40;
+        const t = document.getElementById('type-sel').value;
+        const r = document.getElementById('r')?.value || "0";
+
+        let result = ALL.filter(p => p.name.includes(q));
+        if(t !== "") {
+            const res = await fetch(`https://pokeapi.co/api/v2/type/${t}`);
+            const data = await res.json();
+            const names = data.pokemon.map(p => p.pokemon.name);
+            result = result.filter(p => names.includes(p.name));
+        }
+        filtered = result; limit = 40;
         document.getElementById('master-grid').innerHTML = "";
-        document.getElementById('scroll-box').scrollTop = 0;
         renderBatch();
     }
 
     function renderBatch() {
         const grid = document.getElementById('master-grid');
-        const chunk = filtered.slice(limit - 40, limit);
-        chunk.forEach(p => {
-            const div = document.createElement('div');
-            div.className = 'poke-item';
-            div.onclick = () => addToMyBox(p.id);
-            div.innerHTML = `<img src="${p.img}" loading="lazy"><span class="name">${p.name}</span>`;
-            grid.appendChild(div);
+        filtered.slice(limit - 40, limit).forEach(p => {
+            const d = document.createElement('div'); d.className = 'poke-item';
+            d.onclick = () => { if(!myBox.find(x=>x.id==p.id)) { myBox.push(p); save(); renderMyBox(); } };
+            d.innerHTML = `<img src="${p.img}"><span class="name">${p.name}</span>`;
+            grid.appendChild(d);
         });
     }
 
-    function addToMyBox(id) {
-        if(!myBox.find(x => x.id === id)) {
-            myBox.push(ALL.find(p => p.id === id));
-            localStorage.setItem('p_cba_box', JSON.stringify(myBox));
-            renderMyBox();
-        }
+    function renderMyBox() {
+        const h = myBox.map((p, i) => `<div class="poke-item" onclick="myBox.splice(${i},1); save(); renderMyBox();"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
+        document.getElementById('my-box-list').innerHTML = h;
+        document.getElementById('team-picker').innerHTML = myBox.map((p, i) => `<div class="poke-item" onclick="if(build.length<6){build.push(myBox[${i}]); renderBuild();}"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
     }
 
-    function renderMyBox() {
-        document.getElementById('my-box-list').innerHTML = myBox.map((p, i) => `
-            <div class="poke-item" style="height: 105px;" onclick="myBox.splice(${i},1); localStorage.setItem('p_cba_box', JSON.stringify(myBox)); renderMyBox();">
-                <img src="${p.img}" style="width: 50px; height: 50px;">
-                <span class="name" style="font-size: 8px;">${p.name}</span>
-            </div>
-        `).join('');
+    function renderBuild() {
+        document.getElementById('build-zone').innerHTML = build.map((p, i) => `<div class="poke-item" onclick="build.splice(${i},1); renderBuild();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
     }
+
+    function saveTeam() {
+        if(build.length<6) return;
+        teams.push({ name: document.getElementById('team-name').value || 'New Team', pokes: [...build] });
+        build = []; save(); renderTeams(); renderBuild(); updateBattleSel();
+    }
+
+    function renderTeams() {
+        document.getElementById('saved-list').innerHTML = teams.map((t, i) => `<div style="background:#111; padding:10px; margin-bottom:10px; border-radius:8px;"><b>${t.name}</b> <button onclick="teams.splice(${i},1); save(); renderTeams(); updateBattleSel();" style="float:right; color:red; background:none; border:none; cursor:pointer;">X</button><div class="poke-grid" style="margin-top:5px;">${t.pokes.map(p => `<img src="${p.img}" width="30">`).join('')}</div></div>`).join('');
+    }
+
+    function updateBattleSel() {
+        document.getElementById('battle-sel').innerHTML = teams.map((t, i) => `<option value="${i}">${t.name}</option>`).join('');
+        prepMatch();
+    }
+
+    function prepMatch() {
+        const t = teams[document.getElementById('battle-sel').value];
+        if(!t) return;
+        bTrio = t.pokes.map(p => ({...p, sel: false}));
+        renderPrep();
+    }
+
+    function renderPrep() {
+        document.getElementById('prep-grid').innerHTML = bTrio.map((p, i) => `<div class="poke-item ${p.sel?'active-sel':''}" onclick="bTrio[${i}].sel=!bTrio[${i}].sel; renderPrep();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
+    }
+
+    function startBattle() {
+        const s = bTrio.filter(x => x.sel);
+        if(s.length !== 3) return;
+        bTrio = s; document.getElementById('prep-area').style.display = 'none'; document.getElementById('active-battle').style.display = 'block'; renderArena();
+    }
+
+    function addE(n) { const p = ALL.find(x => x.name === n.toLowerCase()); if(p && bOpp.length<6) { bOpp.push(p); renderArena(); } document.getElementById('enemy-in').value = ""; }
+
+    function renderArena() {
+        document.getElementById('arena-my').innerHTML = bTrio.map((p, i) => `<div class="poke-item ${bMyIdx==i?'active-sel':''}" onclick="bMyIdx=${i}; renderArena();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
+        document.getElementById('arena-opp').innerHTML = bOpp.map((p, i) => `<div class="poke-item ${bOppIdx==i?'enemy-sel':''}" onclick="bOppIdx=${i}; renderArena();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
+        const bar = document.getElementById('adv-msg'); bar.innerText = bOppIdx === null ? TXT[lang].adv : TXT[lang].keep;
+    }
+
+    function resetMatch() { bOpp = []; bMyIdx = null; bOppIdx = null; document.getElementById('prep-area').style.display = 'block'; document.getElementById('active-battle').style.display = 'none'; prepMatch(); }
 
     function showTab(id, btn) {
         document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
+        document.getElementById(id).classList.add('active'); btn.classList.add('active');
+    }
+
+    function save() { localStorage.setItem('p_cba_box', JSON.stringify(myBox)); localStorage.setItem('p_cba_teams', JSON.stringify(teams)); }
+
+    function setLang(l) {
+        lang = l; const t = TXT[l];
+        document.getElementById('t-box').innerText = t.box; document.getElementById('t-teams').innerText = t.teams; document.getElementById('t-battle').innerText = t.battle;
+        document.getElementById('ui-my').innerText = t.my; document.getElementById('ui-sel').innerText = t.sel; document.getElementById('ui-save').innerText = t.save;
+        document.getElementById('ui-pick3').innerText = t.pick3; document.getElementById('ui-start').innerText = t.start;
     }
 
     window.onload = init;
