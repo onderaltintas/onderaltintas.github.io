@@ -8,7 +8,7 @@
         :root { --bg: #0b0f1a; --card: #161d2f; --accent: #f59e0b; --blue: #3b82f6; --red: #ef4444; --green: #10b981; --text: #f8fafc; }
         * { box-sizing: border-box; }
         
-        body, html { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; height: 100vh; width: 100vw; overflow: hidden; }
+        body, html { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; height: 100vh; overflow: hidden; }
 
         header { background: var(--card); border-bottom: 2px solid var(--accent); flex-shrink: 0; position: relative; z-index: 100; }
         nav { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -16,10 +16,10 @@
         .tab-btn { flex: 1; padding: 12px; border: none; background: #242f45; color: #94a3b8; cursor: pointer; font-weight: bold; text-transform: uppercase; }
         .tab-btn.active { background: var(--accent); color: #000; }
 
-        .content { display: none; height: calc(100vh - 105px); width: 100%; position: relative; }
+        .content { display: none; height: calc(100vh - 105px); width: 100%; }
         .content.active { display: flex; }
         
-        .split-view { display: flex; width: 100%; height: 100%; overflow: hidden; position: relative; }
+        .split-view { display: flex; width: 100%; height: 100%; overflow: hidden; }
         @media (max-width: 900px) { .split-view { flex-direction: column; } }
 
         .side-panel { 
@@ -29,10 +29,9 @@
         }
         @media (max-width: 900px) { .side-panel { width: 100%; height: 35%; border-right: none; border-bottom: 1px solid #2d3748; } }
 
-        /* SCROLL FIX: Absolute position ile alanı zorluyoruz */
         .main-scroll { 
-            flex: 1; position: relative; height: 100%; overflow-y: auto; overflow-x: hidden;
-            padding: 20px; -webkit-overflow-scrolling: touch;
+            flex: 1; height: 100%; overflow-y: scroll; /* Kaydırma çubuğunu zorla */
+            padding: 20px; -webkit-overflow-scrolling: touch; background: var(--bg);
         }
 
         .poke-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
@@ -55,7 +54,7 @@
 </head>
 <body>
 
-<div id="loader">POKEMON CHAMPIONS BATTLE ADVISOR...</div>
+<div id="loader">POKEMON CHAMPIONS BATTLE ADVISOR YÜKLENİYOR...</div>
 
 <header>
     <nav>
@@ -75,12 +74,12 @@
 <div id="box" class="content active">
     <div class="split-view">
         <div class="side-panel">
-            <input type="text" id="q" placeholder="Ara..." oninput="filter()">
-            <select id="type-sel" onchange="filter()">
+            <input type="text" id="q" placeholder="Ara..." oninput="applyFilters()">
+            <select id="type-sel" onchange="applyFilters()">
                 <option value="">Tüm Tipler</option>
                 <option value="fire">Fire</option><option value="water">Water</option><option value="grass">Grass</option><option value="electric">Electric</option><option value="ice">Ice</option><option value="fighting">Fighting</option><option value="poison">Poison</option><option value="ground">Ground</option><option value="flying">Flying</option><option value="psychic">Psychic</option><option value="bug">Bug</option><option value="rock">Rock</option><option value="ghost">Ghost</option><option value="dragon">Dragon</option><option value="dark">Dark</option><option value="steel">Steel</option><option value="fairy">Fairy</option><option value="normal">Normal</option>
             </select>
-            <select id="reg-sel" onchange="filter()">
+            <select id="reg-sel" onchange="applyFilters()">
                 <option value="0">Tüm Bölgeler</option>
                 <option value="1">Kanto</option><option value="2">Johto</option><option value="3">Hoenn</option><option value="4">Sinnoh</option><option value="5">Unova</option><option value="6">Kalos</option><option value="7">Alola</option><option value="8">Galar</option><option value="9">Paldea</option>
             </select>
@@ -89,7 +88,6 @@
         </div>
         <div class="main-scroll" id="box-scroll">
             <div class="poke-grid" id="master-grid"></div>
-            <div id="sentinel" style="height:120px; display:flex; align-items:center; justify-content:center;">...</div>
         </div>
     </div>
 </div>
@@ -131,9 +129,10 @@
 <datalist id="p-list"></datalist>
 
 <script>
-    let ALL = [], myBox = JSON.parse(localStorage.getItem('p_cba_box')) || [], teams = JSON.parse(localStorage.getItem('p_cba_teams')) || [];
-    let filtered = [], limit = 40, build = [], lang = 'tr';
+    let ALL_DATA = [], myBox = JSON.parse(localStorage.getItem('p_cba_box')) || [], teams = JSON.parse(localStorage.getItem('p_cba_teams')) || [];
+    let lang = 'tr';
     let bTrio = [], bOpp = [], bMyIdx = null, bOppIdx = null;
+    let typeCache = {}; // Filtreleme hızı için
 
     const TXT = {
         tr: { box: "BOX", teams: "TAKIMLAR", battle: "SAVAŞ", my: "Koleksiyonum", sel: "Kutudan Seç", save: "Takımı Kaydet", pick3: "Maç İçin 3 Seç", start: "Savaşı Başlat", adv: "Rakibi seç!", keep: "Avantajlı!" },
@@ -141,61 +140,93 @@
     };
 
     async function init() {
-        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-        const data = await res.json();
-        ALL = data.results.map((p, i) => {
-            const id = i + 1;
-            let reg = 1;
-            if(id > 151) reg = 2; if(id > 251) reg = 3; if(id > 386) reg = 4; if(id > 493) reg = 5;
-            if(id > 649) reg = 6; if(id > 721) reg = 7; if(id > 809) reg = 8; if(id > 905) reg = 9;
-            return { id, name: p.name, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`, reg };
-        });
-        document.getElementById('p-list').innerHTML = ALL.map(p => `<option value="${p.name}">`).join('');
-        
-        const obs = new IntersectionObserver((e) => { 
-            if(e[0].isIntersecting && limit < filtered.length) { limit += 40; renderBatch(); } 
-        }, { root: document.getElementById('box-scroll'), threshold: 0.1 });
-        obs.observe(document.getElementById('sentinel'));
+        try {
+            const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+            const data = await res.json();
+            
+            ALL_DATA = data.results.map((p, i) => {
+                const id = i + 1;
+                let reg = 1;
+                if(id > 151) reg = 2; if(id > 251) reg = 3; if(id > 386) reg = 4; if(id > 493) reg = 5;
+                if(id > 649) reg = 6; if(id > 721) reg = 7; if(id > 809) reg = 8; if(id > 905) reg = 9;
+                return { id, name: p.name, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`, reg };
+            });
 
-        filter(); renderMyBox(); renderTeams(); updateBattleSel();
-        document.getElementById('loader').style.display = 'none';
-        setLang('tr');
+            document.getElementById('p-list').innerHTML = ALL_DATA.map(p => `<option value="${p.name}">`).join('');
+            
+            // Hepsini en başta DOM'a bas
+            renderAllMaster();
+            renderMyBox();
+            renderTeams();
+            updateBattleSel();
+            
+            document.getElementById('loader').style.display = 'none';
+            setLang('tr');
+        } catch(e) {
+            alert("API Hatası! Sayfayı yenileyin.");
+        }
     }
 
-    async function filter() {
+    function renderAllMaster() {
+        const grid = document.getElementById('master-grid');
+        grid.innerHTML = ALL_DATA.map(p => `
+            <div class="poke-item" data-id="${p.id}" data-name="${p.name}" data-reg="${p.reg}" onclick="addToBox(${p.id})">
+                <img src="${p.img}">
+                <span class="name">${p.name}</span>
+            </div>
+        `).join('');
+    }
+
+    async function applyFilters() {
         const q = document.getElementById('q').value.toLowerCase();
         const t = document.getElementById('type-sel').value;
         const r = document.getElementById('reg-sel').value;
 
-        let resList = ALL.filter(p => p.name.includes(q));
-        if(r !== "0") resList = resList.filter(p => p.reg == r);
-        
+        let allowedNames = null;
+
+        // Tip filtresi seçiliyse API'den veya Cache'den o tipteki isimleri al
         if(t !== "") {
-            const res = await fetch(`https://pokeapi.co/api/v2/type/${t}`);
-            const data = await res.json();
-            const names = data.pokemon.map(p => p.pokemon.name);
-            resList = resList.filter(p => names.includes(p.name));
+            if(!typeCache[t]) {
+                const res = await fetch(`https://pokeapi.co/api/v2/type/${t}`);
+                const data = await res.json();
+                typeCache[t] = data.pokemon.map(p => p.pokemon.name);
+            }
+            allowedNames = typeCache[t];
         }
-        filtered = resList; limit = 40;
-        document.getElementById('master-grid').innerHTML = "";
-        document.getElementById('box-scroll').scrollTop = 0;
-        renderBatch();
+
+        const items = document.querySelectorAll('#master-grid .poke-item');
+        items.forEach(el => {
+            const name = el.getAttribute('data-name');
+            const reg = el.getAttribute('data-reg');
+            
+            let show = name.includes(q);
+            if(show && r !== "0") show = (reg == r);
+            if(show && allowedNames) show = allowedNames.includes(name);
+
+            el.style.display = show ? 'block' : 'none';
+        });
     }
 
-    function renderBatch() {
-        const grid = document.getElementById('master-grid');
-        filtered.slice(limit - 40, limit).forEach(p => {
-            const d = document.createElement('div'); d.className = 'poke-item';
-            d.onclick = () => { if(!myBox.find(x=>x.id==p.id)) { myBox.push(p); save(); renderMyBox(); } };
-            d.innerHTML = `<img src="${p.img}"><span class="name">${p.name}</span>`;
-            grid.appendChild(d);
-        });
+    function addToBox(id) {
+        const p = ALL_DATA.find(x => x.id === id);
+        if(p && !myBox.find(x => x.id === id)) {
+            myBox.push(p);
+            save();
+            renderMyBox();
+        }
     }
 
     function renderMyBox() {
         const h = myBox.map((p, i) => `<div class="poke-item" onclick="myBox.splice(${i},1); save(); renderMyBox();"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
         document.getElementById('my-box-list').innerHTML = h;
-        document.getElementById('team-picker').innerHTML = myBox.map((p, i) => `<div class="poke-item" onclick="if(build.length<6){build.push(myBox[${i}]); renderBuild();}"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
+        document.getElementById('team-picker').innerHTML = myBox.map((p, i) => `<div class="poke-item" onclick="addToBuild(${i})"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
+    }
+
+    function addToBuild(idx) {
+        if(build.length < 6) {
+            build.push(myBox[idx]);
+            renderBuild();
+        }
     }
 
     function renderBuild() {
@@ -234,7 +265,7 @@
         bTrio = s; document.getElementById('prep-area').style.display = 'none'; document.getElementById('active-battle').style.display = 'block'; renderArena();
     }
 
-    function addE(n) { const p = ALL.find(x => x.name === n.toLowerCase()); if(p && bOpp.length<6) { bOpp.push(p); renderArena(); } document.getElementById('enemy-in').value = ""; }
+    function addE(n) { const p = ALL_DATA.find(x => x.name === n.toLowerCase()); if(p && bOpp.length<6) { bOpp.push(p); renderArena(); } document.getElementById('enemy-in').value = ""; }
 
     function renderArena() {
         document.getElementById('arena-my').innerHTML = bTrio.map((p, i) => `<div class="poke-item ${bMyIdx==i?'active-sel':''}" onclick="bMyIdx=${i}; renderArena();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
@@ -249,9 +280,6 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); 
         btn.classList.add('active');
-        // Sekme değişince scroll'u başa alarak tarayıcıyı tetikle
-        const scrollArea = document.querySelector('.content.active .main-scroll');
-        if(scrollArea) scrollArea.scrollTop = 0;
     }
 
     function save() { localStorage.setItem('p_cba_box', JSON.stringify(myBox)); localStorage.setItem('p_cba_teams', JSON.stringify(teams)); }
@@ -261,8 +289,6 @@
         document.getElementById('t-box').innerText = t.box; document.getElementById('t-teams').innerText = t.teams; document.getElementById('t-battle').innerText = t.battle;
         document.getElementById('ui-my').innerText = t.my; document.getElementById('ui-sel').innerText = t.sel; document.getElementById('ui-save').innerText = t.save;
         document.getElementById('ui-pick3').innerText = t.pick3; document.getElementById('ui-start').innerText = t.start;
-        document.getElementById('reg-sel').options[0].text = (l === 'tr' ? "Tüm Bölgeler" : "All Regions");
-        document.getElementById('type-sel').options[0].text = (l === 'tr' ? "Tüm Tipler" : "All Types");
     }
 
     window.onload = init;
