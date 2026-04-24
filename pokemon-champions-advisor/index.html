@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemon Advisor Fix</title>
+    <title>Pokemon Champions Battle Advisor</title>
     <style>
         :root { --bg: #0b0f1a; --card: #161d2f; --accent: #f59e0b; --blue: #3b82f6; --red: #ef4444; --green: #10b981; --text: #f8fafc; }
         * { box-sizing: border-box; }
@@ -49,7 +49,7 @@
 
 <header>
     <nav>
-        <div style="font-weight: 900; color: var(--accent);">POKEMON ADVISOR</div>
+        <div style="font-weight: 900; color: var(--accent);">POKEMON CHAMPIONS BATTLE ADVISOR</div>
         <div style="display: flex; gap: 5px;">
             <button class="btn" style="width:auto; padding:5px 10px;" onclick="setLang('tr')">TR</button>
             <button class="btn" style="width:auto; padding:5px 10px;" onclick="setLang('en')">EN</button>
@@ -74,6 +74,14 @@
                 <option value="psychic">Psychic</option><option value="bug">Bug</option><option value="rock">Rock</option>
                 <option value="ghost">Ghost</option><option value="dragon">Dragon</option><option value="dark">Dark</option>
                 <option value="steel">Steel</option><option value="fairy">Fairy</option><option value="normal">Normal</option>
+            </select>
+            <select id="reg-sel" onchange="filter()">
+                <option value="0">Tüm Bölgeler</option>
+                <option value="1">Kanto (1-151)</option><option value="2">Johto (152-251)</option>
+                <option value="3">Hoenn (252-386)</option><option value="4">Sinnoh (387-493)</option>
+                <option value="5">Unova (494-649)</option><option value="6">Kalos (650-721)</option>
+                <option value="7">Alola (722-809)</option><option value="8">Galar (810-905)</option>
+                <option value="9">Paldea (906-1025)</option>
             </select>
             <h4 id="ui-my">Koleksiyonum</h4>
             <div id="my-box-list" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); overflow-y:auto;"></div>
@@ -134,7 +142,13 @@
     async function init() {
         const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
         const data = await res.json();
-        ALL = data.results.map((p, i) => ({ id: i+1, name: p.name, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png`, reg: Math.ceil((i+1)/151) }));
+        ALL = data.results.map((p, i) => {
+            const id = i + 1;
+            let reg = 1;
+            if(id > 151) reg = 2; if(id > 251) reg = 3; if(id > 386) reg = 4; if(id > 493) reg = 5;
+            if(id > 649) reg = 6; if(id > 721) reg = 7; if(id > 809) reg = 8; if(id > 905) reg = 9;
+            return { id, name: p.name, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`, reg };
+        });
         document.getElementById('p-list').innerHTML = ALL.map(p => `<option value="${p.name}">`).join('');
         
         const obs = new IntersectionObserver((e) => { if(e[0].isIntersecting && limit < filtered.length) { limit += 40; renderBatch(); } }, { root: document.getElementById('box-scroll'), threshold: 0.1 });
@@ -148,16 +162,18 @@
     async function filter() {
         const q = document.getElementById('q').value.toLowerCase();
         const t = document.getElementById('type-sel').value;
-        const r = document.getElementById('r')?.value || "0";
+        const r = document.getElementById('reg-sel').value;
 
-        let result = ALL.filter(p => p.name.includes(q));
+        let resList = ALL.filter(p => p.name.includes(q));
+        if(r !== "0") resList = resList.filter(p => p.reg == r);
+        
         if(t !== "") {
             const res = await fetch(`https://pokeapi.co/api/v2/type/${t}`);
             const data = await res.json();
             const names = data.pokemon.map(p => p.pokemon.name);
-            result = result.filter(p => names.includes(p.name));
+            resList = resList.filter(p => names.includes(p.name));
         }
-        filtered = result; limit = 40;
+        filtered = resList; limit = 40;
         document.getElementById('master-grid').innerHTML = "";
         renderBatch();
     }
@@ -175,16 +191,18 @@
     function renderMyBox() {
         const h = myBox.map((p, i) => `<div class="poke-item" onclick="myBox.splice(${i},1); save(); renderMyBox();"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
         document.getElementById('my-box-list').innerHTML = h;
-        document.getElementById('team-picker').innerHTML = myBox.map((p, i) => `<div class="poke-item" onclick="if(build.length<6){build.push(myBox[${i}]); renderBuild();}"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
+        document.getElementById('team-picker').innerHTML = h.replace(/myBox.splice/g, 'addToBuild');
     }
+
+    function addToBuild(idx) { if(build.length < 6) { build.push(myBox[idx]); renderBuild(); } }
 
     function renderBuild() {
         document.getElementById('build-zone').innerHTML = build.map((p, i) => `<div class="poke-item" onclick="build.splice(${i},1); renderBuild();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
     }
 
     function saveTeam() {
-        if(build.length<6) return;
-        teams.push({ name: document.getElementById('team-name').value || 'New Team', pokes: [...build] });
+        if(build.length < 6) return;
+        teams.push({ name: document.getElementById('team-name').value || 'Takım ' + (teams.length + 1), pokes: [...build] });
         build = []; save(); renderTeams(); renderBuild(); updateBattleSel();
     }
 
@@ -219,7 +237,7 @@
     function renderArena() {
         document.getElementById('arena-my').innerHTML = bTrio.map((p, i) => `<div class="poke-item ${bMyIdx==i?'active-sel':''}" onclick="bMyIdx=${i}; renderArena();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
         document.getElementById('arena-opp').innerHTML = bOpp.map((p, i) => `<div class="poke-item ${bOppIdx==i?'enemy-sel':''}" onclick="bOppIdx=${i}; renderArena();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
-        const bar = document.getElementById('adv-msg'); bar.innerText = bOppIdx === null ? TXT[lang].adv : TXT[lang].keep;
+        document.getElementById('adv-msg').innerText = bOppIdx === null ? TXT[lang].adv : TXT[lang].keep;
     }
 
     function resetMatch() { bOpp = []; bMyIdx = null; bOppIdx = null; document.getElementById('prep-area').style.display = 'block'; document.getElementById('active-battle').style.display = 'none'; prepMatch(); }
