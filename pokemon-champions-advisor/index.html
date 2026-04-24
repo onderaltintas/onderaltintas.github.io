@@ -3,135 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemon Champions Battle Advisor</title>
+    <title>Pokemon Champions Advisor</title>
     <style>
-        :root { --bg: #0b0f1a; --card: #161d2f; --accent: #f59e0b; --blue: #3b82f6; --red: #ef4444; --green: #10b981; --text: #f8fafc; }
+        :root { --bg: #0b0f1a; --card: #161d2f; --accent: #f59e0b; --blue: #3b82f6; --red: #ef4444; --text: #f8fafc; }
         * { box-sizing: border-box; }
         
+        /* Sayfanın genel kaymasını engelliyoruz, sadece kutular kayacak */
         body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            margin: 0; 
-            min-height: 100vh;
-            overflow-y: scroll; /* Her zaman scroll bar göster ki layout zıplamasın */
+            background: var(--bg); color: var(--text); 
+            font-family: sans-serif; margin: 0; 
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Sticky Header & Nav */
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: var(--bg);
-        }
-        
-        nav { 
-            background: var(--card); 
-            padding: 10px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 2px solid var(--accent);
-        }
-
-        .tabs { 
-            display: flex; 
-            background: #000; 
-            padding: 4px; 
-            gap: 4px; 
-        }
-        
-        .tab-btn { 
-            flex: 1; 
-            padding: 15px; 
-            border: none; 
-            background: #242f45; 
-            color: #94a3b8; 
-            cursor: pointer; 
-            font-weight: bold; 
-            text-transform: uppercase;
-        }
-        
+        header { background: var(--card); border-bottom: 2px solid var(--accent); flex-shrink: 0; }
+        nav { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .tabs { display: flex; background: #000; padding: 2px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: #242f45; color: #94a3b8; cursor: pointer; font-weight: bold; }
         .tab-btn.active { background: var(--accent); color: #000; }
 
-        .content { padding: 20px; display: none; }
-        .content.active { display: block; }
+        .content { flex: 1; display: none; overflow: hidden; position: relative; }
+        .content.active { display: flex; flex-direction: column; }
 
-        .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid #2d3748; }
-        
-        /* Grid Layout Fix - Masaüstünde daha geniş, mobilde uygun */
+        /* BOX SECTION ÖZEL: Masaüstünde yan yana, mobilde alt alta */
+        .box-layout { display: flex; flex-direction: row; height: 100%; overflow: hidden; }
+        @media (max-width: 900px) { .box-layout { flex-direction: column; } }
+
+        /* SOL PANEL: Filtreler ve Koleksiyonum */
+        .side-panel { 
+            width: 350px; border-right: 1px solid #2d3748; padding: 15px; 
+            display: flex; flex-direction: column; gap: 15px; flex-shrink: 0;
+            background: rgba(0,0,0,0.2);
+        }
+        @media (max-width: 900px) { .side-panel { width: 100%; height: 40%; border-right: none; border-bottom: 1px solid #2d3748; } }
+
+        /* SAĞ PANEL: Genel Pokemon Listesi (SCROLL BURADA) */
+        .main-list-area { 
+            flex: 1; padding: 15px; overflow-y: auto; 
+            display: flex; flex-direction: column;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .poke-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-            gap: 15px; 
-            width: 100%;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+            gap: 10px; 
         }
 
         .poke-item { 
-            background: #1f2937; 
-            border-radius: 10px; 
-            padding: 10px; 
-            text-align: center; 
-            border: 2px solid transparent; 
-            cursor: pointer; 
-            height: 140px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background: #1f2937; border-radius: 8px; padding: 10px; 
+            text-align: center; border: 2px solid transparent; cursor: pointer;
             transition: 0.2s;
         }
-        
-        .poke-item:hover { border-color: var(--accent); background: #2d3748; }
-        .poke-item img { width: 72px; height: 72px; object-fit: contain; }
-        .poke-item .name { font-size: 11px; font-weight: bold; text-transform: uppercase; margin-top: 8px; }
+        .poke-item:hover { border-color: var(--accent); }
+        .poke-item img { width: 64px; height: 64px; object-fit: contain; }
+        .poke-item .name { font-size: 10px; font-weight: bold; text-transform: uppercase; margin-top: 5px; display: block; overflow: hidden; }
 
-        /* Filter bar sticky under tabs */
-        .filter-row { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 10px; 
-            margin-bottom: 20px; 
-            position: sticky;
-            top: 115px; /* Nav + Tabs yüksekliği kadar aşağıda */
-            z-index: 900;
-            background: var(--bg);
-            padding: 10px 0;
-        }
+        /* My Box Özel */
+        #my-box-list { flex: 1; overflow-y: auto; background: #0004; border-radius: 8px; padding: 5px; }
 
-        input, select { background: #1f2937; border: 1px solid #374151; color: white; padding: 12px; border-radius: 8px; flex: 1; min-width: 150px; }
+        .filter-group { display: flex; flex-direction: column; gap: 8px; }
+        input, select { background: #1f2937; border: 1px solid #374151; color: white; padding: 10px; border-radius: 6px; width: 100%; }
 
-        /* Battle Layout */
-        .battle-arena { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .battle-side { border: 2px solid #334155; border-radius: 12px; padding: 15px; background: rgba(0,0,0,0.2); }
-        .active-sel { border-color: var(--green) !important; background: rgba(16, 185, 129, 0.1) !important; }
-        .enemy-sel { border-color: var(--red) !important; background: rgba(239, 68, 68, 0.1) !important; }
-        .faint { filter: grayscale(1) brightness(0.5); position: relative; }
-        .faint::after { content: 'DEAD'; position: absolute; color: var(--red); font-weight: 900; border: 2px solid var(--red); padding: 2px 5px; transform: rotate(-20deg); }
-
-        .btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; }
-        .btn-blue { background: var(--blue); color: white; }
-        .btn-green { background: var(--green); color: white; }
-        .btn-red { background: var(--red); color: white; }
-
-        #loader { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #loader { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .spinner { border: 4px solid #1f2937; border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div id="loader">
-    <div class="spinner"></div>
-    <p>Database Loading...</p>
-</div>
+<div id="loader"><div class="spinner"></div></div>
 
 <header>
     <nav>
-        <div style="font-weight: 900; color: var(--accent);">POKEMON CHAMPIONS BATTLE ADVISOR</div>
+        <div style="font-weight: 900; color: var(--accent);">POKEMON ADVISOR</div>
         <div style="display: flex; gap: 5px;">
-            <button onclick="setLang('tr')" style="background:#2d3748; color:white; border:none; padding:5px 10px; cursor:pointer;">TR</button>
-            <button onclick="setLang('en')" style="background:#2d3748; color:white; border:none; padding:5px 10px; cursor:pointer;">EN</button>
+            <button onclick="setLang('tr')">TR</button>
+            <button onclick="setLang('en')">EN</button>
         </div>
     </nav>
     <div class="tabs">
@@ -142,323 +88,134 @@
 </header>
 
 <div id="box" class="content active">
-    <div class="filter-row">
-        <input type="text" id="box-q" placeholder="Search Pokémon..." oninput="runFilter()">
-        <select id="box-r" onchange="runFilter()">
-            <option value="0">All Regions</option>
-            <option value="1">Kanto</option><option value="2">Johto</option>
-            <option value="3">Hoenn</option><option value="4">Sinnoh</option>
-            <option value="5">Unova</option><option value="6">Kalos</option>
-            <option value="7">Alola</option><option value="8">Galar</option>
-            <option value="9">Paldea</option>
-        </select>
-    </div>
-    <div class="poke-grid" id="master-list"></div>
-    <div id="scroll-sentinel" style="height: 50px; text-align: center; padding: 20px; color: #444;">--- END OF LIST ---</div>
-    
-    <div class="card" style="margin-top: 40px;">
-        <h3 id="ui-my-title">My Collection</h3>
-        <div class="poke-grid" id="my-box-list"></div>
-    </div>
-</div>
-
-<div id="teams" class="content">
-    <div class="card">
-        <h3 id="ui-sel-title">Select from Box</h3>
-        <div class="poke-grid" id="team-picker-grid"></div>
-    </div>
-    <div class="card">
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <input type="text" id="t-name" placeholder="Team Name">
-            <button onclick="autoFillTeam()" class="btn btn-blue" style="width: auto;">Auto</button>
-        </div>
-        <div id="build-zone" class="poke-grid" style="min-height: 140px; border: 2px dashed #444; padding: 10px;"></div>
-        <button onclick="saveTeam()" class="btn btn-green" style="margin-top:15px;" id="ui-save">Save Team</button>
-    </div>
-    <div id="saved-teams"></div>
-</div>
-
-<div id="battle" class="content">
-    <div class="card">
-        <select id="battle-team-sel" onchange="prepBattle()"></select>
-    </div>
-    
-    <div id="battle-prep" class="card">
-        <h3 id="ui-pick3">Pick 3 for Match</h3>
-        <div class="poke-grid" id="prep-grid"></div>
-        <button onclick="startMatch()" class="btn btn-green" style="margin-top:15px;" id="ui-start">Start Match</button>
-    </div>
-
-    <div id="battle-active" style="display:none;">
-        <div class="battle-arena">
-            <div class="battle-side">
-                <h4 style="color:var(--blue);">MY TRIO</h4>
-                <div id="active-my" class="poke-grid" style="grid-template-columns: 1fr;"></div>
+    <div class="box-layout">
+        <div class="side-panel">
+            <div class="filter-group">
+                <input type="text" id="q" placeholder="Ara..." oninput="filter()">
+                <select id="r" onchange="filter()">
+                    <option value="0">Tüm Bölgeler</option>
+                    <option value="1">Kanto</option><option value="2">Johto</option>
+                    <option value="3">Hoenn</option><option value="4">Sinnoh</option>
+                    <option value="5">Unova</option><option value="6">Kalos</option>
+                    <option value="7">Alola</option><option value="8">Galar</option>
+                    <option value="9">Paldea</option>
+                </select>
             </div>
-            <div class="battle-side">
-                <h4 style="color:var(--red);">ENEMIES (MAX 6)</h4>
-                <input type="text" list="p-data" id="enemy-in" placeholder="Add enemy..." onchange="addEnemy(this.value)">
-                <div id="active-opp" class="poke-grid" style="grid-template-columns: 1fr; margin-top: 15px;"></div>
-            </div>
+            <h4 id="ui-my-title" style="margin: 10px 0 5px 0; color: var(--accent);">Koleksiyonum</h4>
+            <div id="my-box-list" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));"></div>
         </div>
-        <div id="adv-msg" class="card" style="background:var(--accent); color:#000; font-weight:800; text-align:center; margin-top:20px; font-size:1.2rem;">Select enemy!</div>
-        <button onclick="resetBattle()" class="btn btn-red" style="margin-top:15px;">Reset</button>
+
+        <div class="main-list-area" id="main-scroll-container">
+            <div class="poke-grid" id="master-grid"></div>
+            <div id="sentinel" style="height: 100px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #444;">Yükleniyor...</div>
+        </div>
     </div>
 </div>
 
-<datalist id="p-data"></datalist>
+<div id="teams" class="content" style="overflow-y: auto; padding: 20px;">
+    <div class="card">
+        <h3>Koleksiyonundan Takım Kur</h3>
+        <div id="team-pick-grid" class="poke-grid"></div>
+    </div>
+    <div class="card">
+        <input type="text" id="team-name" placeholder="Takım Adı">
+        <div id="build-zone" class="poke-grid" style="min-height: 120px; border: 2px dashed #444; margin: 10px 0;"></div>
+        <button onclick="saveTeam()" class="btn btn-green" style="padding: 15px; width: 100%; background: var(--green); color: white; border: none; font-weight: bold; cursor: pointer;">TAKIMI KAYDET</button>
+    </div>
+</div>
 
 <script>
-    let ALL_P = [];
+    let ALL = [];
     let myBox = JSON.parse(localStorage.getItem('p_cba_box')) || [];
-    let savedTeams = JSON.parse(localStorage.getItem('p_cba_teams')) || [];
-    let currentBuild = [];
-    let lang = 'tr';
-    
-    // Pagination & Filter State
-    let filteredList = [];
-    let pageLimit = 40;
-
-    // Battle State
-    let bTrio = [];
-    let bOpp = [];
-    let bMyIdx = null;
-    let bOppIdx = null;
-
-    const UI = {
-        tr: { my: "Koleksiyonum", sel: "Kutumdan Seç", save: "Takımı Kaydet", pick3: "Maç İçin 3 Seç", start: "Savaşı Başlat", adv: "Rakibi seç, analiz edeyim.", keep: "Avantajlısın, kal!", swap: "Değiştir: " },
-        en: { my: "My Collection", sel: "Select from Box", save: "Save Team", pick3: "Pick 3 for Match", start: "Start Match", adv: "Select enemy to analyze.", keep: "Keep! Advantage.", swap: "Swap to: " }
-    };
+    let teams = JSON.parse(localStorage.getItem('p_cba_teams')) || [];
+    let limit = 40;
+    let filtered = [];
 
     async function init() {
-        try {
-            const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-            const data = await res.json();
-            ALL_P = data.results.map((p, i) => ({
-                id: i + 1,
-                name: p.name,
-                img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png`,
-                reg: Math.ceil((i+1)/151)
-            }));
-            document.getElementById('p-data').innerHTML = ALL_P.map(p => `<option value="${p.name}">`).join('');
-            document.getElementById('loader').style.display = 'none';
-            
-            setupInfiniteScroll();
-            runFilter();
-            renderMyBox();
-            renderSavedTeams();
-            updateBattleSelect();
-            updateUI();
-        } catch(e) { console.error(e); }
+        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+        const data = await res.json();
+        ALL = data.results.map((p, i) => ({
+            id: i + 1,
+            name: p.name,
+            img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png`,
+            reg: Math.ceil((i+1)/151)
+        }));
+        
+        setupObserver();
+        filter();
+        renderMyBox();
+        document.getElementById('loader').style.display = 'none';
     }
 
-    // --- INFINITE SCROLL (GLOBAL WINDOW) ---
-    function setupInfiniteScroll() {
-        const sentinel = document.getElementById('scroll-sentinel');
+    function setupObserver() {
+        // Observer artık sayfanın değil, listenin içindeki sentinel'ı izliyor
         const observer = new IntersectionObserver((entries) => {
-            if(entries[0].isIntersecting && pageLimit < filteredList.length) {
-                pageLimit += 40;
-                renderMaster();
+            if(entries[0].isIntersecting && limit < filtered.length) {
+                limit += 40;
+                renderBatch();
             }
-        }, { threshold: 0.1 });
-        observer.observe(sentinel);
+        }, { root: document.getElementById('main-scroll-container'), threshold: 0.1 });
+        observer.observe(document.getElementById('sentinel'));
     }
 
-    function runFilter() {
-        const q = document.getElementById('box-q').value.toLowerCase();
-        const r = document.getElementById('box-r').value;
+    function filter() {
+        const q = document.getElementById('q').value.toLowerCase();
+        const r = document.getElementById('r').value;
+        filtered = ALL.filter(p => p.name.includes(q));
+        if(r != "0") filtered = filtered.filter(p => p.reg == r);
         
-        filteredList = ALL_P.filter(p => p.name.includes(q));
-        if(r != "0") filteredList = filteredList.filter(p => p.reg == r);
-        
-        pageLimit = 40;
-        document.getElementById('master-list').innerHTML = "";
-        renderMaster();
+        limit = 40;
+        document.getElementById('master-grid').innerHTML = "";
+        document.getElementById('main-scroll-container').scrollTop = 0;
+        renderBatch();
     }
 
-    function renderMaster() {
-        const grid = document.getElementById('master-list');
-        const chunk = filteredList.slice(pageLimit - 40, pageLimit);
-        
+    function renderBatch() {
+        const grid = document.getElementById('master-grid');
+        const chunk = filtered.slice(limit - 40, limit);
         chunk.forEach(p => {
             const div = document.createElement('div');
             div.className = 'poke-item';
             div.onclick = () => addToMyBox(p.id);
-            div.innerHTML = `<img src="${p.img}" loading="lazy"><div class="name">${p.name}</div>`;
+            div.innerHTML = `<img src="${p.img}" loading="lazy"><span class="name">${p.name}</span>`;
             grid.appendChild(div);
         });
     }
 
     function addToMyBox(id) {
         if(!myBox.find(x => x.id === id)) {
-            myBox.push(ALL_P.find(p => p.id === id));
-            save(); renderMyBox();
+            myBox.push(ALL.find(p => p.id === id));
+            localStorage.setItem('p_cba_box', JSON.stringify(myBox));
+            renderMyBox();
         }
     }
 
     function renderMyBox() {
         document.getElementById('my-box-list').innerHTML = myBox.map((p, i) => `
-            <div class="poke-item" onclick="myBox.splice(${i},1); save(); renderMyBox();">
-                <img src="${p.img}">
-                <div class="name">${p.name}</div>
+            <div class="poke-item" style="height: 100px;" onclick="myBox.splice(${i},1); localStorage.setItem('p_cba_box', JSON.stringify(myBox)); renderMyBox();">
+                <img src="${p.img}" style="width: 40px; height: 40px;">
+                <span class="name" style="font-size: 8px;">${p.name}</span>
             </div>
         `).join('');
+        // Takım kurma gridini de güncelle
+        if(document.getElementById('teams').classList.contains('active')) renderTeamPicker();
     }
 
-    // --- TEAMS ---
-    function renderTeamPicker() {
-        document.getElementById('team-picker-grid').innerHTML = myBox.map(p => `
-            <div class="poke-item" onclick="addToBuild(${p.id})">
-                <img src="${p.img}">
-                <div class="name">${p.name}</div>
-            </div>
-        `).join('');
-    }
-
-    function addToBuild(id) {
-        if(currentBuild.length < 6) {
-            currentBuild.push({...myBox.find(x => x.id === id), uid: Date.now()});
-            renderBuildZone();
-        }
-    }
-
-    function renderBuildZone() {
-        document.getElementById('build-zone').innerHTML = currentBuild.map((p, i) => `
-            <div class="poke-item" onclick="currentBuild.splice(${i},1); renderBuildZone();">
-                <img src="${p.img}">
-                <div class="name">${p.name}</div>
-            </div>
-        `).join('');
-    }
-
-    function autoFillTeam() {
-        if(myBox.length < 6) return;
-        currentBuild = [...myBox].sort(() => 0.5 - Math.random()).slice(0,6);
-        renderBuildZone();
-    }
-
-    function saveTeam() {
-        if(currentBuild.length < 6) return;
-        const name = document.getElementById('t-name').value || `Team ${savedTeams.length+1}`;
-        savedTeams.push({ name, pokes: [...currentBuild] });
-        currentBuild = []; save(); renderSavedTeams(); renderBuildZone(); updateBattleSelect();
-    }
-
-    function renderSavedTeams() {
-        document.getElementById('saved-teams').innerHTML = savedTeams.map((t, i) => `
-            <div class="card">
-                <b>${t.name}</b> <button onclick="savedTeams.splice(${i},1); save(); renderSavedTeams(); updateBattleSelect();" style="float:right; border:none; background:none; color:red; cursor:pointer;">DEL</button>
-                <div class="poke-grid" style="margin-top:10px;">${t.pokes.map(p => `<img src="${p.img}" width="30">`).join('')}</div>
-            </div>
-        `).join('');
-    }
-
-    // --- BATTLE ---
-    function updateBattleSelect() {
-        const sel = document.getElementById('battle-team-sel');
-        sel.innerHTML = savedTeams.map((t, i) => `<option value="${i}">${t.name}</option>`).join('');
-        prepBattle();
-    }
-
-    function prepBattle() {
-        const idx = document.getElementById('battle-team-sel').value;
-        if(!savedTeams[idx]) return;
-        bTrio = savedTeams[idx].pokes.map(p => ({...p, selected: false}));
-        bOpp = []; bMyIdx = null; bOppIdx = null;
-        document.getElementById('battle-prep').style.display = 'block';
-        document.getElementById('battle-active').style.display = 'none';
-        renderPrep();
-    }
-
-    function renderPrep() {
-        document.getElementById('prep-grid').innerHTML = bTrio.map((p, i) => `
-            <div class="poke-item ${p.selected ? 'active-sel' : ''}" onclick="togglePrep(${i})">
-                <img src="${p.img}">
-                <div class="name">${p.name}</div>
-            </div>
-        `).join('');
-    }
-
-    function togglePrep(i) {
-        const selCount = bTrio.filter(p => p.selected).length;
-        if(!bTrio[i].selected && selCount >= 3) return;
-        bTrio[i].selected = !bTrio[i].selected;
-        renderPrep();
-    }
-
-    function startMatch() {
-        const sel = bTrio.filter(p => p.selected);
-        if(sel.length < 3) return;
-        bTrio = sel.map(p => ({...p, dead: false}));
-        document.getElementById('battle-prep').style.display = 'none';
-        document.getElementById('battle-active').style.display = 'block';
-        renderArena();
-    }
-
-    function addEnemy(name) {
-        if(bOpp.length >= 6) return;
-        const p = ALL_P.find(x => x.name === name.toLowerCase());
-        if(p) {
-            bOpp.push({...p, dead: false});
-            document.getElementById('enemy-in').value = "";
-            renderArena();
-        }
-    }
-
-    function renderArena() {
-        document.getElementById('active-my').innerHTML = bTrio.map((p, i) => `
-            <div class="poke-item ${p.dead ? 'faint' : ''} ${bMyIdx === i ? 'active-sel' : ''}" onclick="if(!${p.dead}) { bMyIdx=${i}; renderArena(); }">
-                <img src="${p.img}">
-                <div class="name">${p.name}</div>
-                <button onclick="event.stopPropagation(); bTrio[${i}].dead=true; if(bMyIdx==${i}) bMyIdx=null; renderArena();" style="font-size:8px; background:red; color:white; border:none; margin-top:2px; cursor:pointer;">KILL</button>
-            </div>
-        `).join('');
-
-        document.getElementById('active-opp').innerHTML = bOpp.map((p, i) => `
-            <div class="poke-item ${p.dead ? 'faint' : ''} ${bOppIdx === i ? 'enemy-sel' : ''}" onclick="if(!${p.dead}) { bOppIdx=${i}; renderArena(); }">
-                <img src="${p.img}">
-                <div class="name">${p.name}</div>
-                <button onclick="event.stopPropagation(); bOpp[${i}].dead=true; if(bOppIdx==${i}) bOppIdx=null; renderArena();" style="font-size:8px; background:red; color:white; border:none; margin-top:2px; cursor:pointer;">KILL</button>
-            </div>
-        `).join('');
-        analyze();
-    }
-
-    function analyze() {
-        const msg = document.getElementById('adv-msg');
-        if(bOppIdx === null) { msg.innerText = "Select enemy!"; return; }
-        const alive = bTrio.filter(p => !p.dead);
-        if(bMyIdx === null) {
-            msg.innerText = UI[lang].swap + (alive[0] ? alive[0].name.toUpperCase() : "LOST");
-        } else {
-            msg.innerText = UI[lang].keep;
-        }
-    }
-
-    function resetBattle() { bTrio = []; bOpp = []; prepBattle(); }
-
-    // --- SYSTEM ---
     function showTab(id, btn) {
         document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         btn.classList.add('active');
-        window.scrollTo(0, 0); // Sayfa başına dön
         if(id === 'teams') renderTeamPicker();
     }
-    function save() { 
-        localStorage.setItem('p_cba_box', JSON.stringify(myBox)); 
-        localStorage.setItem('p_cba_teams', JSON.stringify(savedTeams)); 
-    }
-    function setLang(l) { lang = l; updateUI(); }
-    function updateUI() {
-        const t = UI[lang];
-        document.getElementById('ui-my-title').innerText = t.my;
-        document.getElementById('ui-sel-title').innerText = t.sel;
-        document.getElementById('ui-save').innerText = t.save;
-        document.getElementById('ui-pick3').innerText = t.pick3;
-        document.getElementById('ui-start').innerText = t.start;
-        analyze();
+
+    function renderTeamPicker() {
+        document.getElementById('team-pick-grid').innerHTML = myBox.map(p => `
+            <div class="poke-item" onclick="/* Takıma ekleme kodu */">
+                <img src="${p.img}">
+                <span class="name">${p.name}</span>
+            </div>
+        `).join('');
     }
 
     window.onload = init;
