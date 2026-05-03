@@ -1,297 +1,509 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemon Champions Battle Advisor-CODING IN PROGRESS...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Pokémon Champions Battle Advisor</title>
+    <!-- Tailwind CSS + Font Awesome + Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0b0f1a; --card: #161d2f; --accent: #f59e0b; --blue: #3b82f6; --red: #ef4444; --green: #10b981; --text: #f8fafc; }
-        * { box-sizing: border-box; }
-        
-        body, html { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; height: 100vh; overflow: hidden; }
-
-        header { background: var(--card); border-bottom: 2px solid var(--accent); flex-shrink: 0; position: relative; z-index: 100; }
-        nav { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .tabs { display: flex; background: #000; padding: 2px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: #242f45; color: #94a3b8; cursor: pointer; font-weight: bold; text-transform: uppercase; }
-        .tab-btn.active { background: var(--accent); color: #000; }
-
-        .content { display: none; height: calc(100vh - 105px); width: 100%; }
-        .content.active { display: flex; }
-        
-        .split-view { display: flex; width: 100%; height: 100%; overflow: hidden; }
-        @media (max-width: 900px) { .split-view { flex-direction: column; } }
-
-        .side-panel { 
-            width: 320px; border-right: 1px solid #2d3748; padding: 15px; 
-            display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; 
-            background: rgba(0,0,0,0.1); height: 100%; 
+        * { font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(145deg, #1e293b 0%, #0f1525 100%); min-height: 100vh; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #facc15; border-radius: 10px; }
+        .pokemon-card { transition: all 0.2s ease; backdrop-filter: blur(2px); }
+        .pokemon-card:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.3); }
+        .tab-active { border-bottom: 3px solid #facc15; color: #facc15; background: rgba(250,204,21,0.1); }
+        .type-badge { @apply text-xs font-semibold px-2 py-1 rounded-full shadow-sm; }
+        .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
+        .battle-active { box-shadow: 0 0 0 3px #facc15, 0 0 0 6px #ffd966; transform: scale(1.02); }
+        .knocked-out { opacity: 0.4; filter: grayscale(0.6); }
+        @media (max-width: 768px) {
+            .pokemon-card img { width: 60px; height: 60px; }
         }
-        @media (max-width: 900px) { .side-panel { width: 100%; height: 35%; border-right: none; border-bottom: 1px solid #2d3748; } }
-
-        .main-scroll { 
-            flex: 1; height: 100%; overflow-y: scroll; /* Kaydırma çubuğunu zorla */
-            padding: 20px; -webkit-overflow-scrolling: touch; background: var(--bg);
-        }
-
-        .poke-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
-        .poke-item { background: #1f2937; border-radius: 8px; padding: 10px; text-align: center; border: 2px solid transparent; cursor: pointer; }
-        .poke-item:hover { border-color: var(--accent); }
-        .poke-item img { width: 70px; height: 70px; object-fit: contain; }
-        .poke-item .name { font-size: 11px; font-weight: bold; text-transform: uppercase; margin-top: 8px; display: block; }
-        
-        .active-sel { border-color: var(--green) !important; background: rgba(16, 185, 129, 0.1) !important; }
-        .enemy-sel { border-color: var(--red) !important; background: rgba(239, 68, 68, 0.1) !important; }
-
-        input, select, .btn { background: #1f2937; border: 1px solid #374151; color: white; padding: 10px; border-radius: 6px; width: 100%; font-size: 13px; outline: none; }
-        .btn { cursor: pointer; font-weight: bold; border: none; text-transform: uppercase; }
-        .btn-green { background: var(--green); }
-        .btn-red { background: var(--red); }
-
-        #loader { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        #my-box-list, #team-picker { flex: 1; overflow-y: auto; padding-right: 5px; }
     </style>
 </head>
-<body>
+<body class="text-gray-200">
 
-<div id="loader">POKEMON CHAMPIONS BATTLE ADVISOR YÜKLENİYOR...</div>
-
-<header>
-    <nav>
-        <div style="font-weight: 900; color: var(--accent);">POKEMON CHAMPIONS BATTLE ADVISOR</div>
-        <div style="display: flex; gap: 5px;">
-            <button class="btn" style="width:auto; padding:5px 10px;" onclick="setLang('tr')">TR</button>
-            <button class="btn" style="width:auto; padding:5px 10px;" onclick="setLang('en')">EN</button>
+<div id="app" class="max-w-7xl mx-auto px-3 sm:px-6 py-5">
+    <!-- Header -->
+    <div class="flex justify-between items-center flex-wrap gap-3 mb-6 pb-2 border-b border-gray-700">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-trophy text-yellow-400 text-3xl"></i>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">Pokémon Champions Battle Advisor</h1>
         </div>
-    </nav>
-    <div class="tabs">
-        <button class="tab-btn active" id="t-box" onclick="showTab('box', this)">BOX</button>
-        <button class="tab-btn" id="t-teams" onclick="showTab('teams', this)">TEAMS</button>
-        <button class="tab-btn" id="t-battle" onclick="showTab('battle', this)">BATTLE</button>
+        <div class="flex gap-2">
+            <button data-lang="en" class="lang-btn px-4 py-2 rounded-xl font-semibold shadow-md bg-gray-700 hover:bg-gray-600">🇬🇧 EN</button>
+            <button data-lang="tr" class="lang-btn px-4 py-2 rounded-xl font-semibold shadow-md bg-gray-700 hover:bg-gray-600">🇹🇷 TR</button>
+        </div>
     </div>
-</header>
 
-<div id="box" class="content active">
-    <div class="split-view">
-        <div class="side-panel">
-            <input type="text" id="q" placeholder="Ara..." oninput="applyFilters()">
-            <select id="type-sel" onchange="applyFilters()">
-                <option value="">Tüm Tipler</option>
-                <option value="fire">Fire</option><option value="water">Water</option><option value="grass">Grass</option><option value="electric">Electric</option><option value="ice">Ice</option><option value="fighting">Fighting</option><option value="poison">Poison</option><option value="ground">Ground</option><option value="flying">Flying</option><option value="psychic">Psychic</option><option value="bug">Bug</option><option value="rock">Rock</option><option value="ghost">Ghost</option><option value="dragon">Dragon</option><option value="dark">Dark</option><option value="steel">Steel</option><option value="fairy">Fairy</option><option value="normal">Normal</option>
-            </select>
-            <select id="reg-sel" onchange="applyFilters()">
-                <option value="0">Tüm Bölgeler</option>
-                <option value="1">Kanto</option><option value="2">Johto</option><option value="3">Hoenn</option><option value="4">Sinnoh</option><option value="5">Unova</option><option value="6">Kalos</option><option value="7">Alola</option><option value="8">Galar</option><option value="9">Paldea</option>
-            </select>
-            <h4 id="ui-my">Koleksiyonum</h4>
-            <div id="my-box-list" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));"></div>
-        </div>
-        <div class="main-scroll" id="box-scroll">
-            <div class="poke-grid" id="master-grid"></div>
+    <!-- Tab Navigation -->
+    <div class="flex flex-wrap gap-1 sm:gap-2 mb-8 border-b border-gray-700">
+        <button data-tab="collection" class="tab-btn px-5 py-3 rounded-t-2xl font-bold text-base transition-all flex items-center gap-2"><i class="fas fa-box-open"></i> <span data-i18n="tab_collection">Koleksiyon</span></button>
+        <button data-tab="teams" class="tab-btn px-5 py-3 rounded-t-2xl font-bold text-base transition-all flex items-center gap-2"><i class="fas fa-users"></i> <span data-i18n="tab_teams">Takımlar</span></button>
+        <button data-tab="battle" class="tab-btn px-5 py-3 rounded-t-2xl font-bold text-base transition-all flex items-center gap-2"><i class="fas fa-gamepad"></i> <span data-i18n="tab_battle">Savaş</span></button>
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <div id="main-content" class="bg-gray-800/50 rounded-2xl p-4 sm:p-6 shadow-2xl backdrop-blur-sm border border-gray-700">
+        <div class="text-center py-20"><i class="fas fa-spinner fa-pulse text-3xl text-yellow-400"></i> <p class="mt-3">Loading Pokédex...</p></div>
+    </div>
+</div>
+
+<!-- Custom Modal (Confirm / Info) -->
+<div id="custom-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden modal-overlay transition-all">
+    <div class="bg-gray-800 rounded-2xl max-w-md w-full mx-4 p-6 border border-yellow-500 shadow-2xl">
+        <h3 id="modal-title" class="text-xl font-bold text-white mb-3"></h3>
+        <p id="modal-message" class="text-gray-300 mb-6"></p>
+        <div class="flex justify-end gap-3">
+            <button id="modal-cancel" class="px-5 py-2 rounded-xl bg-gray-600 hover:bg-gray-500 transition"><span data-i18n="cancel">İptal</span></button>
+            <button id="modal-confirm" class="px-5 py-2 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-black font-bold transition"><span data-i18n="confirm">Onayla</span></button>
         </div>
     </div>
 </div>
 
-<div id="teams" class="content">
-    <div class="split-view">
-        <div class="side-panel">
-            <h4 id="ui-sel">Kutudan Seç</h4>
-            <div id="team-picker" class="poke-grid" style="grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));"></div>
-        </div>
-        <div class="main-scroll">
-            <input type="text" id="team-name" placeholder="Takım Adı">
-            <div id="build-zone" class="poke-grid" style="min-height:140px; border:2px dashed #444; margin:10px 0; padding:10px;"></div>
-            <button onclick="saveTeam()" class="btn btn-green" id="ui-save">Takımı Kaydet</button>
-            <div id="saved-list" style="margin-top:20px;"></div>
+<!-- Simple Info Modal (without confirm) -->
+<div id="info-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden modal-overlay transition-all">
+    <div class="bg-gray-800 rounded-2xl max-w-md w-full mx-4 p-6 border border-blue-500 shadow-2xl">
+        <h3 id="info-title" class="text-xl font-bold text-white mb-3"></h3>
+        <p id="info-message" class="text-gray-300 mb-6"></p>
+        <div class="flex justify-end">
+            <button id="info-close" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 transition">Tamam</button>
         </div>
     </div>
 </div>
-
-<div id="battle" class="content">
-    <div class="main-scroll">
-        <select id="battle-sel" onchange="prepMatch()"></select>
-        <div id="prep-area" style="margin-top:20px;">
-            <h3 id="ui-pick3">Maç İçin 3 Seç</h3>
-            <div id="prep-grid" class="poke-grid"></div>
-            <button onclick="startBattle()" class="btn btn-green" style="margin-top:20px;" id="ui-start">SAVAŞI BAŞLAT</button>
-        </div>
-        <div id="active-battle" style="display:none; margin-top:20px;">
-            <div class="split-view" style="flex-direction:row; gap:20px;">
-                <div style="flex:1;"><h4>MY TRIO</h4><div id="arena-my" class="poke-grid" style="grid-template-columns:1fr;"></div></div>
-                <div style="flex:1;"><h4>ENEMIES</h4><input type="text" list="p-list" id="enemy-in" onchange="addE(this.value)" placeholder="+ Add Enemy"><div id="arena-opp" class="poke-grid" style="grid-template-columns:1fr; margin-top:10px;"></div></div>
-            </div>
-            <div id="adv-msg" style="background:var(--accent); color:#000; padding:20px; text-align:center; font-weight:bold; margin-top:20px; border-radius:8px;">---</div>
-            <button onclick="resetMatch()" class="btn btn-red" style="margin-top:20px;">RESET</button>
-        </div>
-    </div>
-</div>
-
-<datalist id="p-list"></datalist>
 
 <script>
-    let ALL_DATA = [], myBox = JSON.parse(localStorage.getItem('p_cba_box')) || [], teams = JSON.parse(localStorage.getItem('p_cba_teams')) || [];
-    let lang = 'tr';
-    let bTrio = [], bOpp = [], bMyIdx = null, bOppIdx = null;
-    let typeCache = {}; // Filtreleme hızı için
-
-    const TXT = {
-        tr: { box: "BOX", teams: "TAKIMLAR", battle: "SAVAŞ", my: "Koleksiyonum", sel: "Kutudan Seç", save: "Takımı Kaydet", pick3: "Maç İçin 3 Seç", start: "Savaşı Başlat", adv: "Rakibi seç!", keep: "Avantajlı!" },
-        en: { box: "BOX", teams: "TEAMS", battle: "BATTLE", my: "My Collection", sel: "Select from Box", save: "Save Team", pick3: "Pick 3 for Match", start: "Start Battle", adv: "Pick enemy!", keep: "Advantage!" }
+    // ---------- GLOBAL STATE ----------
+    let appState = {
+        pokemonList: [],          // [{ id, name, types, image, generation }]
+        typeChart: {},            // damage relations
+        userCollection: new Set(), // pokemon id set
+        userTeams: [],            // [{ id, name, pokemonIds }]
+        currentTab: 'collection',
+        currentLanguage: 'en',
+        isLoading: true,
+        // battle specific state
+        battleSelectedUserTeamId: null,
+        battleRivalFullTeam: [],     // full rival pokemon objects (max 6)
+        battleRivalTeamIds: [],
+        battleFormat: 'single',      // 'single' or 'double'
+        battleUserPicks: [],         // ids selected for battle (3/4)
+        battleInProgress: false,
+        battleUserActive: [],        // current active ids on field (size 1 or 2)
+        battleRivalActive: [],
+        battleKnockedOut: new Set(), // knocked out pokemon ids (user+rival)
+        rivalTeamConfirmed: false,
+        battleStep: 'select_user_team', // 'select_user_team', 'select_rival', 'choose_battle_mons', 'simulation'
+        tempRivalSearch: '',
+        tempRivalType: '',
+        tempRivalGen: '',
     };
 
-    async function init() {
-        try {
-            const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-            const data = await res.json();
-            
-            ALL_DATA = data.results.map((p, i) => {
-                const id = i + 1;
-                let reg = 1;
-                if(id > 151) reg = 2; if(id > 251) reg = 3; if(id > 386) reg = 4; if(id > 493) reg = 5;
-                if(id > 649) reg = 6; if(id > 721) reg = 7; if(id > 809) reg = 8; if(id > 905) reg = 9;
-                return { id, name: p.name, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`, reg };
-            });
-
-            document.getElementById('p-list').innerHTML = ALL_DATA.map(p => `<option value="${p.name}">`).join('');
-            
-            // Hepsini en başta DOM'a bas
-            renderAllMaster();
-            renderMyBox();
-            renderTeams();
-            updateBattleSel();
-            
-            document.getElementById('loader').style.display = 'none';
-            setLang('tr');
-        } catch(e) {
-            alert("API Hatası! Sayfayı yenileyin.");
+    // ---------- TRANSLATIONS ----------
+    const translations = {
+        en: {
+            tab_collection: "Collection", tab_teams: "Teams", tab_battle: "Battle",
+            search_placeholder: "Search by name...", filter_type: "Filter by Type", filter_region: "Region",
+            add_to_box: "Add", remove_from_box: "Remove", your_box: "Your Box", all_pokemon: "All Pokémon",
+            clear_data: "Clear Data", clear_my_data: "Erase My Pokémon & Teams", clear_all_cache: "Erase ALL (API cache)",
+            confirm_clear_my: "This will delete all your collected Pokémon and teams. Cannot be undone.",
+            confirm_clear_all: "WARNING: All local data and API cache will be erased. Page will reload.",
+            team_name: "Team Name", create_team: "Create Team", auto_team: "Auto Team", delete_team: "Delete",
+            pick_6_pokemon: "Select 6 Pokémon from your box", save_team: "Save Team", team_slots: "Team Slots (6/6)",
+            select_user_team: "Select Your Team", select_rival_team: "Select Rival Team (6 Pokémon)",
+            battle_format: "Battle Format", single: "Single (3v3)", double: "Double (4v4)",
+            select_battle_mons: "Choose your warriors", system_suggestion: "Optimal Suggestion", apply_suggestion: "Apply",
+            start_battle: "Start Battle", active_field: "Active", switch_suggestion: "Switch Suggestion", knock_out: "Mark Fainted",
+            back: "Back", rival_pokemon: "Rival Team", your_team: "Your Team", recommend: "Recommend",
+            add: "Add", remove: "Remove", edit: "Edit", cancel: "Cancel", confirm: "Confirm", save: "Save",
+            generation_1: "Kanto", generation_2: "Johto", generation_3: "Hoenn", generation_4: "Sinnoh",
+            type_effective: "Super effective!", type_resist: "Not very effective...", type_normal: "Normal",
+            no_pokemon: "No Pokémon found", loading: "Loading...", wait_fetch: "Fetching Pokédex...",
+            must_select_6: "You must select exactly 6 Pokémon for rival team.", must_have_6_in_team: "Your team must have 6 Pokémon.",
+            select_battle_pick: "Select {count} Pokémon for battle.", team_ready: "Team ready", vs: "VS"
+        },
+        tr: {
+            tab_collection: "Koleksiyon", tab_teams: "Takımlar", tab_battle: "Savaş",
+            search_placeholder: "İsme göre ara...", filter_type: "Tip Filtresi", filter_region: "Bölge",
+            add_to_box: "Ekle", remove_from_box: "Çıkar", your_box: "Kutum", all_pokemon: "Tüm Pokémonlar",
+            clear_data: "Verileri Temizle", clear_my_data: "Pokémon & Takımlarımı Sil", clear_all_cache: "TAMAMINI Sil (önbellek dahil)",
+            confirm_clear_my: "Tüm topladığınız Pokémonlar ve takımlar silinecek. Geri alınamaz.",
+            confirm_clear_all: "UYARI: Tüm yerel veriler ve API önbelleği silinecek. Sayfa yenilenecek.",
+            team_name: "Takım Adı", create_team: "Takım Oluştur", auto_team: "Otomatik Takım", delete_team: "Sil",
+            pick_6_pokemon: "Kutunuzdan 6 Pokémon seçin", save_team: "Takımı Kaydet", team_slots: "Takım Slotları (6/6)",
+            select_user_team: "Kendi Takımını Seç", select_rival_team: "Rakip Takım Seç (6 Pokémon)",
+            battle_format: "Savaş Formatı", single: "Tekli (3v3)", double: "Çiftli (4v4)",
+            select_battle_mons: "Savaşçılarını Seç", system_suggestion: "En İyi Öneri", apply_suggestion: "Uygula",
+            start_battle: "Savaşı Başlat", active_field: "Aktif", switch_suggestion: "Değiştirme Önerisi", knock_out: "Bayıldı İşaretle",
+            back: "Geri", rival_pokemon: "Rakip Takım", your_team: "Takımın", recommend: "Öner",
+            add: "Ekle", remove: "Çıkar", edit: "Düzenle", cancel: "İptal", confirm: "Onayla", save: "Kaydet",
+            generation_1: "Kanto", generation_2: "Johto", generation_3: "Hoenn", generation_4: "Sinnoh",
+            type_effective: "Süper etkili!", type_resist: "Çok etkili değil...", type_normal: "Normal",
+            no_pokemon: "Pokémon bulunamadı", loading: "Yükleniyor...", wait_fetch: "Pokédex yükleniyor...",
+            must_select_6: "Rakip takım için tam 6 Pokémon seçmelisiniz.", must_have_6_in_team: "Takımınızda 6 Pokémon olmalı.",
+            select_battle_pick: "Savaş için {count} Pokémon seç.", team_ready: "Takım hazır", vs: "VS"
         }
+    };
+    function t(key) { return translations[appState.currentLanguage][key] || translations.en[key] || key; }
+
+    // Helper Modal
+    function showConfirm(title, message, onConfirm) {
+        const modal = document.getElementById('custom-modal');
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-message').innerHTML = message;
+        modal.classList.remove('hidden');
+        const confirmBtn = document.getElementById('modal-confirm');
+        const cancelBtn = document.getElementById('modal-cancel');
+        const handler = () => { modal.classList.add('hidden'); confirmBtn.removeEventListener('click', handler); cancelBtn.removeEventListener('click', cancelHandler); if(onConfirm) onConfirm(); };
+        const cancelHandler = () => { modal.classList.add('hidden'); confirmBtn.removeEventListener('click', handler); cancelBtn.removeEventListener('click', cancelHandler); };
+        confirmBtn.addEventListener('click', handler);
+        cancelBtn.addEventListener('click', cancelHandler);
+    }
+    function showInfo(title, message) {
+        const modal = document.getElementById('info-modal');
+        document.getElementById('info-title').innerText = title;
+        document.getElementById('info-message').innerHTML = message;
+        modal.classList.remove('hidden');
+        const closeBtn = document.getElementById('info-close');
+        const closeHandler = () => { modal.classList.add('hidden'); closeBtn.removeEventListener('click', closeHandler); };
+        closeBtn.addEventListener('click', closeHandler);
     }
 
-    function renderAllMaster() {
-        const grid = document.getElementById('master-grid');
-        grid.innerHTML = ALL_DATA.map(p => `
-            <div class="poke-item" data-id="${p.id}" data-name="${p.name}" data-reg="${p.reg}" onclick="addToBox(${p.id})">
-                <img src="${p.img}">
-                <span class="name">${p.name}</span>
-            </div>
-        `).join('');
-    }
-
-    async function applyFilters() {
-        const q = document.getElementById('q').value.toLowerCase();
-        const t = document.getElementById('type-sel').value;
-        const r = document.getElementById('reg-sel').value;
-
-        let allowedNames = null;
-
-        // Tip filtresi seçiliyse API'den veya Cache'den o tipteki isimleri al
-        if(t !== "") {
-            if(!typeCache[t]) {
-                const res = await fetch(`https://pokeapi.co/api/v2/type/${t}`);
-                const data = await res.json();
-                typeCache[t] = data.pokemon.map(p => p.pokemon.name);
-            }
-            allowedNames = typeCache[t];
+    // ---------- API & CACHE ----------
+    const CACHE_KEY_POKEMON = 'pchampion_pokemon_cache';
+    const CACHE_KEY_TYPE = 'pchampion_type_chart';
+    const CACHE_KEY_COLLECTION = 'pchampion_collection';
+    const CACHE_KEY_TEAMS = 'pchampion_teams';
+    const CACHE_TTL = 24 * 60 * 60 * 1000;
+    async function fetchWithCache(url) { const res = await fetch(url); if(!res.ok) throw new Error(url); return res.json(); }
+    async function loadTypeChart() {
+        const cached = localStorage.getItem(CACHE_KEY_TYPE);
+        if(cached) { try { const c = JSON.parse(cached); if(Date.now() - c.timestamp < CACHE_TTL) return c.data; } catch(e){} }
+        const typeData = await fetchWithCache('https://pokeapi.co/api/v2/type');
+        const chart = {};
+        for(let t of typeData.results) {
+            const detail = await fetchWithCache(t.url);
+            const name = detail.name;
+            chart[name] = { double_from: [], half_from: [], no_from: [], double_to: [], half_to: [], no_to: [] };
+            detail.damage_relations.double_damage_from.forEach(x => chart[name].double_from.push(x.name));
+            detail.damage_relations.half_damage_from.forEach(x => chart[name].half_from.push(x.name));
+            detail.damage_relations.no_damage_from.forEach(x => chart[name].no_from.push(x.name));
+            detail.damage_relations.double_damage_to.forEach(x => chart[name].double_to.push(x.name));
+            detail.damage_relations.half_damage_to.forEach(x => chart[name].half_to.push(x.name));
+            detail.damage_relations.no_damage_to.forEach(x => chart[name].no_to.push(x.name));
         }
-
-        const items = document.querySelectorAll('#master-grid .poke-item');
-        items.forEach(el => {
-            const name = el.getAttribute('data-name');
-            const reg = el.getAttribute('data-reg');
-            
-            let show = name.includes(q);
-            if(show && r !== "0") show = (reg == r);
-            if(show && allowedNames) show = allowedNames.includes(name);
-
-            el.style.display = show ? 'block' : 'none';
+        localStorage.setItem(CACHE_KEY_TYPE, JSON.stringify({ timestamp: Date.now(), data: chart }));
+        return chart;
+    }
+    async function loadAllPokemon() {
+        const cached = localStorage.getItem(CACHE_KEY_POKEMON);
+        if(cached) { const c = JSON.parse(cached); if(Date.now() - c.timestamp < CACHE_TTL) return c.data; }
+        const limit = 493;
+        const listRes = await fetchWithCache(`https://pokeapi.co/api/v2/pokemon?limit=${limit}`);
+        const pokemonPromises = listRes.results.map(async (p, idx) => {
+            const id = idx+1;
+            const detail = await fetchWithCache(p.url);
+            const species = await fetchWithCache(`https://pokeapi.co/api/v2/pokemon-species/${id}/`);
+            let generation = 1;
+            const genName = species.generation.name;
+            if(genName.includes('generation-1')) generation = 1;
+            else if(genName.includes('generation-2')) generation = 2;
+            else if(genName.includes('generation-3')) generation = 3;
+            else if(genName.includes('generation-4')) generation = 4;
+            const types = detail.types.map(t => t.type.name);
+            const image = detail.sprites.other['official-artwork'].front_default || detail.sprites.front_default;
+            return { id, name: p.name, types, image, generation };
         });
+        const results = await Promise.all(pokemonPromises);
+        localStorage.setItem(CACHE_KEY_POKEMON, JSON.stringify({ timestamp: Date.now(), data: results }));
+        return results;
     }
-
-    function addToBox(id) {
-        const p = ALL_DATA.find(x => x.id === id);
-        if(p && !myBox.find(x => x.id === id)) {
-            myBox.push(p);
-            save();
-            renderMyBox();
+    function getEffectiveness(attackTypes, defendTypes) {
+        let multiplier = 1;
+        for(let at of attackTypes) {
+            for(let df of defendTypes) {
+                const rel = appState.typeChart[at];
+                if(rel.double_to.includes(df)) multiplier *= 2;
+                else if(rel.half_to.includes(df)) multiplier *= 0.5;
+                else if(rel.no_to.includes(df)) multiplier *= 0;
+            }
         }
+        return multiplier;
     }
-
-    function renderMyBox() {
-        const h = myBox.map((p, i) => `<div class="poke-item" onclick="myBox.splice(${i},1); save(); renderMyBox();"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
-        document.getElementById('my-box-list').innerHTML = h;
-        document.getElementById('team-picker').innerHTML = myBox.map((p, i) => `<div class="poke-item" onclick="addToBuild(${i})"><img src="${p.img}" style="width:40px;"><span class="name" style="font-size:8px;">${p.name}</span></div>`).join('');
-    }
-
-    function addToBuild(idx) {
-        if(build.length < 6) {
-            build.push(myBox[idx]);
-            renderBuild();
+    function computePokemonScore(pokemon) {
+        let avgOff = 0, avgDef = 0;
+        const allTypes = Object.keys(appState.typeChart);
+        for(let t of allTypes) {
+            avgOff += getEffectiveness(pokemon.types, [t]);
+            avgDef += 1 / (getEffectiveness([t], pokemon.types) || 0.1);
         }
+        return avgOff/allTypes.length + avgDef/allTypes.length;
+    }
+    function generateAutoTeamFromCollection() {
+        let available = Array.from(appState.userCollection).map(id => appState.pokemonList.find(p => p.id == id)).filter(p=>p);
+        if(available.length < 6) return available.map(p=>p.id);
+        let scored = available.map(p => ({ id: p.id, score: computePokemonScore(p), types: p.types }));
+        scored.sort((a,b)=>b.score - a.score);
+        let selected = [];
+        let usedTypes = new Set();
+        for(let s of scored) {
+            if(selected.length >= 6) break;
+            let hasNewType = s.types.some(t => !usedTypes.has(t));
+            if(hasNewType || selected.length < 3) {
+                selected.push(s.id);
+                s.types.forEach(t=>usedTypes.add(t));
+            }
+        }
+        if(selected.length < 6) for(let s of scored) if(!selected.includes(s.id) && selected.length<6) selected.push(s.id);
+        return selected;
+    }
+    function bestBattlePicks(userTeamPokemons, rivalTeamPokemons, pickCount) {
+        let bestCombo = [];
+        let bestScore = -Infinity;
+        const n = userTeamPokemons.length;
+        const indices = Array.from(Array(n).keys());
+        const combine = (arr, k) => { if(k===0) return [[]]; if(arr.length<k) return []; let combs=[]; for(let i=0;i<arr.length;i++) { let rest = combine(arr.slice(i+1), k-1); for(let r of rest) combs.push([arr[i], ...r]); } return combs; };
+        const combos = combine(indices, pickCount);
+        for(let combo of combos) {
+            let totalScore = 0;
+            for(let idx of combo) {
+                let pok = userTeamPokemons[idx];
+                let avgMatch = 0;
+                for(let rival of rivalTeamPokemons) {
+                    avgMatch += getEffectiveness(pok.types, rival.types);
+                }
+                totalScore += avgMatch / rivalTeamPokemons.length;
+            }
+            if(totalScore > bestScore) { bestScore = totalScore; bestCombo = combo; }
+        }
+        return bestCombo.map(i => userTeamPokemons[i].id);
+    }
+    function saveUserData() { localStorage.setItem(CACHE_KEY_COLLECTION, JSON.stringify(Array.from(appState.userCollection))); localStorage.setItem(CACHE_KEY_TEAMS, JSON.stringify(appState.userTeams)); }
+    function loadUserData() { const coll = localStorage.getItem(CACHE_KEY_COLLECTION); if(coll) appState.userCollection = new Set(JSON.parse(coll)); const teams = localStorage.getItem(CACHE_KEY_TEAMS); if(teams) appState.userTeams = JSON.parse(teams); else appState.userTeams = []; }
+
+    // ---------- RENDER DISPATCH ----------
+    async function initApp() {
+        appState.isLoading = true; renderLoading();
+        try {
+            appState.typeChart = await loadTypeChart();
+            appState.pokemonList = await loadAllPokemon();
+            loadUserData();
+            appState.isLoading = false;
+            renderCurrentTab();
+        } catch(err) { console.error(err); appState.isLoading = false; document.getElementById('main-content').innerHTML = `<div class="text-red-400 text-center p-10">API Error: ${err.message}</div>`; }
+    }
+    function renderLoading() { document.getElementById('main-content').innerHTML = `<div class="text-center py-20"><i class="fas fa-spinner fa-pulse text-4xl text-yellow-400"></i><p class="mt-4">${t('wait_fetch')}</p></div>`; }
+    function renderCurrentTab() { if(appState.isLoading) return; if(appState.currentTab === 'collection') renderCollection(); else if(appState.currentTab === 'teams') renderTeams(); else if(appState.currentTab === 'battle') renderBattleMain(); }
+
+    // ---------- COLLECTION (full functional) ----------
+    function renderCollection() {
+        let html = `<div class="flex flex-wrap gap-4 mb-6"><input id="searchInput" placeholder="${t('search_placeholder')}" class="flex-1 p-3 rounded-xl bg-gray-700 border border-gray-600"><select id="typeFilter" class="p-3 rounded-xl bg-gray-700"><option value="">${t('filter_type')}</option>${Object.keys(appState.typeChart).map(t=>`<option>${t}</option>`).join('')}</select>
+        <select id="genFilter" class="p-3 rounded-xl bg-gray-700"><option value="">${t('filter_region')}</option><option value="1">${t('generation_1')}</option><option value="2">${t('generation_2')}</option><option value="3">${t('generation_3')}</option><option value="4">${t('generation_4')}</option></select>
+        <button id="clearMyDataBtn" class="bg-red-700 px-4 rounded-xl"><i class="fas fa-trash"></i> ${t('clear_my_data')}</button>
+        <button id="clearAllBtn" class="bg-red-900 px-4 rounded-xl"><i class="fas fa-database"></i> ${t('clear_all_cache')}</button></div>
+        <div class="grid md:grid-cols-2 gap-6"><div><h3 class="text-xl font-bold mb-3">📋 ${t('all_pokemon')}</h3><div id="allPokemonList" class="h-[500px] overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-3"></div></div>
+        <div><h3 class="text-xl font-bold mb-3">📦 ${t('your_box')} (${appState.userCollection.size})</h3><div id="userBoxList" class="h-[500px] overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-3"></div></div></div>`;
+        document.getElementById('main-content').innerHTML = html;
+        function refresh() {
+            let search = document.getElementById('searchInput')?.value.toLowerCase()||'';
+            let type = document.getElementById('typeFilter')?.value||'';
+            let gen = document.getElementById('genFilter')?.value;
+            const filtered = appState.pokemonList.filter(p => p.name.toLowerCase().includes(search) && (type===''||p.types.includes(type)) && (gen===''||p.generation==parseInt(gen)));
+            const allDiv = document.getElementById('allPokemonList');
+            const userDiv = document.getElementById('userBoxList');
+            if(!allDiv) return;
+            allDiv.innerHTML = filtered.map(p=>`<div class="pokemon-card bg-gray-700/70 rounded-xl p-2 text-center cursor-pointer hover:bg-yellow-600/30" data-id="${p.id}"><img src="${p.image}" class="w-16 h-16 mx-auto"><div class="font-semibold">${p.name}</div><div class="text-xs flex justify-center gap-1">${p.types.map(t=>`<span>${t}</span>`).join('')}</div><button class="add-btn mt-1 bg-green-600 px-2 py-1 rounded text-xs">${t('add_to_box')}</button></div>`).join('');
+            const userMons = appState.pokemonList.filter(p => appState.userCollection.has(p.id));
+            userDiv.innerHTML = userMons.map(p=>`<div class="pokemon-card bg-gray-700/70 rounded-xl p-2 text-center" data-id="${p.id}"><img src="${p.image}" class="w-16 h-16 mx-auto"><div class="font-semibold">${p.name}</div><button class="remove-btn mt-1 bg-red-600 px-2 py-1 rounded text-xs">${t('remove_from_box')}</button></div>`).join('');
+            document.querySelectorAll('.add-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.closest('[data-id]')?.dataset.id); if(id && !appState.userCollection.has(id)){ appState.userCollection.add(id); saveUserData(); refresh(); } }));
+            document.querySelectorAll('.remove-btn').forEach(btn => { const id = parseInt(btn.closest('[data-id]')?.dataset.id); btn.addEventListener('click', (e) => { e.stopPropagation(); if(id && appState.userCollection.has(id)){ appState.userCollection.delete(id); saveUserData(); refresh(); } })});
+        }
+        document.getElementById('searchInput')?.addEventListener('input', refresh);
+        document.getElementById('typeFilter')?.addEventListener('change', refresh);
+        document.getElementById('genFilter')?.addEventListener('change', refresh);
+        document.getElementById('clearMyDataBtn')?.addEventListener('click', ()=>showConfirm(t('clear_my_data'), t('confirm_clear_my'), ()=>{ appState.userCollection.clear(); appState.userTeams = []; saveUserData(); refresh(); renderCurrentTab(); }));
+        document.getElementById('clearAllBtn')?.addEventListener('click', ()=>showConfirm(t('clear_all_cache'), t('confirm_clear_all'), ()=>{ localStorage.clear(); location.reload(); }));
+        refresh();
     }
 
-    function renderBuild() {
-        document.getElementById('build-zone').innerHTML = build.map((p, i) => `<div class="poke-item" onclick="build.splice(${i},1); renderBuild();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
-    }
-
-    function saveTeam() {
-        if(build.length < 6) return;
-        teams.push({ name: document.getElementById('team-name').value || 'Takım ' + (teams.length + 1), pokes: [...build] });
-        build = []; save(); renderTeams(); renderBuild(); updateBattleSel();
-    }
-
+    // ---------- TEAMS (Fully interactive, no alerts) ----------
     function renderTeams() {
-        document.getElementById('saved-list').innerHTML = teams.map((t, i) => `<div style="background:#111; padding:10px; margin-bottom:10px; border-radius:8px;"><b>${t.name}</b> <button onclick="teams.splice(${i},1); save(); renderTeams(); updateBattleSel();" style="float:right; color:red; background:none; border:none; cursor:pointer;">X</button><div class="poke-grid" style="margin-top:5px;">${t.pokes.map(p => `<img src="${p.img}" width="30">`).join('')}</div></div>`).join('');
+        let html = `<div class="mb-5 flex gap-3 flex-wrap"><input id="newTeamName" placeholder="${t('team_name')}" class="p-2 rounded-xl bg-gray-700"><button id="createTeamBtn" class="bg-blue-600 px-4 py-2 rounded-xl">➕ ${t('create_team')}</button><button id="autoGenTeamBtn" class="bg-yellow-600 px-4 py-2 rounded-xl">🤖 ${t('auto_team')}</button></div><div id="teamsListContainer" class="grid md:grid-cols-2 gap-5"></div>`;
+        document.getElementById('main-content').innerHTML = html;
+        function refreshTeams() {
+            const container = document.getElementById('teamsListContainer');
+            if(!container) return;
+            container.innerHTML = appState.userTeams.map((team,idx)=>`<div class="bg-gray-700/60 rounded-2xl p-4"><div class="flex justify-between"><h3 class="text-xl font-bold">${team.name}</h3><button class="delTeamBtn text-red-400" data-idx="${idx}"><i class="fas fa-trash"></i></button></div><div class="flex flex-wrap gap-2 mt-2">${team.pokemonIds.map(pid=>{ let p = appState.pokemonList.find(p=>p.id==pid); return p?`<img src="${p.image}" class="w-12 h-12 rounded-full border" title="${p.name}">`:`<div class="w-12 h-12 bg-gray-500 rounded-full"></div>`}).join('')}</div><button class="editTeamBtn mt-3 bg-indigo-500 px-3 py-1 rounded" data-idx="${idx}">✏️ ${t('edit')}</button></div>`).join('');
+            document.querySelectorAll('.delTeamBtn').forEach(btn => btn.addEventListener('click', (e) => { let idx = parseInt(btn.dataset.idx); showConfirm(t('delete_team'), 'Are you sure?', ()=>{ appState.userTeams.splice(idx,1); saveUserData(); refreshTeams(); }); }));
+            document.querySelectorAll('.editTeamBtn').forEach(btn => btn.addEventListener('click', (e) => { let idx = parseInt(btn.dataset.idx); openTeamEditor(idx); }));
+        }
+        function openTeamEditor(teamIdx) {
+            let team = appState.userTeams[teamIdx];
+            let boxPokemons = appState.pokemonList.filter(p => appState.userCollection.has(p.id));
+            let selected = [...team.pokemonIds];
+            const modalDiv = document.createElement('div'); modalDiv.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
+            modalDiv.innerHTML = `<div class="bg-gray-800 rounded-2xl w-full max-w-4xl p-5 max-h-[90vh] overflow-auto"><h3 class="text-2xl font-bold mb-2">${t('edit')}: ${team.name}</h3><p class="mb-3 text-yellow-400">${t('pick_6_pokemon')} (${selected.length}/6)</p><div class="grid md:grid-cols-2 gap-4"><div><h4 class="font-semibold mb-2">📦 ${t('your_box')}</h4><div id="boxListEditor" class="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto"></div></div><div><h4 class="font-semibold mb-2">✨ ${t('team_slots')}</h4><div id="slotsContainer" class="flex flex-wrap gap-3"></div><button id="saveTeamModalBtn" class="mt-4 bg-green-600 px-5 py-2 rounded-xl w-full">💾 ${t('save_team')}</button></div></div><button id="closeEditorBtn" class="mt-4 bg-gray-600 px-4 py-2 rounded-xl">${t('cancel')}</button></div>`;
+            document.body.appendChild(modalDiv);
+            function renderBoxAndSlots() {
+                const boxDiv = document.getElementById('boxListEditor');
+                const slotsDiv = document.getElementById('slotsContainer');
+                if(!boxDiv) return;
+                boxDiv.innerHTML = boxPokemons.map(p => `<div class="bg-gray-700 p-2 rounded-xl text-center cursor-pointer hover:bg-yellow-600/40 select-pokemon" data-id="${p.id}"><img src="${p.image}" class="w-12 h-12 mx-auto"><span class="text-xs">${p.name}</span></div>`).join('');
+                slotsDiv.innerHTML = Array(6).fill().map((_, idx) => {
+                    let pid = selected[idx];
+                    let p = pid ? appState.pokemonList.find(p=>p.id==pid) : null;
+                    return `<div class="slot-item w-24 bg-gray-700 rounded-xl p-2 text-center relative" data-slot="${idx}">${p ? `<img src="${p.image}" class="w-16 h-16 mx-auto"><div class="text-xs truncate">${p.name}</div><button class="remove-slot-btn absolute top-0 right-0 bg-red-600 rounded-full w-5 h-5 text-xs">✖</button>` : `<div class="h-16 flex items-center justify-center text-gray-400">${t('empty_slot')}</div>`}</div>`;
+                }).join('');
+                document.querySelectorAll('.select-pokemon').forEach(el => el.addEventListener('click', () => { let id = parseInt(el.dataset.id); if(selected.length < 6 && !selected.includes(id)) { selected.push(id); renderBoxAndSlots(); } else if(selected.includes(id)) showInfo("Info", "Pokémon already in team"); else showInfo("Info", "Team already has 6 Pokémon"); }));
+                document.querySelectorAll('.remove-slot-btn').forEach(btn => { let slot = parseInt(btn.closest('.slot-item').dataset.slot); btn.addEventListener('click', () => { selected.splice(slot,1); renderBoxAndSlots(); }); });
+            }
+            renderBoxAndSlots();
+            modalDiv.querySelector('#saveTeamModalBtn').addEventListener('click', () => { if(selected.length === 6) { appState.userTeams[teamIdx].pokemonIds = selected; saveUserData(); modalDiv.remove(); refreshTeams(); } else showInfo(t('team_slots'), "Please select exactly 6 Pokémon."); });
+            modalDiv.querySelector('#closeEditorBtn').addEventListener('click', () => modalDiv.remove());
+        }
+        document.getElementById('createTeamBtn')?.addEventListener('click',()=>{ let name = document.getElementById('newTeamName')?.value.trim()||`Team${appState.userTeams.length+1}`; appState.userTeams.push({ id: Date.now(), name, pokemonIds: [] }); saveUserData(); refreshTeams(); document.getElementById('newTeamName').value = ''; });
+        document.getElementById('autoGenTeamBtn')?.addEventListener('click',()=>{ let autoIds = generateAutoTeamFromCollection(); if(autoIds.length===6){ let name = `Auto ${appState.userTeams.length+1}`; appState.userTeams.push({ id: Date.now(), name, pokemonIds: autoIds }); saveUserData(); refreshTeams(); } else showInfo("Cannot auto", "You need at least 6 Pokémon in your box."); });
+        refreshTeams();
     }
 
-    function updateBattleSel() {
-        document.getElementById('battle-sel').innerHTML = teams.map((t, i) => `<option value="${i}">${t.name}</option>`).join('');
-        prepMatch();
+    // ---------- BATTLE (Fully implemented) ----------
+    function renderBattleMain() {
+        // Reset battle state
+        appState.battleSelectedUserTeamId = null;
+        appState.battleRivalFullTeam = [];
+        appState.battleUserPicks = [];
+        appState.battleInProgress = false;
+        appState.rivalTeamConfirmed = false;
+        appState.battleStep = 'select_user_team';
+        appState.battleKnockedOut.clear();
+        appState.battleUserActive = [];
+        appState.battleRivalActive = [];
+        renderBattleSelectUserTeam();
+    }
+    function renderBattleSelectUserTeam() {
+        let teams = appState.userTeams.filter(t => t.pokemonIds.length === 6);
+        if(teams.length === 0) { document.getElementById('main-content').innerHTML = `<div class="text-center p-10"><i class="fas fa-exclamation-triangle text-3xl text-yellow-500"></i><p class="mt-4">${t('must_have_6_in_team')}</p><button id="gotoTeamsBtn" class="mt-4 bg-blue-600 px-5 py-2 rounded-xl">${t('tab_teams')}</button></div>`;
+            document.getElementById('gotoTeamsBtn')?.addEventListener('click', ()=>{ appState.currentTab = 'teams'; renderCurrentTab(); }); return; }
+        let html = `<h3 class="text-2xl font-bold mb-4">${t('select_user_team')}</h3><div class="grid sm:grid-cols-2 gap-4">${teams.map(team => `<div class="bg-gray-700 p-4 rounded-2xl cursor-pointer hover:bg-yellow-600/30 team-card" data-id="${team.id}"><h4 class="text-xl font-bold">${team.name}</h4><div class="flex gap-2 mt-2">${team.pokemonIds.map(pid=>{ let p=appState.pokemonList.find(p=>p.id==pid); return `<img src="${p?.image}" class="w-12 h-12 rounded-full">`; }).join('')}</div></div>`).join('')}</div><div class="mt-6 flex gap-3"><button id="battleBackTeams" class="bg-gray-600 px-4 py-2 rounded-xl">${t('back')}</button></div>`;
+        document.getElementById('main-content').innerHTML = html;
+        document.querySelectorAll('.team-card').forEach(card => card.addEventListener('click', () => { appState.battleSelectedUserTeamId = parseInt(card.dataset.id); renderBattleSelectRival(); }));
+        document.getElementById('battleBackTeams')?.addEventListener('click', ()=>{ appState.currentTab = 'teams'; renderCurrentTab(); });
+    }
+    function renderBattleSelectRival() {
+        let available = appState.pokemonList; // all pokemons
+        let selectedIds = [...appState.battleRivalFullTeam.map(p=>p.id)];
+        let html = `<h3 class="text-2xl font-bold mb-4">${t('select_rival_team')} (${selectedIds.length}/6)</h3>
+        <div class="flex flex-wrap gap-3 mb-4"><input id="rivalSearch" placeholder="${t('search_placeholder')}" class="p-2 rounded-xl bg-gray-700 flex-1"><select id="rivalTypeFilter" class="p-2 rounded-xl bg-gray-700"><option value="">${t('filter_type')}</option>${Object.keys(appState.typeChart).map(t=>`<option>${t}</option>`).join('')}</select><select id="rivalGenFilter" class="p-2 rounded-xl bg-gray-700"><option value="">${t('filter_region')}</option><option value="1">Kanto</option><option value="2">Johto</option><option value="3">Hoenn</option><option value="4">Sinnoh</option></select></div>
+        <div class="grid md:grid-cols-2 gap-6"><div><div id="rivalAllList" class="h-96 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-3"></div></div><div><h4 class="font-bold">Selected Rivals</h4><div id="selectedRivalsList" class="flex flex-wrap gap-2 mt-2 min-h-[200px]"></div></div></div>
+        <div class="mt-6 flex gap-3"><button id="confirmRivalBtn" class="bg-green-600 px-5 py-2 rounded-xl">✅ ${t('confirm')}</button><button id="resetRivalBtn" class="bg-red-700 px-4 py-2 rounded-xl">Reset</button><button id="backRivalBtn" class="bg-gray-600 px-4 py-2 rounded-xl">${t('back')}</button></div>`;
+        document.getElementById('main-content').innerHTML = html;
+        function refreshRivalList() {
+            let search = document.getElementById('rivalSearch')?.value.toLowerCase()||'';
+            let type = document.getElementById('rivalTypeFilter')?.value||'';
+            let gen = document.getElementById('rivalGenFilter')?.value;
+            let filtered = appState.pokemonList.filter(p => p.name.toLowerCase().includes(search) && (type===''||p.types.includes(type)) && (gen===''||p.generation==parseInt(gen)));
+            const allDiv = document.getElementById('rivalAllList');
+            if(!allDiv) return;
+            allDiv.innerHTML = filtered.map(p=>`<div class="bg-gray-700/70 rounded-xl p-2 text-center cursor-pointer hover:bg-yellow-600/30 add-rival" data-id="${p.id}"><img src="${p.image}" class="w-16 h-16 mx-auto"><div>${p.name}</div></div>`).join('');
+            document.querySelectorAll('.add-rival').forEach(el => el.addEventListener('click', () => { let id = parseInt(el.dataset.id); let pok = appState.pokemonList.find(p=>p.id==id); if(selectedIds.length < 6 && !selectedIds.includes(id)) { appState.battleRivalFullTeam.push(pok); renderBattleSelectRival(); } else if(selectedIds.length>=6) showInfo("Limit", "You can select max 6 rival Pokémon."); }));
+            const selectedDiv = document.getElementById('selectedRivalsList');
+            if(selectedDiv) selectedDiv.innerHTML = appState.battleRivalFullTeam.map((p,idx)=>`<div class="bg-gray-800 p-2 rounded-xl flex flex-col items-center"><img src="${p.image}" class="w-12 h-12"><span class="text-xs">${p.name}</span><button class="removeRivalBtn text-red-400 text-xs" data-idx="${idx}">✖</button></div>`).join('');
+            document.querySelectorAll('.removeRivalBtn').forEach(btn => { let idx = parseInt(btn.dataset.idx); btn.addEventListener('click',()=>{ appState.battleRivalFullTeam.splice(idx,1); renderBattleSelectRival(); }); });
+        }
+        document.getElementById('rivalSearch')?.addEventListener('input', refreshRivalList);
+        document.getElementById('rivalTypeFilter')?.addEventListener('change', refreshRivalList);
+        document.getElementById('rivalGenFilter')?.addEventListener('change', refreshRivalList);
+        document.getElementById('confirmRivalBtn')?.addEventListener('click', ()=>{ if(appState.battleRivalFullTeam.length===6) { appState.rivalTeamConfirmed=true; renderBattleChooseMons(); } else showInfo(t('must_select_6'), t('must_select_6')); });
+        document.getElementById('resetRivalBtn')?.addEventListener('click',()=>{ appState.battleRivalFullTeam=[]; renderBattleSelectRival(); });
+        document.getElementById('backRivalBtn')?.addEventListener('click',()=>renderBattleSelectUserTeam());
+        refreshRivalList();
+    }
+    function renderBattleChooseMons() {
+        let userTeam = appState.userTeams.find(t=>t.id===appState.battleSelectedUserTeamId);
+        if(!userTeam) return;
+        let teamPokemons = userTeam.pokemonIds.map(id=>appState.pokemonList.find(p=>p.id==id));
+        let pickCount = appState.battleFormat === 'single' ? 3 : 4;
+        let suggestion = bestBattlePicks(teamPokemons, appState.battleRivalFullTeam, pickCount);
+        let selectedIds = appState.battleUserPicks.length ? appState.battleUserPicks : suggestion;
+        let html = `<h3 class="text-2xl font-bold mb-4">${t('select_battle_mons').replace('{count}',pickCount)} (${selectedIds.length}/${pickCount})</h3>
+        <div class="flex gap-4 mb-4"><button id="applySuggestionBtn" class="bg-yellow-500 px-4 py-2 rounded-xl">✨ ${t('apply_suggestion')}</button><button id="resetPicksBtn" class="bg-gray-600 px-4 py-2 rounded-xl">Reset</button></div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4"><div><h4>${t('your_team')}</h4><div id="teamPickList" class="grid grid-cols-2 gap-2 mt-2"></div></div><div><h4>Selected for Battle</h4><div id="selectedPicksList" class="flex flex-wrap gap-2 mt-2"></div></div></div>
+        <div class="mt-6 flex gap-3"><button id="startBattleBtn" class="bg-green-600 px-5 py-2 rounded-xl">⚔️ ${t('start_battle')}</button><button id="backToRivalBtn" class="bg-gray-600 px-4 py-2 rounded-xl">${t('back')}</button></div>`;
+        document.getElementById('main-content').innerHTML = html;
+        function renderPickUI() {
+            let teamDiv = document.getElementById('teamPickList');
+            let selectedDiv = document.getElementById('selectedPicksList');
+            let userTeamObj = userTeam.pokemonIds.map(id=>appState.pokemonList.find(p=>p.id==id));
+            teamDiv.innerHTML = userTeamObj.map(p=>`<div class="bg-gray-700 p-2 rounded-xl text-center ${selectedIds.includes(p.id)?'opacity-50':''} selectable-pokemon" data-id="${p.id}"><img src="${p.image}" class="w-16 mx-auto"><div>${p.name}</div><button class="mt-1 text-xs ${selectedIds.includes(p.id)?'bg-red-600':'bg-green-600'} px-2 py-0.5 rounded">${selectedIds.includes(p.id)?t('remove'):t('add')}</button></div>`).join('');
+            selectedDiv.innerHTML = selectedIds.map(id=>{ let p=appState.pokemonList.find(p=>p.id==id); return `<div class="bg-gray-800 p-2 rounded-xl"><img src="${p.image}" class="w-12"><div class="text-xs">${p.name}</div><button class="removePick text-red-400" data-id="${id}">✖</button></div>`; }).join('');
+            document.querySelectorAll('.selectable-pokemon').forEach(el=>{ let id=parseInt(el.dataset.id); let btn=el.querySelector('button'); btn.addEventListener('click',()=>{ if(selectedIds.includes(id)) { let idx=selectedIds.indexOf(id); if(idx!==-1) selectedIds.splice(idx,1); } else { if(selectedIds.length < pickCount) selectedIds.push(id); else showInfo("Limit", `You can select only ${pickCount} Pokémon.`); } appState.battleUserPicks = selectedIds; renderBattleChooseMons(); }); });
+            document.querySelectorAll('.removePick').forEach(btn=>{ let id=parseInt(btn.dataset.id); btn.addEventListener('click',()=>{ let idx=selectedIds.indexOf(id); if(idx!==-1) selectedIds.splice(idx,1); appState.battleUserPicks = selectedIds; renderBattleChooseMons(); }); });
+        }
+        document.getElementById('applySuggestionBtn')?.addEventListener('click',()=>{ appState.battleUserPicks = suggestion; renderBattleChooseMons(); });
+        document.getElementById('resetPicksBtn')?.addEventListener('click',()=>{ appState.battleUserPicks = []; renderBattleChooseMons(); });
+        document.getElementById('startBattleBtn')?.addEventListener('click',()=>{ if(appState.battleUserPicks.length===pickCount){ renderBattleSimulation(); } else showInfo("Error", `Select exactly ${pickCount} Pokémon.`); });
+        document.getElementById('backToRivalBtn')?.addEventListener('click',()=>renderBattleSelectRival());
+        renderPickUI();
+    }
+    function renderBattleSimulation() {
+        let userActive = appState.battleUserPicks.slice(0, appState.battleFormat==='single'?1:2);
+        let rivalActive = appState.battleRivalFullTeam.slice(0, appState.battleFormat==='single'?1:2).map(p=>p.id);
+        appState.battleUserActive = userActive;
+        appState.battleRivalActive = rivalActive;
+        appState.battleInProgress = true;
+        refreshBattleUI();
+    }
+    function refreshBattleUI() {
+        let format = appState.battleFormat;
+        let userTeamObj = appState.battleUserPicks.map(id=>appState.pokemonList.find(p=>p.id==id));
+        let rivalTeamObj = appState.battleRivalFullTeam;
+        let availableUser = appState.battleUserPicks.filter(id=>!appState.battleKnockedOut.has(id));
+        let html = `<div class="flex flex-wrap gap-6"><div class="flex-1"><h3 class="text-xl font-bold mb-2">${t('your_team')}</h3><div class="grid grid-cols-2 gap-2">${userTeamObj.map(p=>`<div class="bg-gray-700 p-2 rounded-xl text-center ${appState.battleUserActive.includes(p.id)?'battle-active':''} ${appState.battleKnockedOut.has(p.id)?'knocked-out':''}"><img src="${p.image}" class="w-16 mx-auto"><div>${p.name}</div><button class="active-btn mt-1 text-xs bg-blue-600 px-2 rounded" data-id="${p.id}" ${appState.battleKnockedOut.has(p.id)?'disabled':''}>Set Active</button><button class="ko-btn mt-1 text-xs bg-red-600 px-2 rounded" data-id="${p.id}">${t('knock_out')}</button></div>`).join('')}</div></div>
+        <div class="flex-1"><h3 class="text-xl font-bold mb-2">${t('rival_pokemon')}</h3><div class="grid grid-cols-2 gap-2">${rivalTeamObj.map(p=>`<div class="bg-gray-700 p-2 rounded-xl text-center ${appState.battleRivalActive.includes(p.id)?'battle-active':''} ${appState.battleKnockedOut.has(p.id)?'knocked-out':''}"><img src="${p.image}" class="w-16 mx-auto"><div>${p.name}</div><button class="ko-rival-btn mt-1 text-xs bg-red-600 px-2 rounded" data-id="${p.id}">${t('knock_out')}</button></div>`).join('')}</div></div></div>
+        <div class="mt-6 bg-gray-700/50 p-4 rounded-2xl"><h4>⚡ ${t('switch_suggestion')}</h4><div id="suggestionBox"></div></div>
+        <div class="mt-4 flex gap-3"><button id="resetBattleBtn" class="bg-orange-600 px-5 py-2 rounded-xl">Restart Battle</button><button id="exitBattleBtn" class="bg-gray-600 px-5 py-2 rounded-xl">Exit Battle</button></div>`;
+        document.getElementById('main-content').innerHTML = html;
+        // Switch suggestion
+        let activeUserIds = appState.battleUserActive;
+        let activeRivalIds = appState.battleRivalActive;
+        let availableIds = appState.battleUserPicks.filter(id=>!appState.battleKnockedOut.has(id));
+        if(activeUserIds.length && activeRivalIds.length) {
+            let bestSwitch = null;
+            let bestScore = -1;
+            for(let activeId of activeUserIds) {
+                let suggestion = getSwitchSuggestionForActive(activeId, activeRivalIds, availableIds);
+                if(suggestion && suggestion.advantage > bestScore) { bestScore = suggestion.advantage; bestSwitch = suggestion; }
+            }
+            if(bestSwitch) document.getElementById('suggestionBox').innerHTML = `<p>🔄 Switch ${appState.pokemonList.find(p=>p.id==bestSwitch.fromId)?.name} → ${appState.pokemonList.find(p=>p.id==bestSwitch.toId)?.name} (Advantage: ${bestSwitch.advantage.toFixed(2)}x)</p><button id="applySwitchBtn" class="mt-2 bg-yellow-500 px-3 py-1 rounded">Apply Switch</button>`;
+            else document.getElementById('suggestionBox').innerHTML = `<p>No better switch available.</p>`;
+            document.getElementById('applySwitchBtn')?.addEventListener('click',()=>{ if(bestSwitch) { let idx = appState.battleUserActive.indexOf(bestSwitch.fromId); if(idx!==-1) appState.battleUserActive[idx] = bestSwitch.toId; refreshBattleUI(); } });
+        } else { document.getElementById('suggestionBox').innerHTML = `<p>Select active Pokémon to get advice.</p>`; }
+        document.querySelectorAll('.active-btn').forEach(btn=>{ let id=parseInt(btn.dataset.id); btn.addEventListener('click',()=>{ if(!appState.battleKnockedOut.has(id)) { if(format==='single') appState.battleUserActive = [id]; else { if(appState.battleUserActive.length<2 && !appState.battleUserActive.includes(id)) appState.battleUserActive.push(id); else if(appState.battleUserActive.includes(id)) appState.battleUserActive = appState.battleUserActive.filter(i=>i!==id); else showInfo("Invalid","Cannot add more than 2 active"); } refreshBattleUI(); } }); });
+        document.querySelectorAll('.ko-btn').forEach(btn=>{ let id=parseInt(btn.dataset.id); btn.addEventListener('click',()=>{ appState.battleKnockedOut.add(id); if(appState.battleUserActive.includes(id)) appState.battleUserActive = appState.battleUserActive.filter(i=>i!==id); refreshBattleUI(); }); });
+        document.querySelectorAll('.ko-rival-btn').forEach(btn=>{ let id=parseInt(btn.dataset.id); btn.addEventListener('click',()=>{ appState.battleKnockedOut.add(id); if(appState.battleRivalActive.includes(id)) appState.battleRivalActive = appState.battleRivalActive.filter(i=>i!==id); refreshBattleUI(); }); });
+        document.getElementById('resetBattleBtn')?.addEventListener('click',()=>{ appState.battleKnockedOut.clear(); renderBattleChooseMons(); });
+        document.getElementById('exitBattleBtn')?.addEventListener('click',()=>{ renderBattleMain(); });
+    }
+    function getSwitchSuggestionForActive(activeId, rivalIds, availableIds) {
+        let activeP = appState.pokemonList.find(p=>p.id==activeId);
+        let currentEff = getEffectiveness(activeP.types, rivalIds.map(id=>appState.pokemonList.find(p=>p.id==id)?.types).flat());
+        let best = null, bestEff = currentEff;
+        for(let pid of availableIds) { if(pid===activeId) continue;
+            let p = appState.pokemonList.find(p=>p.id==pid);
+            let eff = getEffectiveness(p.types, rivalIds.map(id=>appState.pokemonList.find(p=>p.id==id)?.types).flat());
+            if(eff > bestEff) { bestEff = eff; best = { fromId: activeId, toId: pid, advantage: eff }; }
+        } return best;
     }
 
-    function prepMatch() {
-        const t = teams[document.getElementById('battle-sel').value];
-        if(!t) return;
-        bTrio = t.pokes.map(p => ({...p, sel: false}));
-        renderPrep();
-    }
-
-    function renderPrep() {
-        document.getElementById('prep-grid').innerHTML = bTrio.map((p, i) => `<div class="poke-item ${p.sel?'active-sel':''}" onclick="bTrio[${i}].sel=!bTrio[${i}].sel; renderPrep();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
-    }
-
-    function startBattle() {
-        const s = bTrio.filter(x => x.sel);
-        if(s.length !== 3) return;
-        bTrio = s; document.getElementById('prep-area').style.display = 'none'; document.getElementById('active-battle').style.display = 'block'; renderArena();
-    }
-
-    function addE(n) { const p = ALL_DATA.find(x => x.name === n.toLowerCase()); if(p && bOpp.length<6) { bOpp.push(p); renderArena(); } document.getElementById('enemy-in').value = ""; }
-
-    function renderArena() {
-        document.getElementById('arena-my').innerHTML = bTrio.map((p, i) => `<div class="poke-item ${bMyIdx==i?'active-sel':''}" onclick="bMyIdx=${i}; renderArena();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
-        document.getElementById('arena-opp').innerHTML = bOpp.map((p, i) => `<div class="poke-item ${bOppIdx==i?'enemy-sel':''}" onclick="bOppIdx=${i}; renderArena();"><img src="${p.img}"><span class="name">${p.name}</span></div>`).join('');
-        document.getElementById('adv-msg').innerText = bOppIdx === null ? TXT[lang].adv : TXT[lang].keep;
-    }
-
-    function resetMatch() { bOpp = []; bMyIdx = null; bOppIdx = null; document.getElementById('prep-area').style.display = 'block'; document.getElementById('active-battle').style.display = 'none'; prepMatch(); }
-
-    function showTab(id, btn) {
-        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active'); 
-        btn.classList.add('active');
-    }
-
-    function save() { localStorage.setItem('p_cba_box', JSON.stringify(myBox)); localStorage.setItem('p_cba_teams', JSON.stringify(teams)); }
-
-    function setLang(l) {
-        lang = l; const t = TXT[l];
-        document.getElementById('t-box').innerText = t.box; document.getElementById('t-teams').innerText = t.teams; document.getElementById('t-battle').innerText = t.battle;
-        document.getElementById('ui-my').innerText = t.my; document.getElementById('ui-sel').innerText = t.sel; document.getElementById('ui-save').innerText = t.save;
-        document.getElementById('ui-pick3').innerText = t.pick3; document.getElementById('ui-start').innerText = t.start;
-    }
-
-    window.onload = init;
+    // Event listeners for tabs & language
+    document.querySelectorAll('.tab-btn').forEach(btn=> btn.addEventListener('click',(e)=>{ appState.currentTab = btn.dataset.tab; document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('tab-active')); btn.classList.add('tab-active'); renderCurrentTab(); }));
+    document.querySelectorAll('.lang-btn').forEach(btn=> btn.addEventListener('click',(e)=>{ appState.currentLanguage = btn.dataset.lang; renderCurrentTab(); }));
+    initApp();
 </script>
 </body>
 </html>
