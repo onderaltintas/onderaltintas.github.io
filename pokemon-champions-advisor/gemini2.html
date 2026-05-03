@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Champions Battle Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .active-tab { border-bottom: 3px solid #3b82f6; color: #3b82f6; }
+        .poke-card { transition: all 0.2s; cursor: pointer; border: 2px solid transparent; }
+        /* Modal Başlangıçta Kesinlikle Kapalı */
+        .modal-overlay { 
+            background-color: rgba(0,0,0,0.7); 
+            display: none !important; 
+            position: fixed; 
+            inset: 0; 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .modal-active { display: flex !important; }
+        .type-badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; color: white; text-transform: uppercase; font-weight: bold; }
+        /* Pokemon Tür Renkleri */
+        .type-fire { background-color: #F08030; } .type-water { background-color: #6890F0; }
+        .type-grass { background-color: #78C850; } .type-electric { background-color: #F8D030; }
+        .type-psychic { background-color: #F85888; } .type-ice { background-color: #98D8D8; }
+        .type-dragon { background-color: #7038F8; } .type-dark { background-color: #705848; }
+        .type-fairy { background-color: #EE99AC; } .type-normal { background-color: #A8A878; }
+        .type-fighting { background-color: #C03028; } .type-flying { background-color: #A890F0; }
+        .type-poison { background-color: #A040A0; } .type-ground { background-color: #E0C068; }
+        .type-rock { background-color: #B8A038; } .type-bug { background-color: #A8B820; }
+        .type-ghost { background-color: #705898; } .type-steel { background-color: #B8B8D0; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-10">
+
+    <header class="bg-white shadow-sm p-4 flex justify-between items-center sticky top-0 z-50 border-b">
+        <h1 class="text-lg font-black text-blue-600 italic tracking-tighter">PCBA</h1>
+        <div class="flex items-center gap-3">
+            <select id="lang-select" class="bg-gray-50 border border-gray-300 text-xs rounded-lg p-1" onchange="changeLanguage()">
+                <option value="tr">Türkçe</option>
+                <option value="en">English</option>
+            </select>
+            <button onclick="confirmReset()" class="text-red-500 hover:bg-red-50 p-2 rounded-full">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </header>
+
+    <nav class="bg-white border-b flex justify-around sticky top-[61px] z-40 shadow-sm">
+        <button onclick="switchTab('box')" id="tab-box" class="flex-1 py-3 text-xs font-bold active-tab">BOX</button>
+        <button onclick="switchTab('teams')" id="tab-teams" class="flex-1 py-3 text-xs font-bold">TEAMS</button>
+        <button onclick="switchTab('battle')" id="tab-battle" class="flex-1 py-3 text-xs font-bold">BATTLE</button>
+    </nav>
+
+    <main class="max-w-2xl mx-auto p-4">
+        <section id="area-box" class="space-y-4">
+            <div class="flex gap-2">
+                <input type="text" id="poke-search" oninput="filterList()" class="flex-1 p-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                <select id="filter-type" onchange="filterList()" class="p-2 border rounded-xl text-sm bg-white"></select>
+            </div>
+            <div id="loading" class="text-center py-10 text-gray-400 text-sm font-semibold">Loading PokéAPI...</div>
+            <div id="pokemon-list" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
+        </section>
+
+        <section id="area-teams" class="hidden space-y-4">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border space-y-4">
+                <div class="flex gap-2">
+                    <input type="text" id="team-name-input" class="flex-1 p-2 border rounded-xl text-sm">
+                    <button onclick="autoFillTeam()" class="bg-emerald-500 text-white px-3 py-2 rounded-xl text-xs font-bold" id="btn-auto">AUTO</button>
+                    <button onclick="saveTeam()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold" id="btn-save">SAVE</button>
+                </div>
+                <div class="p-3 bg-gray-50 rounded-xl">
+                    <p class="text-[10px] font-bold text-gray-400 mb-2 uppercase" id="lbl-box-pokes">Your Box:</p>
+                    <div id="team-selection-source" class="flex flex-wrap gap-2 min-h-[40px]"></div>
+                </div>
+                <div id="current-team-slots" class="grid grid-cols-6 gap-2"></div>
+            </div>
+            <div id="saved-teams" class="space-y-3 mt-6"></div>
+        </section>
+
+        <section id="area-battle" class="hidden space-y-4">
+            <div class="bg-blue-600 p-4 rounded-2xl text-white shadow-lg">
+                <div class="flex justify-center gap-6 mb-4">
+                    <label class="flex items-center gap-2 text-sm font-bold cursor-pointer">
+                        <input type="radio" name="bmode" value="3" checked onchange="resetBattle()"> SINGLE (3)
+                    </label>
+                    <label class="flex items-center gap-2 text-sm font-bold cursor-pointer">
+                        <input type="radio" name="bmode" value="4" onchange="resetBattle()"> DOUBLE (4)
+                    </label>
+                </div>
+                <select id="battle-team-select" class="w-full p-3 border-none rounded-xl text-gray-800 text-sm font-bold outline-none" onchange="initBattle()">
+                    <option value="" id="opt-select-team">Select Team</option>
+                </select>
+            </div>
+
+            <div id="battle-ui" class="hidden space-y-4">
+                <div class="bg-white p-4 rounded-2xl border shadow-sm">
+                    <h3 class="text-sm font-bold mb-3 flex items-center gap-2 text-red-500"><i data-lucide="target"></i> <span id="lbl-rival-team">Rival Team (6)</span></h3>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="rival-search" oninput="filterRival()" class="flex-1 p-2 border rounded-lg text-xs">
+                        <select id="rival-type" onchange="filterRival()" class="p-2 border rounded-lg text-xs"></select>
+                    </div>
+                    <div id="rival-source" class="flex overflow-x-auto gap-2 pb-2 mb-3 border-b"></div>
+                    <div id="rival-slots" class="grid grid-cols-6 gap-2 min-h-[60px]"></div>
+                    <button id="btn-lock" onclick="calculateBattleAdvantage()" class="w-full mt-4 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm tracking-wide">LOCK & ADVISE</button>
+                </div>
+
+                <div id="advisor-result" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-2xl">
+                    <div class="flex items-center gap-2 text-amber-800 font-bold text-sm mb-3">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> <span id="lbl-advise-title">Battle Strategy</span>
+                    </div>
+                    <div id="advisor-pokes" class="flex gap-3"></div>
+                    <p id="advisor-desc" class="text-xs text-amber-700 mt-3 italic"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modal" class="modal-overlay">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl mx-6">
+            <h3 id="m-title" class="text-lg font-bold mb-2"></h3>
+            <p id="m-body" class="text-gray-500 text-sm mb-6 leading-relaxed"></p>
+            <div id="m-footer" class="flex justify-end gap-3"></div>
+        </div>
+    </div>
+
+    <script>
+        // Veriler ve Global Değişkenler
+        const API = "https://pokeapi.co/api/v2";
+        const typeChart = {
+            fire: { grass: 2, ice: 2, bug: 2, steel: 2, fire: 0.5, water: 0.5, rock: 0.5, dragon: 0.5 },
+            water: { fire: 2, ground: 2, rock: 2, water: 0.5, grass: 0.5, dragon: 0.5 },
+            grass: { water: 2, ground: 2, rock: 2, fire: 0.5, grass: 0.5, poison: 0.5, flying: 0.5, bug: 0.5, dragon: 0.5, steel: 0.5 },
+            electric: { water: 2, flying: 2, electric: 0.5, grass: 0.5, dragon: 0.5, ground: 0 },
+            ice: { grass: 2, ground: 2, flying: 2, dragon: 2, fire: 0.5, water: 0.5, ice: 0.5, steel: 0.5 },
+            fighting: { normal: 2, ice: 2, rock: 2, dark: 2, steel: 2, poison: 0.5, flying: 0.5, psychic: 0.5, bug: 0.5, fairy: 0.5, ghost: 0 },
+            poison: { grass: 2, fairy: 2, poison: 0.5, ground: 0.5, rock: 0.5, ghost: 0.5, steel: 0 },
+            ground: { fire: 2, electric: 2, poison: 2, rock: 2, steel: 2, grass: 0.5, bug: 0.5, flying: 0 },
+            flying: { grass: 2, fighting: 2, bug: 2, electric: 0.5, rock: 0.5, steel: 0.5 },
+            psychic: { fighting: 2, poison: 2, psychic: 0.5, steel: 0.5, dark: 0 },
+            bug: { grass: 2, psychic: 2, dark: 2, fire: 0.5, fighting: 0.5, poison: 0.5, flying: 0.5, ghost: 0.5, steel: 0.5, fairy: 0.5 },
+            rock: { fire: 2, ice: 2, flying: 2, bug: 2, fighting: 0.5, ground: 0.5, steel: 0.5 },
+            ghost: { psychic: 2, ghost: 2, normal: 0, dark: 0.5 },
+            dragon: { dragon: 2, steel: 0.5, fairy: 0 },
+            dark: { psychic: 2, ghost: 2, fighting: 0.5, dark: 0.5, fairy: 0.5 },
+            steel: { ice: 2, rock: 2, fairy: 2, fire: 0.5, water: 0.5, electric: 0.5, steel: 0.5 },
+            fairy: { fighting: 2, dragon: 2, dark: 2, fire: 0.5, poison: 0.5, steel: 0.5 },
+            normal: { rock: 0.5, steel: 0.5, ghost: 0 }
+        };
+
+        const i18n = {
+            tr: {
+                box: "KUTU", teams: "TAKIMLAR", battle: "SAVAŞ",
+                search: "Pokemon ara...", select_type: "Tür Seç",
+                auto: "OTOMATİK", save: "KAYDET", box_pokes: "Kutundaki Pokemonlar:",
+                team_name: "Takım İsmi (Örn: T1)", select_team: "Takımını Seç",
+                rival_team: "Rakip Takım (6 Pokemon Seç)", lock: "KİLİTLE VE TAVSİYE AL",
+                advise_title: "Savaş Stratejisi & Öneri",
+                advise_desc: "Rakip dizilimine karşı en yüksek tip avantajına sahip Pokemonların yukarıdadır.",
+                confirm_reset: "Sıfırlama", confirm_reset_body: "Tüm verileriniz silinecek. Emin misiniz?",
+                btn_yes: "Evet", btn_no: "Hayır", err_6: "6 Pokemon seçmelisin!"
+            },
+            en: {
+                box: "BOX", teams: "TEAMS", battle: "BATTLE",
+                search: "Search pokemon...", select_type: "Select Type",
+                auto: "AUTO", save: "SAVE", box_pokes: "Your Box:",
+                team_name: "Team Name (e.g. T1)", select_team: "Select Team",
+                rival_team: "Rival Team (Select 6)", lock: "LOCK & ADVISE",
+                advise_title: "Battle Strategy & Advise",
+                advise_desc: "These Pokemon have the best type advantages against the rival's current lineup.",
+                confirm_reset: "Reset Data", confirm_reset_body: "All your data will be wiped. Are you sure?",
+                btn_yes: "Yes", btn_no: "No", err_6: "Must select 6 Pokemon!"
+            }
+        };
+
+        let pokedex = [], userBox = [], teams = [], activeTeam = [], rivals = [], lang = 'tr';
+
+        // Başlangıç Fonksiyonu
+        window.onload = async () => {
+            closeModal(); // Modalı kesinlikle kapat
+            lucide.createIcons();
+            loadStorage();
+            await initData();
+            changeLanguage();
+        };
+
+        async function initData() {
+            const cached = localStorage.getItem('pcba_data');
+            if (cached) {
+                pokedex = JSON.parse(cached);
+            } else {
+                const res = await fetch(`${API}/pokemon?limit=251`);
+                const data = await res.json();
+                pokedex = await Promise.all(data.results.map(async (p) => {
+                    const d = await fetch(p.url).then(r => r.json());
+                    return { id: d.id, name: d.name, img: d.sprites.front_default, types: d.types.map(t => t.type.name) };
+                }));
+                localStorage.setItem('pcba_data', JSON.stringify(pokedex));
+            }
+            document.getElementById('loading').style.display = 'none';
+            renderBox();
+            fillTypeSelects();
+        }
+
+        function loadStorage() {
+            userBox = JSON.parse(localStorage.getItem('pcba_box') || '[]');
+            teams = JSON.parse(localStorage.getItem('pcba_teams') || '[]');
+        }
+
+        function saveStorage() {
+            localStorage.setItem('pcba_box', JSON.stringify(userBox));
+            localStorage.setItem('pcba_teams', JSON.stringify(teams));
+        }
+
+        // Dil Değiştirme
+        function changeLanguage() {
+            lang = document.getElementById('lang-select').value;
+            const t = i18n[lang];
+            document.getElementById('tab-box').innerText = t.box;
+            document.getElementById('tab-teams').innerText = t.teams;
+            document.getElementById('tab-battle').innerText = t.battle;
+            document.getElementById('poke-search').placeholder = t.search;
+            document.getElementById('btn-auto').innerText = t.auto;
+            document.getElementById('btn-save').innerText = t.save;
+            document.getElementById('team-name-input').placeholder = t.team_name;
+            document.getElementById('opt-select-team').innerText = t.select_team;
+            document.getElementById('btn-lock').innerText = t.lock;
+            document.getElementById('lbl-box-pokes').innerText = t.box_pokes;
+            document.getElementById('lbl-rival-team').innerText = t.rival_team;
+            document.getElementById('lbl-advise-title').innerText = t.advise_title;
+            document.getElementById('advisor-desc').innerText = t.advise_desc;
+        }
+
+        // Tab Yönetimi
+        function switchTab(id) {
+            ['box', 'teams', 'battle'].forEach(k => {
+                document.getElementById(`area-${k}`).classList.toggle('hidden', k !== id);
+                document.getElementById(`tab-${k}`).classList.toggle('active-tab', k === id);
+            });
+            if (id === 'teams') renderTeamPanel();
+            if (id === 'battle') fillTeamSelect();
+        }
+
+        // Box & Team Panel Render
+        function renderBox() {
+            const container = document.getElementById('pokemon-list');
+            container.innerHTML = pokedex.map(p => `
+                <div onclick="toggleBox(${p.id})" class="poke-card bg-white p-2 rounded-2xl shadow-sm text-center ${userBox.includes(p.id) ? 'border-blue-500 bg-blue-50' : ''}">
+                    <img src="${p.img}" class="w-16 mx-auto">
+                    <p class="text-[10px] font-bold capitalize">${p.name}</p>
+                </div>
+            `).join('');
+        }
+
+        function toggleBox(id) {
+            const idx = userBox.indexOf(id);
+            if (idx > -1) userBox.splice(idx, 1); else userBox.push(id);
+            saveStorage(); renderBox();
+        }
+
+        function filterList() {
+            const q = document.getElementById('poke-search').value.toLowerCase();
+            const type = document.getElementById('filter-type').value;
+            const cards = document.querySelectorAll('#pokemon-list .poke-card');
+            pokedex.forEach((p, i) => {
+                const match = p.name.includes(q) && (!type || p.types.includes(type));
+                cards[i].style.display = match ? 'block' : 'none';
+            });
+        }
+
+        function renderTeamPanel() {
+            const source = document.getElementById('team-selection-source');
+            source.innerHTML = userBox.map(id => {
+                const p = pokedex.find(x => x.id === id);
+                return `<img src="${p.img}" onclick="toggleTeamActive(${id})" class="w-10 h-10 border rounded-lg cursor-pointer ${activeTeam.includes(id) ? 'bg-blue-100 border-blue-400' : 'bg-white'}">`;
+            }).join('');
+            renderTeamSlots();
+            renderSavedTeams();
+        }
+
+        function toggleTeamActive(id) {
+            const idx = activeTeam.indexOf(id);
+            if (idx > -1) activeTeam.splice(idx, 1);
+            else if (activeTeam.length < 6) activeTeam.push(id);
+            renderTeamPanel();
+        }
+
+        function renderTeamSlots() {
+            const container = document.getElementById('current-team-slots');
+            container.innerHTML = Array(6).fill(0).map((_, i) => {
+                const p = pokedex.find(x => x.id === activeTeam[i]);
+                return `<div class="aspect-square bg-gray-100 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center">${p ? `<img src="${p.img}">` : ''}</div>`;
+            }).join('');
+        }
+
+        function saveTeam() {
+            if (activeTeam.length < 6) {
+                showModal("Hata / Error", i18n[lang].err_6, [{ text: "Tamam", cls: "bg-blue-600 text-white", fn: closeModal }]);
+                return;
+            }
+            const name = document.getElementById('team-name-input').value || `T${teams.length + 1}`;
+            teams.push({ name, pokes: [...activeTeam] });
+            saveStorage(); activeTeam = [];
+            document.getElementById('team-name-input').value = "";
+            renderTeamPanel();
+        }
+
+        function renderSavedTeams() {
+            const container = document.getElementById('saved-teams');
+            container.innerHTML = teams.map((t, i) => `
+                <div class="bg-white p-3 rounded-2xl border flex justify-between items-center shadow-sm">
+                    <div>
+                        <p class="text-xs font-bold mb-2">${t.name}</p>
+                        <div class="flex gap-1">${t.pokes.map(pid => `<img src="${pokedex.find(x => x.id === pid).img}" class="w-8">`).join('')}</div>
+                    </div>
+                    <button onclick="deleteTeam(${i})" class="text-red-400 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function deleteTeam(i) { teams.splice(i, 1); saveStorage(); renderTeamPanel(); }
+
+        // SAVAŞ MANTIĞI
+        function fillTeamSelect() {
+            const s = document.getElementById('battle-team-select');
+            s.innerHTML = `<option value="">${i18n[lang].select_team}</option>` + teams.map((t, i) => `<option value="${i}">${t.name}</option>`).join('');
+        }
+
+        function initBattle() {
+            const idx = document.getElementById('battle-team-select').value;
+            if (idx === "") return document.getElementById('battle-ui').classList.add('hidden');
+            document.getElementById('battle-ui').classList.remove('hidden');
+            renderRivalSource();
+        }
+
+        function renderRivalSource() {
+            const container = document.getElementById('rival-source');
+            container.innerHTML = pokedex.map(p => `<img src="${p.img}" onclick="addRival(${p.id})" class="w-12 h-12 bg-gray-50 border rounded-xl cursor-pointer flex-shrink-0">`).join('');
+            renderRivalSlots();
+        }
+
+        function addRival(id) {
+            if (rivals.length < 6) rivals.push(id); renderRivalSlots();
+        }
+
+        function renderRivalSlots() {
+            const container = document.getElementById('rival-slots');
+            container.innerHTML = Array(6).fill(0).map((_, i) => {
+                const p = pokedex.find(x => x.id === rivals[i]);
+                return `<div onclick="rivals.splice(${i},1);renderRivalSlots();" class="aspect-square bg-gray-50 border rounded-xl flex items-center justify-center">${p ? `<img src="${p.img}">` : ''}</div>`;
+            }).join('');
+        }
+
+        function calculateBattleAdvantage() {
+            if (rivals.length < 6) {
+                showModal("Hata / Error", i18n[lang].err_6, [{ text: "Tamam", cls: "bg-blue-600 text-white", fn: closeModal }]);
+                return;
+            }
+            const teamIdx = document.getElementById('battle-team-select').value;
+            const myTeamIds = teams[teamIdx].pokes;
+            const battleCount = parseInt(document.querySelector('input[name="bmode"]:checked').value);
+
+            let scores = myTeamIds.map(myId => {
+                let p = pokedex.find(x => x.id === myId);
+                let score = 0;
+                rivals.forEach(rid => {
+                    let r = pokedex.find(x => x.id === rid);
+                    p.types.forEach(pt => {
+                        r.types.forEach(rt => {
+                            if (typeChart[pt] && typeChart[pt][rt]) score += typeChart[pt][rt];
+                            if (typeChart[rt] && typeChart[rt][pt]) score -= typeChart[rt][pt];
+                        });
+                    });
+                });
+                return { id: myId, score };
+            });
+
+            scores.sort((a, b) => b.score - a.score);
+            const advised = scores.slice(0, battleCount);
+
+            const container = document.getElementById('advisor-pokes');
+            container.innerHTML = advised.map(adv => {
+                const p = pokedex.find(x => x.id === adv.id);
+                return `<div class="text-center bg-white p-2 rounded-xl border-2 border-amber-300 shadow-sm">
+                    <img src="${p.img}" class="w-16">
+                    <p class="text-[10px] font-bold capitalize">${p.name}</p>
+                </div>`;
+            }).join('');
+            document.getElementById('advisor-result').classList.remove('hidden');
+        }
+
+        // MODAL YÖNETİMİ
+        function showModal(title, body, actions) {
+            const m = document.getElementById('modal');
+            document.getElementById('m-title').innerText = title;
+            document.getElementById('m-body').innerText = body;
+            const f = document.getElementById('m-footer'); f.innerHTML = '';
+            actions.forEach(a => {
+                const btn = document.createElement('button');
+                btn.className = `px-4 py-2 rounded-xl font-bold text-xs ${a.cls}`;
+                btn.innerText = a.text;
+                btn.onclick = () => { a.fn(); };
+                f.appendChild(btn);
+            });
+            m.classList.add('modal-active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('modal-active');
+        }
+
+        function confirmReset() {
+            showModal(i18n[lang].confirm_reset, i18n[lang].confirm_reset_body, [
+                { text: i18n[lang].btn_yes, cls: 'bg-red-500 text-white', fn: () => { localStorage.clear(); location.reload(); } },
+                { text: i18n[lang].btn_no, cls: 'bg-gray-100 text-gray-600', fn: closeModal }
+            ]);
+        }
+
+        function fillTypeSelects() {
+            const types = Object.keys(typeChart);
+            const html = `<option value="">${i18n[lang].select_type}</option>` + types.map(t => `<option value="${t}">${t.toUpperCase()}</option>`).join('');
+            document.getElementById('filter-type').innerHTML = html;
+            const rt = document.getElementById('rival-type');
+            if(rt) rt.innerHTML = html;
+        }
+
+        function resetBattle() { rivals = []; document.getElementById('advisor-result').classList.add('hidden'); renderRivalSlots(); }
+
+        function autoFillTeam() { if (userBox.length >= 6) { activeTeam = userBox.slice(0, 6); renderTeamPanel(); } }
+        
+        function filterRival() {
+            const q = document.getElementById('rival-search').value.toLowerCase();
+            const type = document.getElementById('rival-type').value;
+            const container = document.getElementById('rival-source');
+            container.innerHTML = pokedex
+                .filter(p => p.name.includes(q) && (!type || p.types.includes(type)))
+                .map(p => `<img src="${p.img}" onclick="addRival(${p.id})" class="w-12 h-12 bg-gray-50 border rounded-xl cursor-pointer flex-shrink-0">`)
+                .join('');
+        }
+    </script>
+</body>
+</html>
