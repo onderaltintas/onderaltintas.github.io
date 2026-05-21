@@ -2,14 +2,17 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>2026 Kira Vergisi Hesaplayıcı v1.5</title>
+    <title>2026 Kira Vergisi Hesaplayıcı v2.0</title>
     <style>
         body { font-family: sans-serif; max-width: 800px; margin: 20px auto; line-height: 1.6; color: #333; }
         .container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; background: #f9f9f9; }
         .input-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; }
-        input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
-        button { background: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .radio-group { display: flex; gap: 20px; margin-top: 5px; }
+        .radio-group label { display: inline; font-weight: normal; cursor: pointer; }
+        .radio-group input { width: auto; margin-right: 5px; }
+        button { background: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px; }
         button:hover { background: #0056b3; }
         .result { margin-top: 20px; padding: 15px; border-left: 5px solid #28a745; background: #e9f7ef; }
         .optimization { margin-top: 15px; padding: 15px; border-left: 5px solid #ffc107; background: #fffdf5; }
@@ -18,13 +21,15 @@
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
         .version { font-size: 12px; color: #888; text-align: right; }
+        .hidden { display: none; }
+        .nested-box { border: 1px dashed #bbb; padding: 15px; background: #f0f0f0; border-radius: 4px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Kira Vergisi Hesaplama (2026)</h2>
-    <p class="version">Versiyon: v1.5</p>
+    <h2>2026 Yılı Kira Vergisi Hesaplayıcı</h2>
+    <p class="version">Versiyon: v2.0</p>
     
     <div class="input-group">
         <label>Ev Sayısı:</label>
@@ -36,6 +41,48 @@
         <input type="number" id="aylikKira" value="4050">
     </div>
 
+    <div class="input-group">
+        <label>Konut İstisnası Uygulansın mı?</label>
+        <select id="istisnaUygula" onchange="GiderTuruKontrol()">
+            <option value="evet">Evet (58.000 TL İstisna Uygula)</option>
+            <option value="hayir">Hayır (İstisna Uygulama)</option>
+        </select>
+        <small style="color: #666;">* Birden fazla konuttan kira elde edilse bile istisna sadece tek bir kez uygulanabilir. Ticari işletmede kayıtlı olanlar veya başka gelirleri nedeniyle beyanname verenler istisnadan yararlanamayabilir.</small>
+    </div>
+
+    <div class="input-group">
+        <label>Gider Yöntemi:</label>
+        <div class="radio-group">
+            <label><input type="radio" name="giderTuru" value="goturu" checked onchange="GiderTuruKontrol()"> Götürü Gider (%15)</label>
+            <label><input type="radio" name="giderTuru" value="gercek" onchange="GiderTuruKontrol()"> Gerçek Gider</label>
+        </div>
+    </div>
+
+    <div id="gercekGiderAlani" class="input-group hidden nested-box">
+        <label style="border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;">Belgelendirilebilir Gerçek Giderler (Yıllık Toplam TL)</label>
+        
+        <div class="input-group">
+            <label style="font-weight: normal;">Amortismanlar (%2):</label>
+            <input type="number" id="giderAmortisman" value="0" min="0">
+        </div>
+        <div class="input-group">
+            <label style="font-weight: normal;">Kiraya Verilen Gayrimenkulün Borç Faizleri:</label>
+            <input type="number" id="giderFaiz" value="0" min="0">
+        </div>
+        <div class="input-group">
+            <label style="font-weight: normal;">Son 5 Yılda Alınan Konutun İktisap Bedeli (%5):</label>
+            <input type="number" id="giderIktisap" value="0" min="0">
+        </div>
+        <div class="input-group">
+            <label style="font-weight: normal;">Ödenen Aydınlatma, Isıtma, Su ve Asansör Giderleri:</label>
+            <input type="number" id="giderBakim" value="0" min="0">
+        </div>
+        <div class="input-group">
+            <label style="font-weight: normal;">Diğer Gerçek Giderler (Vergi, Resim, Harç, Sigorta vb.):</label>
+            <input type="number" id="giderDiger" value="0" min="0">
+        </div>
+    </div>
+
     <button onclick="hesapla()">Hesapla</button>
 
     <div id="sonucAlani" style="display:none;">
@@ -45,46 +92,38 @@
 </div>
 
 <script>
-const KONUT_ISTISNA = 47000; // 2025 gelirleri için (Mart 2026 beyan)
+const KONUT_ISTISNA_2026 = 58000; 
 const GOTURU_GIDER_ORANI = 0.15;
 const DAMGA_VERGISI = 1189.50;
 
-// Yıllık NET kazancı hesaplayan fonksiyon
-function netKazancHesapla(yillikBrut) {
-    if (yillikBrut <= KONUT_ISTISNA) {
-        return yillikBrut; // İstisna altı: Vergi yok, damga vergisi yok
-    }
+function GiderTuruKontrol() {
+    const giderTuru = document.querySelector('input[name="giderTuru"]:checked').value;
+    const gercekGiderAlani = document.getElementById('gercekGiderAlani');
     
-    let matrah = (yillikBrut - KONUT_ISTISNA) * (1 - GOTURU_GIDER_ORANI);
+    if (giderTuru === 'gercek') {
+        gercekGiderAlani.classList.remove('hidden');
+    } else {
+        gercekGiderAlani.classList.add('hidden');
+    }
+}
+
+function vergiHesapla(matrah) {
+    if (matrah <= 0) return 0;
     let vergi = 0;
 
-    // 2026 Beyan Dönemi Vergi Dilimleri
+    // 2026 Yılı Gelir Vergisi Tarifesi
     if (matrah <= 190000) {
         vergi = matrah * 0.15;
     } else if (matrah <= 400000) {
         vergi = 28500 + (matrah - 190000) * 0.20;
     } else if (matrah <= 1000000) {
         vergi = 70500 + (matrah - 400000) * 0.27;
-    } else {
+    } else if (matrah <= 5300000) {
         vergi = 232500 + (matrah - 1000000) * 0.35;
+    } else {
+        vergi = 1737500 + (matrah - 5300000) * 0.40;
     }
-
-    return yillikBrut - (vergi + DAMGA_VERGISI);
-}
-
-// Detaylı hesaplama fonksiyonu (Mevcut durum özeti için)
-function detayHesapla(yillikBrut) {
-    if (yillikBrut <= KONUT_ISTISNA) {
-        return { vergi: 0, damga: 0, net: yillikBrut };
-    }
-    let matrah = (yillikBrut - KONUT_ISTISNA) * (1 - GOTURU_GIDER_ORANI);
-    let vergi = 0;
-    if (matrah <= 190000) vergi = matrah * 0.15;
-    else if (matrah <= 400000) vergi = 28500 + (matrah - 190000) * 0.20;
-    else if (matrah <= 1000000) vergi = 70500 + (matrah - 400000) * 0.27;
-    else vergi = 232500 + (matrah - 1000000) * 0.35;
-    
-    return { vergi: vergi, damga: DAMGA_VERGISI, net: yillikBrut - (vergi + DAMGA_VERGISI) };
+    return vergi;
 }
 
 function format(num) {
@@ -92,56 +131,90 @@ function format(num) {
 }
 
 function hesapla() {
-    const evSayisi = parseInt(document.getElementById('evSayisi').value);
-    const aylikKira = parseFloat(document.getElementById('aylikKira').value);
-    
+    const evSayisi = parseInt(document.getElementById('evSayisi').value) || 0;
+    const aylikKira = parseFloat(document.getElementById('aylikKira').value) || 0;
+    const istisnaUygula = document.getElementById('istisnaUygula').value === 'evet';
+    const giderTuru = document.querySelector('input[name="giderTuru"]:checked').value;
+
     const yillikBrut = aylikKira * 12 * evSayisi;
-    const mevcut = detayHesapla(yillikBrut);
+    const istisnaTutari = istisnaUygula ? KONUT_ISTISNA_2026 : 0;
+
+    // İstisna sınır kontrolü
+    if (istisnaUygula && yillikBrut <= istisnaTutari) {
+        document.getElementById('sonucAlani').style.display = 'block';
+        document.getElementById('anaSonuc').innerHTML = `
+            <h3>Mevcut Durum Özeti (2026)</h3>
+            <p>Toplam brüt geliriniz (${format(yillikBrut)}), 2026 yılı konut istisna sınırının (${format(istisnaTutari)}) altında kaldığı için beyanname vermenize ve vergi ödemenize gerek yoktur.</p>
+        `;
+        document.getElementById('optimizasyonAlani').innerHTML = `<h3>Optimizasyon Notu</h3><p>Mevcut geliriniz istisna sınırının altındadır.</p>`;
+        return;
+    }
+
+    let matrah = yillikBrut - istisnaTutari;
+    let indirilebilirGider = 0;
+
+    if (giderTuru === 'goturu') {
+        indirilebilirGider = matrah * GOTURU_GIDER_ORANI;
+        matrah = matrah - indirilebilirGider;
+    } else {
+        // Gerçek Gider formülü: İstisnaya isabet eden giderler düşülemez.
+        let toplamGercekGider = 
+            (parseFloat(document.getElementById('giderAmortisman').value) || 0) +
+            (parseFloat(document.getElementById('giderFaiz').value) || 0) +
+            (parseFloat(document.getElementById('giderIktisap').value) || 0) +
+            (parseFloat(document.getElementById('giderBakim').value) || 0) +
+            (parseFloat(document.getElementById('giderDiger').value) || 0);
+
+        if (istisnaUygula) {
+            // İndirilebilecek Gider = Toplam Gider * (Toplam Hasılat - İstisna) / Toplam Hasılat
+            indirilebilirGider = toplamGercekGider * (yillikBrut - istisnaTutari) / yillikBrut;
+        } else {
+            indirilebilirGider = toplamGercekGider;
+        }
+        matrah = matrah - indirilebilirGider;
+    }
+
+    if (matrah < 0) matrah = 0;
+
+    const vergi = vergiHesapla(matrah);
+    const toplamVergiAndHarch = vergi + DAMGA_VERGISI;
+    const netKazanc = yillikBrut - toplamVergiAndHarch;
+    const vergiOrani = yillikBrut > 0 ? (toplamVergiAndHarch / yillikBrut) * 100 : 0;
 
     document.getElementById('sonucAlani').style.display = 'block';
     
     document.getElementById('anaSonuc').innerHTML = `
-        <h3>Mevcut Durum Özeti (v1.5)</h3>
+        <h3>Mevcut Durum Özeti (2026)</h3>
         <table>
-            <tr><td>Yıllık Brüt Kira:</td><td>${format(yillikBrut)}</td></tr>
-            <tr><td>Hesaplanan Gelir Vergisi:</td><td>${format(mevcut.vergi)}</td></tr>
-            <tr><td>Damga Vergisi:</td><td>${format(mevcut.damga)}</td></tr>
-            <tr><td><b>Yıllık Net Kazanç:</b></td><td><b>${format(mevcut.net)}</b></td></tr>
-            <tr><td><b>Aylık Net Kazanç:</b></td><td>${format(mevcut.net / 12)}</td></tr>
+            <tr><td>Yıllık Brüt Kira Geliri:</td><td>${format(yillikBrut)}</td></tr>
+            <tr><td>Konut İstisna Tutarı:</td><td>${format(istisnaTutari)}</td></tr>
+            <tr><td>İndirilebilecek Giderler Toplamı:</td><td>${format(indirilebilirGider)}</td></tr>
+            <tr><td>Vergiye Tabi Gelir (Matrah):</td><td>${format(matrah)}</td></tr>
+            <tr><td>Ödenecek Kira Gelir Vergisi:</td><td>${format(vergi)}</td></tr>
+            <tr><td>Ödenecek Damga Vergisi (2026):</td><td>${format(DAMGA_VERGISI)}</td></tr>
+            <tr><td><b>Ödenecek Vergiler Toplamı:</b></td><td><b>${format(toplamVergiAndHarch)}</b></td></tr>
+            <tr><td>Gerçekleşen Toplam Vergi Oranı:</td><td>%${vergiOrani.toFixed(2)}</td></tr>
+            <tr><td><b>Yıllık Net Kazanç:</b></td><td><b>${format(netKazanc)}</b></td></tr>
+            <tr><td><b>Aylık Ortalama Net Kazanç:</b></td><td>${format(netKazanc / 12)}</td></tr>
         </table>
     `;
 
-    // --- OPTİMİZASYON ANALİZİ ---
-    let enIyiNet = mevcut.net;
-    let idealKira = aylikKira;
-    let bulundu = false;
-    let idealBrut = 0;
-
-    // Mevcut kiranın altına bakıyoruz (50 TL adımlarla kontrol)
-    for (let testKira = aylikKira - 50; testKira > 0 && testKira > aylikKira - 10000; testKira -= 50) {
-        let testBrut = testKira * 12 * evSayisi;
-        let testNet = netKazancHesapla(testBrut);
-
-        if (testNet > enIyiNet) {
-            enIyiNet = testNet;
-            idealKira = testKira;
-            idealBrut = testBrut;
-            bulundu = true;
-        }
-    }
-
+    // Optimizasyon Analizi (Eğer istisna sınırı sınırındaysa veya iyileştirme imkanı varsa)
     const optDiv = document.getElementById('optimizasyonAlani');
-    if (bulundu) {
-        let fark = enIyiNet - mevcut.net;
-        optDiv.innerHTML = `
-            <h3>Kâr Optimizasyon Uyarısı!</h3>
-            <p>Kirayı <b>${format(idealKira)}</b> seviyesine düşürürseniz, toplam yıllık geliri <b>${format(idealBrut)}</b> yaparak istisna sınırının (47.000 TL) altına kalırsınız.</p>
-            <p>Bu durumda damga vergisi ve gelir vergisinden muaf olursunuz.</p>
-            <p><b>Yıllık Ekstra Kârınız:</b> ${format(fark)}<br>
-            <b>Yeni Yıllık Net Kazancınız:</b> ${format(enIyiNet)}</p>
-        `;
+    if (istisnaUygula && yillikBrut > istisnaTutari && yillikBrut < istisnaTutari + 20000) {
+        let idealKira = Math.floor(istisnaTutari / 12 / evSayisi);
+        let idealBrut = idealKira * 12 * evSayisi;
+        if (idealBrut <= istisnaTutari) {
+            optDiv.innerHTML = `
+                <h3>Kâr Optimizasyon Uyarısı!</h3>
+                <p>Yıllık brüt geliriniz istisna sınırına çok yakın. Eğer aylık kirayı <b>${format(idealKira)}</b> seviyesine revize ederseniz, yıllık toplam geliriniz <b>${format(idealBrut)}</b> olur ve istisna sınırının altında kalırsınız.</p>
+                <p>Bu durumda gelir vergisi ve damga vergisinden muaf olursunuz.</p>
+            `;
+        } else {
+            optDiv.innerHTML = `<h3>Optimizasyon Notu</h3><p>Mevcut kira seviyeniz, brüt gelire oranla en yüksek net kazancı sağlıyor.</p>`;
+        }
     } else {
-        optDiv.innerHTML = `<h3>Optimizasyon Notu</h3><p>Mevcut kira seviyeniz, brüt gelire oranla en yüksek net kazancı sağlıyor.</p>`;
+        optDiv.innerHTML = `<h3>Optimizasyon Notu</h3><p>Mevcut seçimlerinize ve gelir düzeyinize göre hesaplama yapılmıştır. Gider yöntemi değişikliği yaparak (Götürü/Gerçek) hangisinin daha avantajlı olduğunu tablodan kıyaslayabilirsiniz.</p>`;
     }
 }
 </script>
