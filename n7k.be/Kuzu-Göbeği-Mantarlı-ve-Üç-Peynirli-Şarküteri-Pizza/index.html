@@ -106,16 +106,6 @@
       color: var(--warm);
     }
 
-    .note {
-      margin-top: 30px;
-      background: #f3f3f3;
-      border-left: 4px solid var(--warm);
-      padding: 18px 22px;
-      border-radius: 14px;
-      font-size: 15px;
-      color: #333;
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -133,6 +123,7 @@
       font-size: 14px;
       color: var(--muted);
       margin-top: 40px;
+      line-height: 1.5;
     }
 
     @media (max-width: 900px) {
@@ -156,15 +147,25 @@
 
     <header>
       <div class="title">
-        <div class="tag">11 Haziran 2026 • Gurme • Yoğun Aromatik</div>
+        <div class="tag">12 Haziran 2026 • 2 Kişilik</div>
         <h1>Kuzu Göbeği Mantarlı ve<br>Üç Peynirli Şarküteri Pizza</h1>
         <p>
           Topraksı kuzu göbeği mantarının, şarküteri ürünleri ve karakteri güçlü üç farklı peynir kombinasyonuyla buluştuğu ev yapımı zengin bir pizza reçetesi.
         </p>
       </div>
 
-      <img src="gorselyok.png" alt="Kuzu Göbeği Mantarlı ve Üç Peynirli Şarküteri Pizza">
+      <img src="gorsel.png" alt="Kuzu Göbeği Mantarlı ve Üç Peynirli Şarküteri Pizza">
     </header>
+
+    <section>
+      <h2>Mutfak İpuçları & Püf Noktaları</h2>
+      <ul>
+        <li><strong>Tuz Dengesi:</strong> Kullanılacak peynirler ve şarküteriler yüksek oranda tuz içerdiği için sosa ekstra tuz eklenmemiştir; ancak damak tadına göre kontrollü şekilde ilave edilebilir.</li>
+        <li><strong>Ön Pişirme Avantajı:</strong> Tabanın peynir ve şarküteri yükü altında ıslanmasını önlemek için hamurun sosla birlikte önceden çıtırlaştırılması, restoran kalitesinde bir doku sağlar.</li>
+        <li><strong>Mantar Hazırlığı:</strong> Kuzu göbeği mantarlarını pizzaya eklemeden önce nemini almak ve aromasını yoğunlaştırmak adına kuru bir tavada çok kısa süre yüksek ateşte terletmek gerekir.</li>
+        <li><strong>Isı Yönetimi:</strong> Ev fırınlarında taş fırın etkisi yaratabilmek için tepsinin fırının en alt rafına yakın konumlandırılması taban çıtırlığını artırır.</li>
+      </ul>
+    </section>
 
     <section>
       <h2>Malzemeler</h2>
@@ -173,36 +174,38 @@
         <div>
           <h3>Pizza Hamuru</h3>
           <ul>
-            <li>2 bardak un</li>
-            <li>1.5 yemek kaşığı maya</li>
-            <li>2 çay kaşığı şeker</li>
+            <li>2 su bardağı un</li>
+            <li>1.5 yemek kaşığı kuru maya</li>
+            <li>1 adet kesme şeker</li>
+            <li>1 bardak ılık su</li>
+            <li>1.5 tatlı kaşığı şeker</li>
             <li>1 çay kaşığı tuz</li>
             <li>3 yemek kaşığı zeytinyağı</li>
-            <li>3/4 bardak su (ılık)</li>
+            <li>Yeterince su</li>
           </ul>
 
           <h3>Pizza Sosu</h3>
           <ul>
-            <li>1 adet domates (rendelenmiş)</li>
-            <li>2 yemek kaşığı domates salçası</li>
-            <li>Yarım soğan (çok ince yemeklik doğranmış veya rendelenmiş)</li>
-            <li>3 diş sarımsak (ezilmiş)</li>
-            <li>100 ml su (sos kıvamını açmak için)</li>
-            <li>1 yemek kaşığı zeytinyağı</li>
-            <li>Kara biber, reyhan, kekik</li>
+            <li>1 orta boy soğan</li>
+            <li>3 yemek kaşığı zeytinyağı</li>
+            <li>3 diş sarımsak</li>
+            <li>4 adet domates</li>
+            <li>1.5 yemek kaşığı salça</li>
+            <li>1 tutam kekik</li>
+            <li>1 tutam reyhan</li>
           </ul>
         </div>
 
         <div>
           <h3>Üst Malzemeler & Peynirler</h3>
           <ul>
-            <li>Gouda Peyniri (Rendelenmiş, taban için)</li>
-            <li>Eski Kaşar Peyniri (Rendelenmiş, taban için)</li>
-            <li>Rokfor Peyniri (Küp küp ufalanmış, üstü için)</li>
-            <li>Kuzu göbeği mantarı (Temizlenmiş, halka doğranmış)</li>
-            <li>Sucuk (İnce dilimlenmiş)</li>
-            <li>Pastırma (Dilimlenmiş)</li>
-            <li>Roka (Fırın çıkışı taze eklenecek)</li>
+            <li>Gouda Peyniri</li>
+            <li>Eski Kaşar Peyniri</li>
+            <li>Rokfor Peyniri</li>
+            <li>Kuzu göbeği mantarı</li>
+            <li>Sucuk</li>
+            <li>Pastırma</li>
+            <li>Roka</li>
           </ul>
         </div>
       </div>
@@ -211,43 +214,49 @@
     <section>
       <h2>Hazırlanış</h2>
 
-      <h3>1. Hamur ve Sos Ön Hazırlığı</h3>
+      <h3>1. Hamur</h3>
       <div class="step">
-        <span>1.</span> Ilık su, maya ve şekeri karıştırıp 5 dakika aktifleştirin. Un ve tuzu geniş bir kaba eleyin, ortasını açıp mayalı suyu ve zeytinyağını ekleyerek 10 dakika yoğurun. Üzerini kapatıp sıcak bir ortamda 45-60 dakika mayalandırın.
+        <span>1.</span> Mayanın kabarması için bir bardak elini yakmayacak sıcaklıkta suyun içine bir kesme şeker ve mayayı koyup unun ortasına oturtun.
       </div>
       <div class="step">
-        <span>2.</span> Sos tenceresine zeytinyağını alın. İnce doğranmış yarım soğan ve ezilmiş sarımsakları soteleyin. Salçayı kavurduktan sonra rendelenmiş domatesi, 100 ml suyu ve baharatları ekleyip kısık ateşte 5-10 dakika kaynatıp soğutun.
+        <span>2.</span> İki bardak unu yoğuracağınız kaba alın, unun içine de 1.5 tatlı kaşığı şeker, bir çay kaşığı tuz ve üç yemek kaşığı zeytinyağını koyun.
       </div>
       <div class="step">
-        <span>3.</span> Temizlenmiş kuzu göbeği mantarlarını, yüksek ateşte çok az zeytinyağı ile 2-3 dakika soteleyerek fazla suyunu uçurun.
-      </div>
-
-      <h3>2. Fırınlama ve Birleştirme</h3>
-      <div class="step">
-        <span>4.</span> Ev fırınını en yüksek dereceye (230°C - 250°C) ayarlayın ve pişirme yapacağınız fırın tepsisini de fırının içinde bırakarak iyice ısıtın.
-      </div>
-      <div class="step">
-        <span>5.</span> Mayalanan pizza hamurunu unlanmış tezgahta tepsi boyutunda açıp yağlı kağıt üzerine aktarın. Üzerine hazırladığınız pizza sosunu eşitçe yayın.
-      </div>
-      <div class="step">
-        <span>6.</span> Rendelenmiş Gouda ve Eski Kaşar peynirlerini harmanlayarak sosun üzerine taban olarak serpin.
-      </div>
-      <div class="step">
-        <span>7.</span> Peynir tabanının üzerine sucukları, pastırmaları ve mantarları dizin. Aralara ufalanmış Rokfor peyniri parçalarını serpiştirin.
-      </div>
-      <div class="step">
-        <span>8.</span> Pizzayı, ısınmış olan sıcak fırın tepsisinin üzerine yağlı kağıdıyla kaydırın. Kenarları kızarana kadar 12-15 dakika pişirin. Fırından çıkan pizzayı taze roka yapraklarıyla servis edin.
+        <span>3.</span> Bir müddet mayanın kabarmasını bekleyin. Maya kabarınca yumuşak hamur olana kadar yoğurun ve sonrada hamurun mayasını, kabarmasını bekleyin.
       </div>
 
-      <div class="note">
-        • Kuzu göbeği mantarları pizzaya çiğden konulmaz, mutlaka yüksek ateşte sotelenerek fazla suyu uçurulur.<br>
-        • Rokfor güçlü bir aromaya sahip olduğundan tabana yayılmamalı, üst malzemelerin arasına nokta atışı serpiştirilmelidir.<br>
-        • Fırın tepsisinin önceden ısıtılması, pizza hamurunun altının çiğ kalmasını önler ve çıtırlık katar.
+      <h3>2. Sos</h3>
+      <div class="step">
+        <span>4.</span> 1 orta boy soğan, 3 yemek kaşığı zeytinyağı, 3 diş sarımsak, 4 adet domates, 1.5 yemek kaşığı salça, bir tutam kekik ve bir tutam reyhanı birleştirerek sosu hazırlayın.
+      </div>
+
+      <h3>3. Pişirme & Birleştirme</h3>
+      <div class="step">
+        <span>5.</span> Mayalanan hamuru tepsiye düzgünce serin ve üzerine hazırladığınız yoğun domates sosunu eşit şekilde yayın.
+      </div>
+      <div class="step">
+        <span>6.</span> 220 derecede altlı üstlü turbo ayarındaki fırında, hamurun kenarları ve tabanı hafifçe çıtırlaşmaya başlayana kadar ön pişirme yapın.
+      </div>
+      <div class="step">
+        <span>7.</span> Tepsiyi fırından çıkararak taban kısmına rendelenmiş Gouda ve Eski Kaşar peynirini homojen bir şekilde serpiştirin.
+      </div>
+      <div class="step">
+        <span>8.</span> Peynir tabanının üzerine kuzu göbeği mantarı, sucuk ve pastırma dilimlerini dizip, ufaladığınız rokfor peyniri parçalarını aralara dengeli biçimde yerleştirerek tekrar fırına verin.
+      </div>
+      <div class="step">
+        <span>9.</span> Peynirler tamamen eriyip şarküteriler kızardığında pizzayı fırından alın, üzerine taze roka yaprakları ekleyerek servis edin.
       </div>
     </section>
 
     <section>
-      <h2>Kalori Tablosu (Öğün Toplamı)</h2>
+      <h2>Sağlık ve Gastronomi Değerlendirmesi</h2>
+      <p>
+        Bu reçete, geleneksel İtalyan çizgilerinden uzak, umami değeri ve besleyiciliği son derece yüksek gurme bir fırın pizzasıdır. Kuzu göbeği mantarının barındırdığı yüksek protein ve lif yapısı, sucuk ile pastırmanın etsi karakteriyle birleşerek güçlü bir protein profili oluşturur. Tabanı kaplayan Gouda ve Eski Kaşar kalsiyum oranını zirveye taşırken, aralara serpiştirilen rokfor peyniri ve sosun temelini oluşturan sarımsak-soğan ikilisi sindirimi destekleyici ve iştah açıcı bir gastronomi deneyimi sunar. Karbonhidrat, yağ ve yüksek protein istikrarı nedeniyle dengeli porsiyonlanması önerilen zengin bir öğündür.
+      </p>
+    </section>
+
+    <section>
+      <h2>Kalori Tablosu</h2>
       <table>
         <thead>
           <tr>
@@ -259,50 +268,38 @@
         <tbody>
           <tr>
             <td>Pizza Hamuru</td>
-            <td>2 Bardak Un, Yağ, Maya, Şeker</td>
-            <td>~950</td>
+            <td>2 Bardak Un, Zeytinyağı, Maya, Şekerler</td>
+            <td>~965</td>
           </tr>
           <tr>
             <td>Pizza Sosu</td>
-            <td>Domates, Salça, Yağ, Soğan, Sarımsak</td>
-            <td>~140</td>
-          </tr>
-          <tr>
-            <td>Peynir Karışımı</td>
-            <td>Gouda, Eski Kaşar, Rokfor Kombinasyonu</td>
-            <td>~680</td>
-          </tr>
-          <tr>
-            <td>Şarküteri Malzemeleri</td>
-            <td>Dilimlenmiş Sucuk ve Pastırma</td>
+            <td>4 Domates, 1.5 YK Salça, Soğan, Sarımsak, Yağ</td>
             <td>~310</td>
           </tr>
           <tr>
-            <td>Mantar ve Yeşillik</td>
-            <td>Kuzu Göbeği Mantarı, Roka</td>
-            <td>~35</td>
+            <td>Peynir Kombinasyonu</td>
+            <td>Gouda, Eski Kaşar ve Rokfor Peynirleri</td>
+            <td>~680</td>
+          </tr>
+          <tr>
+            <td>Şarküteri & Mantar</td>
+            <td>Sucuk, Pastırma, Kuzu Göbeği Mantarı, Roka</td>
+            <td>~345</td>
           </tr>
           <tr>
             <td><strong>TOPLAM</strong></td>
-            <td><strong>Tüm Pizza Geneli (Ortalama 2-3 Porsiyon)</strong></td>
-            <td><strong>~2115 kcal</strong></td>
+            <td><strong>2 Kişilik Tepsi Pizzası Toplamı</strong></td>
+            <td><strong>~2300 kcal</strong></td>
           </tr>
         </tbody>
       </table>
     </section>
 
-    <section>
-      <h2>Sağlık ve Gastronomi Değerlendirmesi</h2>
-      <p>
-        <strong>Gastronomik Analiz:</strong> Eski kaşar ve gouda pizzanın uzama ve taban dokusunu oluştururken; rokfor lokal lezzet patlamaları sağlar. Kuzu göbeğinin gözenekli yapısı şarküteri yağlarını emerek umami yoğunluğunu artırır.
-      </p>
-      <p>
-        <strong>Besinsel Analiz:</strong> Protein ve nitelikli yağlar açısından oldukça zengin, yüksek kalorili ve yoğun bir öğündür. Şarküteri ürünlerinin ve peynirlerin tuz oranı yüksek olduğundan pizza sosuna ekstra tuz eklemekten kaçınılmalıdır.
-      </p>
-    </section>
-
     <footer>
-      11.06.2026 - Zenginleştirilmiş Gurme Pizza Reçetesi.
+      12.06.2026<br>
+      <small style="color: var(--muted); font-size: 12px; display: block; margin-top: 5px;">
+        * Yapay zekanın uydurmasyon mantık hatalarıyla doldurduğu teorik reçete, mutfaktaki şef deneyimi ve pratik fırınlama teknikleriyle tamamen revize edilerek doğru forma kavuşturulmuştur.
+      </small>
     </footer>
 
   </div>
